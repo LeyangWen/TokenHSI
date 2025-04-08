@@ -155,7 +155,8 @@ class Humanoid(BaseTask):
 
         self._create_ground_plane()
         self._create_envs(self.num_envs, self.cfg["env"]['envSpacing'], int(np.sqrt(self.num_envs)))
-        self.camera_handles = self.get_camera_handels()
+        if self.headless and self.record_headless:
+            self.camera_handles = self.get_camera_handels()
         return
 
     def reset(self, env_ids=None):

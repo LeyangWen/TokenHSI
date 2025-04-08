@@ -1,14 +1,14 @@
 #!/bin/bash -l
-#SBATCH --job-name=TokenHSI-test
-#SBATCH --output=output_slurm/log.txt
-#SBATCH --error=output_slurm/error.txt
+#SBATCH --job-name=TokenHSI-train
+#SBATCH --output=output_slurm/train_log.txt
+#SBATCH --error=output_slurm/train_error.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=5:00
+#SBATCH --time=20:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -33,7 +33,10 @@ echo "=== PyTorch Version ==="
 python -c "import torch; print('Torch version:', torch.__version__)"
 python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
 
+echo "=== vulkaninfo ==="
+vulkaninfo | grep -i "version" | grep -i "vulkan" | head -n 1
 
+echo ""
 # module list
 
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
@@ -55,19 +58,14 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 
 # export MAX_JOBS=1
 
-> joint_states.csv
-
-# sh tokenhsi/scripts/single_task/carry_test.sh
 python ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/single_task/ckpt_carry.pth \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry1/ \
-    --test \
+    --num_envs 512 \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/train_exp/ \
     --headless \
-    --record_headless \
-    --num_envs 1
+    --record_headless
 
 
 

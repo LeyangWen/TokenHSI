@@ -433,11 +433,39 @@ Please note that it also relies on external libraries and datasets, each of whic
 - Make it ergo correct
   - Ergo loss
 
+### render
+- temp solution: output 3D pose and box location, draw locally in matplotlib
 
+- problem: person stuck after putting down box, then, jump to next motion/freeze some times
+  - maybe caused by tenser not being correctly retrieved
+- problem: when goal location is too low, 
+
+### Box size
+- `tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml` 
+  - `box-build-testSizes`, does not make a difference, seem to just be a list to replace into the `box-build-boxSize`
+  - `box-build-boxSize` & `randomSize: False`
+    - Tried 1x1x1, seem to be too big for actor, failed lift
+    - Training range is 0.4*0.5 - 0.4*1.5, so lets keep in that general range, use suggested size of 0.22 & 0.57 cube, works
+
+### Start/end location
+- Temp render global view
+
+- Default start location
+  - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
+  -  `def _build_box(self, env_id, env_ptr)`
+  -  `self._platform_asset = self.gym.create_box(self.sim, 0.4, 0.4, self._platform_height, asset_options)`
+
+- Default target location
+  - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
+  -  `self._tar_pos` in `def _reset_task(self, env_ids)`
+
+
+### Weight
+- There is a density parameter, which is defualt to 1000kg/m3
 
 ## Debug notes
 
-### 2025-04-03
+### 2025-04-03 System setup
 
 #### On Windows
 - issacgym dont support, can't import w. correct version error
@@ -595,4 +623,5 @@ Please note that it also relies on external libraries and datasets, each of whic
     - Tried VNC interactive sessions, same issue
 
 
--gpu render instead of cpu
+- gpu render instead of cpu for headless_render
+
