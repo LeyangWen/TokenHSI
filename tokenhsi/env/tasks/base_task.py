@@ -80,6 +80,7 @@ class BaseTask():
         self.last_rand_step = -1
 
         # create envs, sim and viewer
+        self.record_headless = cfg["args"].record_headless
         self.create_sim()
         self.gym.prepare_sim(self.sim)
 
@@ -89,7 +90,6 @@ class BaseTask():
 
         # save imgs
         from datetime import datetime as dt
-        self.record_headless = cfg["args"].record_headless
         self.save_video = False
         self.save_video_dir = os.path.join(cfg["args"].output_path, "imgs/{}/".format(dt.now().strftime("%Y-%m-%d_%H-%M-%S")))
         self.save_img_count = 0
@@ -216,7 +216,7 @@ class BaseTask():
             if not self.record_headless:  # no need to render
                 return
 
-            if self.device != 'cpu':  # todo: change, method mianly for CPU
+            if self.device != 'cpu':  # todo: change, method mianly for CPU, from graphics.py example
                 self.gym.fetch_results(self.sim, True)
                 self.gym.step_graphics(self.sim)
                 self.gym.render_all_camera_sensors(self.sim)
@@ -292,7 +292,8 @@ class BaseTask():
                                 normalized_depth_image.save("graphics_images/depth_env%d_cam%d_frame%d.jpg" % (i, j, self.save_img_count))
 
             else:  # GPU
-                pass
+                return
+                # todo: use example for interop_torch.py to write GPU export code
                 self.gym.fetch_results(self.sim, True)
 
                 # refresh state data in the tensor

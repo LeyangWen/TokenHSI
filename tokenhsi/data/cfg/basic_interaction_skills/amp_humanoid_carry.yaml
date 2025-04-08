@@ -46,8 +46,8 @@ env:
 
   box:
     build:
-      baseSize: [0.4, 0.4, 0.4] # unit: m
-      randomSize: True
+      baseSize: [0.57, 0.57, 0.57] #[0.4, 0.4, 0.4] # unit: m
+      randomSize: False #True
       randomModeEqualProportion: True
       scaleRangeX: [0.5, 1.5] # default range if randomModeEqualProportion: True
       scaleRangeY: [0.5, 1.5]
