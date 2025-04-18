@@ -90,7 +90,7 @@ env:
     dynamicFriction: 1.0
     restitution: 0.
     curriculum: False
-    mapLength: 20.
+    mapLength: 20.  # these parameters are only used in train, o.w. get overridden to 8,8,
     mapWidth: 20.
     numLevels: 5
     numTerrains: 20

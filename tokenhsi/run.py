@@ -40,6 +40,7 @@ from rl_games.torch_runner import Runner
 import numpy as np
 import copy
 import torch
+import wandb
 
 from learning import amp_agent
 from learning import amp_players
@@ -219,6 +220,9 @@ def main():
     cfg_train['params']['config']['train_dir'] = args.output_path
     
     vargs = vars(args)
+    args.cfg = cfg
+    args.cfg_train = cfg_train
+    wandb.init(project=args.wandb_project, name=args.wandb_name, config=args, sync_tensorboard=True)
 
     algo_observer = RLGPUAlgoObserver()
 
@@ -227,6 +231,7 @@ def main():
     runner.reset()
     runner.run(vargs)
 
+    wandb.finish()
     return
 
 if __name__ == '__main__':

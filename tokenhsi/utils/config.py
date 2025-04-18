@@ -39,6 +39,16 @@ import torch
 
 SIM_TIMESTEP = 1.0 / 60.0
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 def set_np_formatting():
     np.set_printoptions(edgeitems=30, infstr='inf',
                         linewidth=4000, nanstr='nan', precision=2,
@@ -93,6 +103,41 @@ def load_cfg(args):
 
     cfg["name"] = args.task
     cfg["headless"] = args.headless
+
+    # === Overrides for env.box.build ===
+    if args.box_w is not None:
+        # If only box_w is provided, assume cube
+        box_w = args.box_w
+        box_h = args.box_h if args.box_h is not None else box_w
+        box_l = args.box_l if args.box_l is not None else box_w
+        
+        # Set the box baseSize override
+        cfg["env"]["box"]["build"]["baseSize"] = [box_w, box_l, box_h]
+
+    if args.random_size is not None:
+        cfg["env"]["box"]["build"]["randomSize"] = args.random_size
+
+    if args.random_mode_equal_proportion is not None:
+        cfg["env"]["box"]["build"]["randomModeEqualProportion"] = args.random_mode_equal_proportion
+
+    if args.random_density is not None:
+        cfg["env"]["box"]["build"]["randomDensity"] = args.random_density
+
+    # === Overrides for env.eval ===
+    if args.num_experiments is not None:
+        cfg["env"]["eval"]["numExperiments"] = args.num_experiments
+
+    if args.construction_experiment is not None:
+        cfg["env"]["eval"]["constructionExperiment"] = args.construction_experiment
+
+    if args.start_positions is not None:
+        cfg["env"]["eval"]["start_positions"] = eval(args.start_positions)
+
+    if args.end_positions is not None:
+        cfg["env"]["eval"]["end_positions"] = eval(args.end_positions)
+
+    if args.density is not None:
+        cfg["env"]["eval"]["density"] = args.density
 
     # Set physics domain randomization
     if "task" in cfg:
@@ -290,8 +335,43 @@ def get_args(benchmark=False):
             "help": ""},
         {"name": "--record", "action": "store_true", "default": False,
             "help": ""},
+        
+        ##################### wen custom add
+        # Overrides for env.box.build
+        {"name": "--box_w", "type": float, "default": None,
+            "help": "Override width for env.box.build.baseSize."},
+        {"name": "--box_h", "type": float, "default": None,
+            "help": "Override height for env.box.build.baseSize. If not provided and --box_w is specified, assumes a cube."},
+        {"name": "--box_l", "type": float, "default": None,
+            "help": "Override length for env.box.build.baseSize. If not provided and --box_w is specified, assumes a cube."},
+
+        {"name": "--random_size", "type": str2bool, "default": None,
+            "help": "Override env.box.build.randomSize (e.g., --random_size True or --random_size False)"},
+        {"name": "--random_mode_equal_proportion", "type": str2bool, "default": None,
+            "help": "Override env.box.build.randomModeEqualProportion (e.g., --random_mode_equal_proportion True)"},
+        {"name": "--random_density", "type": str2bool, "default": None,
+            "help": "Override env.box.build.randomDensity (e.g., --random_density True or --random_density False)"},
+
+        # Overrides for env.eval
+        {"name": "--num_experiments", "type": int, "default": None,
+            "help": "Override env.eval.numExperiments"},
+        {"name": "--construction_experiment", "type": str2bool, "default": None,
+            "help": "Override env.eval.constructionExperiment (e.g., --construction_experiment True)"},
+        {"name": "--start_positions", "type": str, "default": None,
+            "help": "Override env.eval.start_positions. Provide a YAML-formatted list (e.g., '[[x1,y1,z1], [x2,y2,z2]]')"},
+        {"name": "--end_positions", "type": str, "default": None,
+            "help": "Override env.eval.end_positions. Provide a YAML-formatted list (e.g., '[[x1,y1,z1], [x2,y2,z2]]')"},
+        {"name": "--density", "type": float, "default": None,
+            "help": "Override env.eval.density"},
+
         {"name": "--record_headless", "action": "store_true", "default": False,
-            "help": "wen custom"},
+            "help": "output pose as a csv file, use in tests"},
+
+        {"name": "--wandb_project", "type": str, "default": "TokenHSI-Train"},
+        {"name": "--wandb_name", "type": str, "default": "test"},
+        {"name": "--notes", "type": str, "default": ""},
+
+
         
         ]
 
@@ -303,6 +383,9 @@ def get_args(benchmark=False):
                                   "help": "Number of timing reports"},
                               {"name": "--bench_file", "action": "store", "help": "Filename to store benchmark results"}]
 
+    
+
+    
     # parse arguments
     args = gymutil.parse_arguments(
         description="RL Policy",
