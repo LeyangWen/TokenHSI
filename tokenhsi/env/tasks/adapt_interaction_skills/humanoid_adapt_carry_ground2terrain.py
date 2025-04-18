@@ -77,6 +77,10 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._mode = cfg["env"]["mode"] # determine which set of objects to use (train or test)
         assert self._mode in ["train", "test"]
 
+        self._is_eval = cfg["args"].eval
+        self._is_test = cfg["args"].test
+        self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
+        self._box_density_value = cfg["env"]["box"]["build"].get("density", False)
         if cfg["args"].eval:
             self._mode = "test"
 
@@ -178,6 +182,8 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                          device_type=device_type,
                          device_id=device_id,
                          headless=headless)
+
+        # self._initial_dof_pos[:, 0:2] = self._dof_pos[:, 0:2] + 5  # temp fix
         
         self._skill = cfg["env"]["skill"]
         self._skill_init_prob = torch.tensor(cfg["env"]["skillInitProb"], device=self.device, dtype=torch.float) # probs for state init
@@ -230,6 +236,29 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             self._skill = cfg["env"]["eval"]["skill"]
             self._skill_init_prob = torch.tensor(cfg["env"]["eval"]["skillInitProb"], device=self.device, dtype=torch.float) # probs for state init
 
+
+        ###### Wen: Testing for construction experiments
+        print(f"[Info]: constructionExp = {self.constructionExp}")
+        print(f"[Info]: _is_eval = {self._is_eval}")
+        print(f"[Info]: _is_test = {self._is_test}")
+        if self.constructionExp and self._is_test:
+            print("#"*40, "Using construction experiment mode", "#"*40)
+            self._num_experiments = cfg["env"]["eval"].get("numExperiments", 1)
+            # Convert YAML lists into tensors for later indexing.
+            self._fixed_start_positions = torch.tensor(cfg["env"]["eval"]["start_positions"], device=self.device, dtype=torch.float32)
+            self._fixed_target_positions = torch.tensor(cfg["env"]["eval"]["end_positions"], device=self.device, dtype=torch.float32)
+
+            assert self._fixed_start_positions.shape[0] == self._fixed_target_positions.shape[0]
+            assert self._fixed_start_positions.shape[0] == self._num_experiments
+            self._box_counter = torch.zeros((self.num_envs,), device=self.device, dtype=torch.long)
+            self._target_counter = torch.zeros((self.num_envs,), device=self.device, dtype=torch.long)
+            print(f"[Info]: _num_experiments = {self._num_experiments}")
+            print(f"[Info]: _fixed_start_positions = {self._fixed_start_positions}")
+            print(f"[Info]: _fixed_target_positions = {self._fixed_target_positions}")
+            print(f"[Info]: _box_counter = {self._box_counter}")
+            print(f"[Info]: _target_counter = {self._target_counter}")
+            print(f"[Info]: _box_density_value = {self._box_density_value}")
+            print(f"[Info]: init done {'#'*40}")
         return
     
     def get_multi_task_info(self):
@@ -261,19 +290,11 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
     def init_square_height_points(self):
         # 4mx4m square
         y =  torch.tensor(np.linspace(-self.sensor_extent, self.sensor_extent, self.sensor_res), device=self.device, requires_grad=False)
-        x = torch.tensor(np.linspace(-self.sensor_extent, self.sensor_extent,
-                                     self.sensor_res),
-                         device=self.device,
-                         requires_grad=False)
-        grid_x, grid_y = torch.meshgrid(x, y)
+        x = torch.tensor(np.linspace(-self.sensor_extent, self.sensor_extent, self.sensor_res), device=self.device, requires_grad=False)
         grid_x, grid_y = torch.meshgrid(x, y)
 
         self.num_height_points = grid_x.numel()
-        points = torch.zeros(self.num_envs,
-                             self.num_height_points,
-                             3,
-                             device=self.device,
-                             requires_grad=False)
+        points = torch.zeros(self.num_envs, self.num_height_points, 3, device=self.device, requires_grad=False)
         points[:, :, 0] = grid_x.flatten()
         points[:, :, 1] = grid_y.flatten()
         return points
@@ -539,11 +560,20 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         # randomize mass
         self._box_density = torch.zeros((self.num_envs), dtype=torch.float32, device=self.device)
-        if self._build_random_density:
-            dist = torch.distributions.uniform.Uniform(torch.tensor([300.0], device=self.device), torch.tensor([800.0], device=self.device))
-            self._box_density = dist.sample((self.num_envs,))
+        if self._is_test and self.constructionExp:  # _box_density from the yaml file
+            if self._box_density_value:
+                assert self._build_random_density, "Please set build_random_density to True in the yaml file to put mass in observation"
+            else:
+                self._box_density_value = 100.0
+            self._box_density[:] = self._box_density_value
         else:
-            self._box_density[:] = 100.0
+            if self._build_random_density:
+                dist = torch.distributions.uniform.Uniform(torch.tensor([80.0], device=self.device), torch.tensor([800.0], device=self.device))
+                self._box_density = dist.sample((self.num_envs,))
+            else:
+                self._box_density[:] = 100.0
+
+
 
         self._box_size = torch.tensor(self._build_base_size, device=self.device).reshape(1, 3) * self._box_scale # (num_envs, 3)
 
@@ -795,7 +825,33 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         return
 
     def _reset_task(self, env_ids):
+        if self._is_test and self.constructionExp:  # wen: specify target location from yaml instead of random
+            ids = env_ids.to(dtype=torch.long)
+            
+            # Use the persistent experiment counter to index the fixed target positions.
+            # For each environment, the target for the next episode is given by:
+            target_indices = self._target_counter[ids] % self._num_experiments # repeat afterwards
+            
+            new_target_pos = self._fixed_target_positions[target_indices]
+            
+            # Check if the new target is too close to the humanoid or box.
+            min_dist = 1.0
+            target_overlap = torch.logical_or(
+                torch.sum((new_target_pos[..., :2] - self._humanoid_root_states[ids, :2]) ** 2, dim=-1) < min_dist,
+                torch.sum((new_target_pos[..., :2] - self._box_states[ids, :2]) ** 2, dim=-1) < min_dist
+            )
+            if torch.sum(target_overlap) > 0:
+                print(f"[Warning]: _reset_task: target xy overlap with humanoid or box, min_dist = {min_dist}, target_overlap = {target_overlap}")
+            
 
+            self._tar_pos[ids] = new_target_pos
+            self._tar_platform_pos[ids, 0:2] = new_target_pos[:, 0:2] # xy
+            self._tar_platform_pos[ids, -1] = new_target_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
+            print(f"[Info]: _target_counter = {self._target_counter[ids]}")
+            print(f"[Info]: _reset_task: target_pos = {self._tar_pos[ids]}")
+            print(f"[Info]: task reset {'#'*40}")
+            self._target_counter[ids] += 1 # increment the counter for the next episode
+            return
         # for skill is putDown, the target location of the box is from the reference box motion
         for sk_name in ["putDown"]:
             if self._reset_ref_env_ids.get(sk_name) is not None:
@@ -1279,7 +1335,38 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         return top_surface_z - box_size[:, 2] / 2
     
     def _reset_boxes(self, env_ids):
+        if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
+            ids = env_ids.to(dtype=torch.long)
+            # Use the same or a separate experiment counter as needed (here we assume the same)
+            start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
+            root_pos = self._fixed_start_positions[start_indices]
+            self._box_states[ids, 0:3] = root_pos
 
+            axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
+            # if self._reset_random_rot:
+            #     coeff = 1.0
+            # else:
+            coeff = 0.0 # lets just set to 0 for now
+            ang = torch.rand((len(ids),), device=self.device) * 2 * np.pi * coeff
+            root_rot = quat_from_angle_axis(ang, axis)
+
+            self._box_states[ids, 3:7] = root_rot
+            self._box_states[ids, 7:10] = 0.0
+            self._box_states[ids, 10:13] = 0.0
+
+
+            self._platform_pos[ids, 0:2] = root_pos[:, 0:2] # xy
+            self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
+
+            self._box_states[ids, 2] += 0.05 # add 0.05 to enable correct collision detection
+            
+
+            print(f"[Info]: _box_counter = {self._box_counter[ids]}")
+            print(f"[Info]: _reset_boxes: box_pos = {self._box_states[ids, 0:3]}")
+            print(f"[Info]: box reset {'#'*40}")
+            # Increment the counter here if you want start and target to rotate together.
+            self._box_counter[ids] += 1
+            return
         # for skill is pickUp, carryWith, putDown, the initial location of the box is from the reference box motion
         for sk_name in ["pickUp", "carryWith", "putDown"]:
             if self._reset_ref_env_ids.get(sk_name) is not None:
@@ -1429,6 +1516,8 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                 
                 if self._is_eval:
                     root_pos = self._initial_humanoid_root_states[curr_env_ids, 0:3]
+                    # print(f"[Info]: _reset_ref_state_init: root_pos[curr_env_ids, 0:3] = {root_pos[curr_env_ids, 0:3]}")
+                    # root_pos[curr_env_ids, 0:2] = root_pos[curr_env_ids, 0:2] + 8
                     root_rot = self._initial_humanoid_root_states[curr_env_ids, 3:7]
                     root_vel = self._initial_humanoid_root_states[curr_env_ids, 7:10]
                     root_ang_vel = self._initial_humanoid_root_states[curr_env_ids, 10:13]
@@ -1437,7 +1526,8 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                 
                 old_root_xyz = root_pos.clone()
 
-                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids)
+                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids) + 8
+                print(f"[Info]: _reset_ref_state_init: new_root_xy = {new_root_xy}")
 
                 root_pos[:, 0:2] = new_root_xy
 
@@ -1813,39 +1903,68 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf, contact_body_id
 
 class Terrain:
     def __init__(self, cfg, num_robots, device) -> None:
-
+        print(cfg)
         self.type = cfg["terrainType"]
         self.device = device
         if self.type in ["none", 'plane']:
             return
-        self.horizontal_scale = 0.1 # resolution 0.1
-        self.vertical_scale = 0.005
-        self.border_size = 50 # 乘scale后单位才是m
-        self.env_length = cfg["mapLength"] # 每个小env 每小块地形的长和宽 单位是m
-        self.env_width = cfg["mapWidth"]
-        self.proportions = [
-            np.sum(cfg["terrainProportions"][:i + 1])
-            for i in range(len(cfg["terrainProportions"]))
-        ]
+        if cfg["loadTerrain"]:
+            self.horizontal_scale = 0.1 # resolution 0.1
+            self.vertical_scale = 0.1
+            self.border_size = 5 # keep some edge in the scaned model
+            self.proportions = [
+                np.sum(cfg["terrainProportions"][:i + 1])
+                for i in range(len(cfg["terrainProportions"]))
+            ]
 
-        self.env_rows = cfg["numLevels"]
-        self.env_cols = cfg["numTerrains"]
-        self.num_maps = self.env_rows * self.env_cols # 一共100块地形
-        self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
+            self.env_rows = 1
+            self.env_cols = 1
+            self.num_maps = self.env_rows * self.env_cols # 一共100块地形
+            self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
+        else:
+        
+            self.horizontal_scale = 0.1 # resolution 0.1
+            self.vertical_scale = 0.005
+            self.border_size = 50 # 乘scale后单位才是m
+            self.env_length = cfg["mapLength"] # 每个小env 每小块地形的长和宽 单位是m
+            self.env_width = cfg["mapWidth"]
+            self.proportions = [
+                np.sum(cfg["terrainProportions"][:i + 1])
+                for i in range(len(cfg["terrainProportions"]))
+            ]
 
-        self.width_per_env_pixels = int(self.env_width / self.horizontal_scale) # 每个小env的宽度的单位是0.1m，宽8m，所以有80个pixels
-        self.length_per_env_pixels = int(self.env_length /
-                                         self.horizontal_scale)
+            self.env_rows = cfg["numLevels"]
+            self.env_cols = cfg["numTerrains"]
+            self.num_maps = self.env_rows * self.env_cols # 一共100块地形
+            self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
 
-        self.border = int(self.border_size / self.horizontal_scale)
-        self.tot_cols = int(
-            self.env_cols * self.width_per_env_pixels) + 2 * self.border
-        self.tot_rows = int(
-            self.env_rows * self.length_per_env_pixels) + 2 * self.border
+            self.width_per_env_pixels = int(self.env_width / self.horizontal_scale) # 每个小env的宽度的单位是0.1m，宽8m，所以有80个pixels
+            self.length_per_env_pixels = int(self.env_length /
+                                            self.horizontal_scale)
 
-        self.height_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
-        self.walkable_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
-        if cfg["curriculum"]:
+            self.border = int(self.border_size / self.horizontal_scale)
+            self.tot_cols = int(
+                self.env_cols * self.width_per_env_pixels) + 2 * self.border
+            self.tot_rows = int(
+                self.env_rows * self.length_per_env_pixels) + 2 * self.border
+            
+            # print("terrain type: ", self.type)
+            # print("env_columns: ", self.env_cols)
+            # print("env_rows: ", self.env_rows)
+            # print("env_length: ", self.env_length)
+            # print("env_width: ", self.env_width)
+            # print("width_per_env_pixels: ", self.width_per_env_pixels)
+            # print("length_per_env_pixels: ", self.length_per_env_pixels)
+            # print("border: ", self.border)
+            # print("tot_cols: ", self.tot_cols)
+            # print("tot_rows: ", self.tot_rows)
+            # print(cfg)
+
+            self.height_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
+            self.walkable_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
+        if cfg["loadTerrain"]:
+            self.load_terrain(cfg)
+        elif cfg["curriculum"]:
             self.curiculum(num_robots,
                            num_terrains=self.env_cols,
                            num_levels=self.env_rows)
@@ -1854,22 +1973,60 @@ class Terrain:
         self.heightsamples = torch.from_numpy(self.height_field_raw).to(self.device) # ZL: raw height field, first dimension is x, second is y
         self.walkable_field = torch.from_numpy(self.walkable_field_raw).to(self.device)
         self.vertices, self.triangles = convert_heightfield_to_trimesh(self.height_field_raw, self.horizontal_scale, self.vertical_scale, cfg["slopeTreshold"])
+        
+        # with open("height_field_raw.npy", "wb") as f:
+        #     np.save(f, self.height_field_raw)
+        # with open("walkable_field_raw.npy", "wb") as f:
+        #     np.save(f, self.walkable_field_raw)
+        # print("terrain type: ", self.type)
+        # print("height field raw shape: ", self.height_field_raw.shape)
+        # print("walkable field raw shape: ", self.walkable_field_raw.shape)
+        # print("height field example: ", self.height_field_raw[700:710, 700:710])
+        # print("walkable field example: ", self.walkable_field_raw[700:710, 700:710])
+        # print("sum of walkable field: ", self.walkable_field.sum())
+
+        # print("walkable field shape: ", self.walkable_field.shape)
+        # print("vertices shape: ", self.vertices.shape)
+        # print("triangles shape: ", self.triangles.shape)
+      
+
         self.sample_extent_x = int((self.tot_rows - self.border * 2) * self.horizontal_scale)
         self.sample_extent_y = int((self.tot_cols - self.border * 2) * self.horizontal_scale)
 
-        coord_x, coord_y = torch.where(self.walkable_field == 0)
+        coord_x, coord_y = torch.where(self.walkable_field == 0)  # each 1400x2600=3640k long
         coord_x_scale = coord_x * self.horizontal_scale # 转换为真实尺度
         coord_y_scale = coord_y * self.horizontal_scale
         walkable_subset = torch.logical_and(
                 torch.logical_and(coord_y_scale < coord_y_scale.max() - self.border * self.horizontal_scale, coord_x_scale < coord_x_scale.max() - self.border * self.horizontal_scale),
                 torch.logical_and(coord_y_scale > coord_y_scale.min() + self.border * self.horizontal_scale, coord_x_scale > coord_x_scale.min() +  self.border * self.horizontal_scale)
             )
+        # print("coord_x", coord_x)
+        # print("coord_y", coord_y)
+        # print("coord_x shape: ", coord_x.shape)
+        # print("coord_y shape: ", coord_y.shape)
+        # print("walkable subset shape: ", walkable_subset.shape)
+        # print("walkable subset example: ", walkable_subset[0:10])
+
+        
         # import ipdb; ipdb.set_trace()
         # joblib.dump(self.walkable_field_raw, "walkable_field.pkl")
 
         self.coord_x_scale = coord_x_scale[walkable_subset]
         self.coord_y_scale = coord_y_scale[walkable_subset]
         self.num_samples = self.coord_x_scale.shape[0]
+        # print()
+        # print("sample extent sample_extent_x: ", self.sample_extent_x)
+        # print("sample extent sample_extent_y: ", self.sample_extent_y)
+        # print("walkable subset num_samples: ", self.num_samples)
+        # print("walkable subset coord_x_scale: ", self.coord_x_scale)
+        # print("walkable subset coord_y_scale: ", self.coord_y_scale)
+        # print("walkable subset x min: ", self.coord_x_scale.min())
+        # print("walkable subset x max: ", self.coord_x_scale.max())
+        # print("walkable subset y min: ", self.coord_y_scale.min())
+        # print("walkable subset y max: ", self.coord_y_scale.max())
+        # print("walkable subset shape: ", self.coord_x_scale.shape)
+        # print("walkable subset shape: ", self.coord_y_scale.shape)
+        # raise NotImplementedError("break")
 
     def sample_valid_locations(self, max_num_envs, env_ids):
         
@@ -2064,3 +2221,42 @@ class Terrain:
                 ]
 
         self.walkable_field_raw = ndimage.binary_dilation(self.walkable_field_raw, iterations=3).astype(int)
+
+    def load_terrain(self, cfg):
+
+        self.height_field_raw = np.load(cfg["heightFieldPath"])
+        self.walkable_field_raw = np.load(cfg["walkableFieldPath"])
+        self.walkable_field_raw = ndimage.binary_dilation(self.walkable_field_raw, iterations=3).astype(int)
+        
+        self.width_per_env_pixels = self.height_field_raw.shape[0]
+        self.length_per_env_pixels = self.height_field_raw.shape[1]
+        self.env_length = self.height_field_raw.shape[0] * self.horizontal_scale
+        self.env_width = self.height_field_raw.shape[1] * self.horizontal_scale
+
+
+        self.border = int(self.border_size / self.horizontal_scale)
+        self.tot_cols = int(self.env_cols * self.width_per_env_pixels) + 2 * self.border
+        self.tot_rows = int(self.env_rows * self.length_per_env_pixels) + 2 * self.border
+        env_origin_x = (0 + 0.5) * self.env_length
+        env_origin_y = (0 + 0.5) * self.env_width
+        x1 = int((self.env_length / 2. - 1) / self.horizontal_scale)
+        x2 = int((self.env_length / 2. + 1) / self.horizontal_scale)
+        y1 = int((self.env_width / 2. - 1) / self.horizontal_scale)
+        y2 = int((self.env_width / 2. + 1) / self.horizontal_scale)
+        env_origin_z = np.max(self.height_field_raw[x1:x2,y1:y2]) * self.vertical_scale
+        self.env_origins[0, 0] = [env_origin_x, env_origin_y, env_origin_z]
+
+        
+
+        # pad out boarder
+        self.height_field_raw = np.pad(self.height_field_raw,
+                                       ((self.border, self.border),
+                                        (self.border, self.border)),
+                                       mode='constant',
+                                        constant_values=-2)
+        self.walkable_field_raw = np.pad(self.walkable_field_raw,
+                                        ((self.border, self.border),
+                                            (self.border, self.border)),
+                                            mode='constant',
+                                            constant_values=0)
+

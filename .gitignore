@@ -7,6 +7,10 @@ output_slurm/
 # C extensions
 *.so
 
+wandb/
+*_field_raw
+
+
 # Distribution / packaging
 .Python
 build/

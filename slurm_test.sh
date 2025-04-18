@@ -34,48 +34,55 @@ python -c "import torch; print('Torch version:', torch.__version__)"
 python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
 
 
-# module list
-
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64:$LD_LIBRARY_PATH"
-
-# > output_slurm/mem_usage.log # truncate the file
-# while true; do
-#     free -h >> output_slurm/mem_usage.log
-#     sleep 60
-# done &
-# monitor_pid=$!
-
-# > output_slurm/gpu_usage.log  # truncate or create a fresh log file
-# while true; do
-#     nvidia-smi --query-gpu=memory.total,memory.used,memory.free --format=csv >> output_slurm/gpu_usage.log
-#     sleep 60
-# done &
-# gpu_monitor_pid=$!
 
 # export MAX_JOBS=1
 
 > joint_states.csv
 
-# sh tokenhsi/scripts/single_task/carry_test.sh
-python ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml \
+# # sh tokenhsi/scripts/single_task/carry_test.sh
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+#     --checkpoint output/single_task/ckpt_carry.pth \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry1/ \
+#     --test \
+#     --headless \
+#     --record_headless \
+#     --num_envs 1
+
+
+# sh tokenhsi/scripts/tokenhsi/stage2_terrain_carry_test.sh
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/single_task/ckpt_carry.pth \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry1/ \
+    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry_terrain1/ \
     --test \
     --headless \
     --record_headless \
-    --num_envs 1
-
-
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "CarryTerrain_test" \
+    --notes "rand loc, test carry" \
 
 # python lpanlib/others/video.py --imgs_dir output/imgs/example_path --delete_imgs
 
-
-
-
-
-# kill $monitor_pid
-# kill $gpu_monitor_pid
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/train_exp_1/Humanoid_09-00-42-07/nn/Humanoid.pth \
+#     --box_w 1.0 \
+    # --box_h 1.5 \
+    # --box_l 2.0 \
+    # --random_size False \
+    # --random_mode_equal_proportion True \
+    # --scale_sample_interval 0.1 \
+    # --random_density False \
+    # --num_experiments 5 \
+    # --construction_experiment False \
+    # --start_positions "[[-3.0, -3.0, 1.0], [3.0, -3.0, 0.8]]" \
+    # --end_positions "[[0.0, 0.0, 0.5], [0.0, 0.0, 0.75]]" \
+    # --density 120.0 \

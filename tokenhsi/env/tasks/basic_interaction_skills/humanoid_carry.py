@@ -63,6 +63,10 @@ class HumanoidCarry(Humanoid):
         self._mode = cfg["env"]["mode"] # determine which set of objects to use (train or test)
         assert self._mode in ["train", "test"]
 
+        self._is_eval = cfg["args"].eval
+        self._is_test = cfg["args"].test
+        self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
+        self._box_density_value = cfg["env"]["box"]["build"].get("density", False)
         if cfg["args"].eval:
             self._mode = "test"
 
@@ -152,7 +156,6 @@ class HumanoidCarry(Humanoid):
         self._kinematic_humanoid_rigid_body_states = torch.zeros((self.num_envs, self.num_bodies, 13), device=self.device, dtype=torch.float)
 
         ###### evaluation!!!
-        self._is_eval = cfg["args"].eval
         if self._is_eval:
 
             self._success_buf = torch.zeros((self.num_envs), device=self.device, dtype=torch.long)
@@ -162,6 +165,32 @@ class HumanoidCarry(Humanoid):
 
             self._skill = cfg["env"]["eval"]["skill"]
             self._skill_init_prob = torch.tensor(cfg["env"]["eval"]["skillInitProb"], device=self.device, dtype=torch.float) # probs for state init
+        
+
+        ###### Wen: Testing for construction experiments
+        print(f"[Info]: constructionExp = {self.constructionExp}")
+        print(f"[Info]: _is_eval = {self._is_eval}")
+        print(f"[Info]: _is_test = {self._is_test}")
+        if self.constructionExp and self._is_test:
+            print("#"*40, "Using construction experiment mode", "#"*40)
+            self._num_experiments = cfg["env"]["eval"].get("numExperiments", 1)
+            # Convert YAML lists into tensors for later indexing.
+            self._fixed_start_positions = torch.tensor(cfg["env"]["eval"]["start_positions"], device=self.device, dtype=torch.float32)
+            self._fixed_target_positions = torch.tensor(cfg["env"]["eval"]["end_positions"], device=self.device, dtype=torch.float32)
+
+            assert self._fixed_start_positions.shape[0] == self._fixed_target_positions.shape[0]
+            assert self._fixed_start_positions.shape[0] == self._num_experiments
+            self._box_counter = torch.zeros((self.num_envs,), device=self.device, dtype=torch.long)
+            self._target_counter = torch.zeros((self.num_envs,), device=self.device, dtype=torch.long)
+            print(f"[Info]: _num_experiments = {self._num_experiments}")
+            print(f"[Info]: _fixed_start_positions = {self._fixed_start_positions}")
+            print(f"[Info]: _fixed_target_positions = {self._fixed_target_positions}")
+            print(f"[Info]: _box_counter = {self._box_counter}")
+            print(f"[Info]: _target_counter = {self._target_counter}")
+            print(f"[Info]: _box_density_value = {self._box_density_value}")
+            print(f"[Info]: init done {'#'*40}")
+
+
 
         return
     
@@ -270,11 +299,20 @@ class HumanoidCarry(Humanoid):
 
         # randomize mass
         self._box_density = torch.zeros((self.num_envs), dtype=torch.float32, device=self.device)
-        if self._build_random_density:
-            dist = torch.distributions.uniform.Uniform(torch.tensor([300.0], device=self.device), torch.tensor([800.0], device=self.device))
-            self._box_density = dist.sample((self.num_envs,))
+        if self._is_test and self.constructionExp:  # _box_density from the yaml file
+            if self._box_density_value:
+                assert self._build_random_density, "Please set build_random_density to True in the yaml file to put mass in observation"
+            else:
+                self._box_density_value = 100.0
+            self._box_density[:] = self._box_density_value
         else:
-            self._box_density[:] = 100.0
+            if self._build_random_density:
+                dist = torch.distributions.uniform.Uniform(torch.tensor([80.0], device=self.device), torch.tensor([800.0], device=self.device))
+                self._box_density = dist.sample((self.num_envs,))
+            else:
+                self._box_density[:] = 100.0
+
+
 
         self._box_size = torch.tensor(self._build_base_size, device=self.device).reshape(1, 3) * self._box_scale # (num_envs, 3)
 
@@ -433,7 +471,33 @@ class HumanoidCarry(Humanoid):
         return
 
     def _reset_task(self, env_ids):
+        if self._is_test and self.constructionExp:  # wen: specify target location from yaml instead of random
+            ids = env_ids.to(dtype=torch.long)
+            
+            # Use the persistent experiment counter to index the fixed target positions.
+            # For each environment, the target for the next episode is given by:
+            target_indices = self._target_counter[ids] % self._num_experiments # repeat afterwards
+            
+            new_target_pos = self._fixed_target_positions[target_indices]
+            
+            # Check if the new target is too close to the humanoid or box.
+            min_dist = 1.0
+            target_overlap = torch.logical_or(
+                torch.sum((new_target_pos[..., :2] - self._humanoid_root_states[ids, :2]) ** 2, dim=-1) < min_dist,
+                torch.sum((new_target_pos[..., :2] - self._box_states[ids, :2]) ** 2, dim=-1) < min_dist
+            )
+            if torch.sum(target_overlap) > 0:
+                print(f"[Warning]: _reset_task: target xy overlap with humanoid or box, min_dist = {min_dist}, target_overlap = {target_overlap}")
+            
 
+            self._tar_pos[ids] = new_target_pos
+            self._tar_platform_pos[ids, 0:2] = new_target_pos[:, 0:2] # xy
+            self._tar_platform_pos[ids, -1] = new_target_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
+            print(f"[Info]: _target_counter = {self._target_counter[ids]}")
+            print(f"[Info]: _reset_task: target_pos = {self._tar_pos[ids]}")
+            print(f"[Info]: task reset {'#'*40}")
+            self._target_counter[ids] += 1 # increment the counter for the next episode
+            return
         # for skill is putDown, the target location of the box is from the reference box motion
         for sk_name in ["putDown"]:
             if self._reset_ref_env_ids.get(sk_name) is not None:
@@ -721,7 +785,38 @@ class HumanoidCarry(Humanoid):
         return
     
     def _reset_boxes(self, env_ids):
+        if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
+            ids = env_ids.to(dtype=torch.long)
+            # Use the same or a separate experiment counter as needed (here we assume the same)
+            start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
+            root_pos = self._fixed_start_positions[start_indices]
+            self._box_states[ids, 0:3] = root_pos
 
+            axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
+            # if self._reset_random_rot:
+            #     coeff = 1.0
+            # else:
+            coeff = 0.0 # lets just set to 0 for now
+            ang = torch.rand((len(ids),), device=self.device) * 2 * np.pi * coeff
+            root_rot = quat_from_angle_axis(ang, axis)
+
+            self._box_states[ids, 3:7] = root_rot
+            self._box_states[ids, 7:10] = 0.0
+            self._box_states[ids, 10:13] = 0.0
+
+
+            self._platform_pos[ids, 0:2] = root_pos[:, 0:2] # xy
+            self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
+
+            self._box_states[ids, 2] += 0.05 # add 0.05 to enable correct collision detection
+            
+
+            print(f"[Info]: _box_counter = {self._box_counter[ids]}")
+            print(f"[Info]: _reset_boxes: box_pos = {self._box_states[ids, 0:3]}")
+            print(f"[Info]: box reset {'#'*40}")
+            # Increment the counter here if you want start and target to rotate together.
+            self._box_counter[ids] += 1
+            return
         # for skill is pickUp, carryWith, putDown, the initial location of the box is from the reference box motion
         for sk_name in ["pickUp", "carryWith", "putDown"]:
             if self._reset_ref_env_ids.get(sk_name) is not None:
@@ -746,7 +841,7 @@ class HumanoidCarry(Humanoid):
                     if self._reset_random_height:
                         self._platform_pos[curr_env_ids] = self._platform_default_pos[curr_env_ids]
 
-        # for skill is loco and reset default, we random generate an inital location of the box
+        # for skill is loco and reset default, we random generate an initial location of the box
         random_env_ids = []
         if len(self._reset_default_env_ids) > 0:
             random_env_ids.append(self._reset_default_env_ids)

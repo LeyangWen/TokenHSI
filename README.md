@@ -353,6 +353,18 @@ The recorded screenshots are saved in ``` output/imgs/ ```. You can use ``` lpan
 python lpanlib/others/video.py --imgs_dir output/imgs/example_path --delete_imgs
 ```
 
+### tensorboard
+```
+# remote
+tb_dir="/scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/train_exp_4/Humanoid_12-00-05-17/summaries/"
+tb_dir="/scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/train_exp_3/Humanoid_12-00-00-12/summaries/"
+nohup tensorboard --logdir="$tb_dir" --port=6006 --host=0.0.0.0 > tb.log 2>&1 &
+
+
+# local
+ssh -L 6006:localhost:6006 wenleyan@greatlakes.arc-ts.umich.edu
+# open http://localhost:6006 in your browser.
+```
 ## 🔗 Citation
 
 If you find our work helpful, please cite:
@@ -410,17 +422,10 @@ This repository builds upon the following awesome open-source projects:
 This codebase is released under the [MIT License](LICENSE).  
 Please note that it also relies on external libraries and datasets, each of which may be subject to their own licenses and terms of use.
 
-## 🌟 Star History
-
-<p align="center">
-    <a href="https://www.star-history.com/#liangpan99/TokenHSI&Date" target="_blank">
-        <img width="500" src="https://api.star-history.com/svg?repos=liangpan99/TokenHSI&type=Date" alt="Star History Chart">
-    </a>
-<p>
 
 
+# Debug notes
 
-# Notes:
 
 ## Goal:
 - Carry task + specify parameters
@@ -447,23 +452,36 @@ Please note that it also relies on external libraries and datasets, each of whic
     - Tried 1x1x1, seem to be too big for actor, failed lift
     - Training range is 0.4*0.5 - 0.4*1.5, so lets keep in that general range, use suggested size of 0.22 & 0.57 cube, works
 
-### Start/end location
+### Start/end location and mass
 - Temp render global view
 
 - Default start location
   - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
-  -  `def _build_box(self, env_id, env_ptr)`
+  -  `def _build_box(self, env_id, env_ptr)` and `def _reset_box`, build_box is for initiating the actor, reset is for position
   -  `self._platform_asset = self.gym.create_box(self.sim, 0.4, 0.4, self._platform_height, asset_options)`
 
 - Default target location
   - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
   -  `self._tar_pos` in `def _reset_task(self, env_ids)`
 
+- To modify
+  - addded parameters in skill yaml file
+  - Replace randome reset for box and task with the specified location
 
-### Weight
-- There is a density parameter, which is defualt to 1000kg/m3
 
-## Debug notes
+#### Mass
+- set `randomDensity` to True in yaml to have it added to observation
+- Starting training another model with density=True, different checkpoint weight size (265+1=266)
+- Specify density in `def _load_box_asset(self):`
+- mass read in `def _build_box(self, env_id, env_ptr)` 
+
+### Terrain
+- Do the same modifications in
+  - `tokenhsi/env/tasks/adapt_interaction_skills/humanoid_adapt_carry_ground2terrain.py`
+  - `tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain.yaml`
+- Pass in custom using trimesh
+
+
 
 ### 2025-04-03 System setup
 
@@ -625,3 +643,7 @@ Please note that it also relies on external libraries and datasets, each of whic
 
 - gpu render instead of cpu for headless_render
 
+
+
+
+#todo: maybe rand desity lead to too high, maybe box too big
