@@ -312,7 +312,7 @@ class HumanoidCarry(Humanoid):
             else:
                 self._box_density[:] = 100.0
 
-
+        print(f"[Info]: _box_density = {self._box_density}")
 
         self._box_size = torch.tensor(self._build_base_size, device=self.device).reshape(1, 3) * self._box_scale # (num_envs, 3)
 
