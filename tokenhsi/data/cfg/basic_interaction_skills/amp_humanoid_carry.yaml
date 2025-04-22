@@ -47,7 +47,7 @@ env:
   box:
     build:
       baseSize: [0.4, 0.4, 0.4] # unit: m
-      randomSize: False #True
+      randomSize: True
       randomModeEqualProportion: True
       scaleRangeX: [0.5, 1.5] # default range if randomModeEqualProportion: True
       scaleRangeY: [0.5, 1.5]
@@ -83,22 +83,6 @@ env:
     successThreshold: 0.2
     skill: ["loco"]
     skillInitProb: [1.0]
-    # wen custom input for weight, start and end location
-    numExperiments: 3
-    specifyStartEndPos: True
-    start_positions:
-      - [-4.0, -4.0, 1.0]
-      - [4.0, -4.0, 0.75]
-      - [4.0,  4.0, 0.5]
-    end_positions:
-      - [0.0, 0.0, 0.5]
-      - [0.0, 0.0, 0.75]
-      - [0.0, 0.0, 1.0]
-    specifyMass: True
-    mass:
-      - 0.5
-      - 1.0
-      - 1.5
 
   asset:
     assetRoot: "tokenhsi/data/assets"
