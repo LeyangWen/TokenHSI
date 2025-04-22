@@ -1,16 +1,20 @@
 # conda activate tokenhsi # need python 3.8, so you cant load python3.10-anaconda etc, or used the module load pytorch
 
-export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64:$LD_LIBRARY_PATH"
 
-CUDA_LAUNCH_BLOCKING=1 python ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml \
+
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/single_task/ckpt_carry.pth \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry1/ \
+    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry_terrain1/ \
     --test \
-    --record_headless \
-    --num_envs 1 > gui_out.txt
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "CarryTerrain_test" \
+    --wandb_mode "disabled" \
+    --notes "rand loc, test carry" \
+
 
 # sh tokenhsi/scripts/single_task/traj_test.sh

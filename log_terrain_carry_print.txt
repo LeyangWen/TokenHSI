@@ -1,0 +1,138 @@
+
+Job information
+#-------------------------------------------------------------------
+SLURM_SUBMIT_HOST    gl-login2.arc-ts.umich.edu
+SLURM_JOB_ACCOUNT    shdpm0
+SLURM_JOB_PARTITION  spgpu
+SLURM_JOB_NAME       TokenHSI-test
+SLURM_JOBID          24055049
+SLURM_NODELIST       gl1523
+SLURM_JOB_NUM_NODES  1
+SLURM_NTASKS         1
+SLURM_TASKS_PER_NODE 1
+SLURM_CPUS_PER_TASK  1
+SLURM_NPROCS         1
+SLURM_MEM_PER_CPU    
+GPU_DEVICE_ORDINAL   0
+GPU 0: NVIDIA A40 (UUID: GPU-70eb5185-beb1-013e-c184-8c9a00b32ded)
+SLURM_SUBMIT_DIR     /home/wenleyan/projects/TokenHSI
+
+scheduling priority             (-e) 0
+pending signals                 (-i) 1540191
+max memory size         (kbytes, -m) 20971520
+open files                      (-n) 131072
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+max user processes              (-u) 1540191
+
+Running on gl1523.arc-ts.umich.edu at Wed Apr 16 03:26:36 EDT 2025
+Your job output begins below the line
+#-------------------------------------------------------------------
+=== NVIDIA SMI ===
+Wed Apr 16 03:26:36 2025       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 560.35.05              Driver Version: 560.35.05      CUDA Version: 12.6     |
+|-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A40                     On  |   00000000:1B:00.0 Off |                    0 |
+|  0%   40C    P0             57W /  300W |       1MiB /  46068MiB |      0%   E. Process |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+                                                                                         
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI        PID   Type   Process name                              GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+=== NVCC Version ===
+=== Python Version ===
+Python 3.8.20
+=== PyTorch Version ===
+Torch version: 2.0.0
+CUDA available: True
+*** Warning: failed to preload USD libs
+Importing module 'gym_38' (/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64/gym_38.so)
+Setting GYM_USD_PLUG_INFO_PATH to /home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64/usd/plugInfo.json
+PyTorch version 2.0.0
+Device count 1
+/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/src/gymtorch
+ninja: no work to do.
+Error: FBX library failed to load - importing FBX data will not succeed. Message: No module named 'fbx'
+FBX tools must be installed from https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_scripting_with_python_fbx_installing_python_fbx_html
+MOVING MOTION DATA TO GPU, USING CACHE: True
+Importing module 'rlgpu_38' (/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64/rlgpu_38.so)
+Not connected to PVD
++++ Using GPU PhysX
+Physics Engine: PhysX
+Physics Device: cuda:0
+GPU Pipeline: enabled
+Setting seed: 363
+Started to play
+terrain type:  trimesh
+env_columns:  20
+env_rows:  5
+env_length:  8
+env_width:  8
+width_per_env_pixels:  80
+length_per_env_pixels:  80
+border:  500
+tot_cols:  2600
+tot_rows:  1400
+{'terrainType': 'trimesh', 'staticFriction': 1.0, 'dynamicFriction': 1.0, 'restitution': 0.0, 'curriculum': False, 'mapLength': 8, 'mapWidth': 8, 'numLevels': 5, 'numTerrains': 20, 'terrainProportions': [0.0, 0.0, 0.35, 0.35, 0.2, 0, 0, 0.1], 'slopeTreshold': 0.9}
+terrain type:  trimesh
+height field raw shape:  (1400, 2600)
+walkable field raw shape:  (1400, 2600)
+height field example:  [[216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]
+ [216 216 216 216 216 216 216 216 216 216]]
+walkable field example:  [[0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]
+ [0 0 0 0 0 0 0 0 0 0]]
+sum of walkable field:  tensor(0, device='cuda:0')
+walkable field shape:  torch.Size([1400, 2600])
+vertices shape:  (3640000, 3)
+triangles shape:  (7272002, 3)
+coord_x tensor([   0,    0,    0,  ..., 1399, 1399, 1399], device='cuda:0')
+coord_y tensor([   0,    1,    2,  ..., 2597, 2598, 2599], device='cuda:0')
+coord_x shape:  torch.Size([3640000])
+coord_y shape:  torch.Size([3640000])
+walkable subset shape:  torch.Size([3640000])
+walkable subset example:  tensor([False, False, False, False, False, False, False, False, False, False],
+       device='cuda:0')
+
+sample extent sample_extent_x:  40
+sample extent sample_extent_y:  160
+walkable subset num_samples:  637602
+walkable subset coord_x_scale:  tensor([50.1000, 50.1000, 50.1000,  ..., 89.9000, 89.9000, 89.9000],
+       device='cuda:0')
+walkable subset coord_y_scale:  tensor([ 50.1000,  50.2000,  50.3000,  ..., 209.6000, 209.7000, 209.8000],
+       device='cuda:0')
+walkable subset x min:  tensor(50.1000, device='cuda:0')
+walkable subset x max:  tensor(89.9000, device='cuda:0')
+walkable subset y min:  tensor(50.1000, device='cuda:0')
+walkable subset y max:  tensor(209.8000, device='cuda:0')
+walkable subset shape:  torch.Size([637602])
+walkable subset shape:  torch.Size([637602])
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mtest[0m at: [34mhttps://wandb.ai/qaq37/TokenHSI-Train/runs/43n51oip[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20250416_032653-43n51oip/logs[0m

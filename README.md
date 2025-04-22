@@ -103,6 +103,11 @@ Follow the following instructions:
     ```
     conda install -c fvcore -c iopath -c conda-forge fvcore iopath
     pip install git+https://github.com/facebookresearch/pytorch3d.git@v0.7.7
+
+    # if it froze
+    export MAX_JOBS=1
+    pip install --no-cache-dir "git+https://github.com/facebookresearch/pytorch3d.git@v0.7.7"
+
     ```
 
 4. Download [SMPL body models](https://smpl.is.tue.mpg.de/) and organize them as follows:
@@ -480,7 +485,8 @@ Please note that it also relies on external libraries and datasets, each of whic
   - `tokenhsi/env/tasks/adapt_interaction_skills/humanoid_adapt_carry_ground2terrain.py`
   - `tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain.yaml`
 - Pass in custom using trimesh
-
+- `walkable_map` not working
+- Not going around obsticles
 
 
 ### 2025-04-03 System setup
@@ -581,6 +587,45 @@ Please note that it also relies on external libraries and datasets, each of whic
     Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
 
     ```
+  - Upgraded GPU
+  - Pytorch3D no cuda issue when running long term, no need to fix for now
+    ```
+    Traceback (most recent call last):
+    File "./tokenhsi/run.py", line 238, in <module>
+      main()
+    File "./tokenhsi/run.py", line 232, in main
+      runner.run(vargs)
+    File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/rl_games/torch_runner.py", line 144, in run
+      player.run()
+    File "/home/leyang/Documents/TokenHSI/tokenhsi/learning/transformer/trans_players.py", line 212, in run
+      super().run()
+    File "/home/leyang/Documents/TokenHSI/tokenhsi/learning/common_player.py", line 78, in run
+      obs_dict = self.env_reset()
+    File "/home/leyang/Documents/TokenHSI/tokenhsi/learning/common_player.py", line 197, in env_reset
+      obs = self.env.reset(env_ids)
+    File "/home/leyang/Documents/TokenHSI/tokenhsi/env/tasks/vec_task_wrappers.py", line 53, in reset
+      self.task.reset(env_ids)
+    File "/home/leyang/Documents/TokenHSI/tokenhsi/env/tasks/humanoid.py", line 165, in reset
+      self._reset_envs(env_ids)
+    File "/home/leyang/Documents/TokenHSI/./tokenhsi/env/tasks/longterm_task_completion/humanoid_longterm_4basicskills.py", line 1551, in _reset_envs
+      self._compute_observations(env_ids)
+    File "/home/leyang/Documents/TokenHSI/./tokenhsi/env/tasks/longterm_task_completion/humanoid_longterm_4basicskills.py", line 945, in _compute_observations
+      task_obs = self._compute_task_obs(env_ids)
+    File "/home/leyang/Documents/TokenHSI/./tokenhsi/env/tasks/longterm_task_completion/humanoid_longterm_4basicskills.py", line 1120, in _compute_task_obs
+      zbuf = self._dynamic_scene_rasterizer(scene)
+    File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1501, in _call_impl
+      return forward_call(*args, **kwargs)
+    File "/home/leyang/Documents/TokenHSI/./tokenhsi/env/tasks/longterm_task_completion/humanoid_longterm_4basicskills.py", line 105, in forward
+      _, zbuf, _, _ = rasterize_meshes(
+    File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/pytorch3d/renderer/mesh/rasterize_meshes.py", line 225, in rasterize_meshes
+      pix_to_face, zbuf, barycentric_coords, dists = _RasterizeFaceVerts.apply(
+    File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/torch/autograd/function.py", line 506, in apply
+      return super().apply(*args, **kwargs)  # type: ignore[misc]
+    File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/pytorch3d/renderer/mesh/rasterize_meshes.py", line 298, in forward
+      pix_to_face, zbuf, barycentric_coords, dists = _C.rasterize_meshes(
+    RuntimeError: Not compiled with GPU support
+    ```
+  
 
 #### On slurm
 - `ImportError: libpython3.8.so.1.0: cannot open shared object file: No such file or directory`

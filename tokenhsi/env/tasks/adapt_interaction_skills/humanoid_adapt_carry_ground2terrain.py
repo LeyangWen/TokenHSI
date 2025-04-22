@@ -827,13 +827,11 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
     def _reset_task(self, env_ids):
         if self._is_test and self.constructionExp:  # wen: specify target location from yaml instead of random
             ids = env_ids.to(dtype=torch.long)
-            
-            # Use the persistent experiment counter to index the fixed target positions.
-            # For each environment, the target for the next episode is given by:
-            target_indices = self._target_counter[ids] % self._num_experiments # repeat afterwards
-            
-            new_target_pos = self._fixed_target_positions[target_indices]
-            
+            target_indices = self._target_counter[ids] % self._fixed_target_positions.shape[0]
+            root_pos = self._fixed_target_positions[target_indices]
+
+            new_target_pos = self._process_box_root_pos(root_pos)
+
             # Check if the new target is too close to the humanoid or box.
             min_dist = 1.0
             target_overlap = torch.logical_or(
@@ -1334,14 +1332,29 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         top_surface_z = torch.clamp_max(top_surface_z, self._reset_maxTopSurfaceHeight)
         return top_surface_z - box_size[:, 2] / 2
     
+    def _process_box_root_pos(self, root_pos):
+            """
+            For fixed input in the construction Exp, used to set the box root position for start and target.
+            1. offset x, y by padding
+            2. offset z by terrain height
+            """
+            padding = self.terrain.border_size  # m
+            root_pos[:, :2] = root_pos[:, :2] + padding
+            # terrain height
+            terrain_height = self.terrain.sample_height_points(root_pos[:, :2].reshape([1, -1, 2]))
+            root_pos[:, 2] = root_pos[:, 2] + terrain_height
+            return root_pos
+            
+
+    
     def _reset_boxes(self, env_ids):
         if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
             ids = env_ids.to(dtype=torch.long)
-            # Use the same or a separate experiment counter as needed (here we assume the same)
             start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
             root_pos = self._fixed_start_positions[start_indices]
-            self._box_states[ids, 0:3] = root_pos
 
+            root_pos = self._process_box_root_pos(root_pos)
+            self._box_states[ids, 0:3] = root_pos
             axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
             # if self._reset_random_rot:
             #     coeff = 1.0
@@ -1526,8 +1539,11 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                 
                 old_root_xyz = root_pos.clone()
 
-                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids) + 8
-                print(f"[Info]: _reset_ref_state_init: new_root_xy = {new_root_xy}")
+
+                padding = self.terrain.border_size
+                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids, fixed_loc="center") + padding # + 8 # OG code hard coded +8, which is the mapLength for test scenarios
+                # todo: og code seem to be adding 8, which is the mapLength instead of border, finde out why
+                print(f"[Info]: _reset_ref_state_init: new_root_xy = {new_root_xy}, padding = {padding}")
 
                 root_pos[:, 0:2] = new_root_xy
 
@@ -1908,10 +1924,10 @@ class Terrain:
         self.device = device
         if self.type in ["none", 'plane']:
             return
-        if cfg["loadTerrain"]:
+        if "loadTerrain" in cfg and cfg["loadTerrain"]:  # wen: added custom load function
             self.horizontal_scale = 0.1 # resolution 0.1
-            self.vertical_scale = 0.1
-            self.border_size = 5 # keep some edge in the scaned model
+            self.vertical_scale = 0.2
+            self.border_size = 1 # keep some edge in the scaned model
             self.proportions = [
                 np.sum(cfg["terrainProportions"][:i + 1])
                 for i in range(len(cfg["terrainProportions"]))
@@ -1921,11 +1937,13 @@ class Terrain:
             self.env_cols = 1
             self.num_maps = self.env_rows * self.env_cols # 一共100块地形
             self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
-        else:
+
+            # other init put into load_terrain function since it depend on terrain size
+        else:  # og code from TokenHSI
         
             self.horizontal_scale = 0.1 # resolution 0.1
             self.vertical_scale = 0.005
-            self.border_size = 50 # 乘scale后单位才是m
+            self.border_size = 50 # 乘scale后单位才是m, (I think this is in meter, after deviding by horizontal_scale it is in pixel/grid
             self.env_length = cfg["mapLength"] # 每个小env 每小块地形的长和宽 单位是m
             self.env_width = cfg["mapWidth"]
             self.proportions = [
@@ -1939,14 +1957,11 @@ class Terrain:
             self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
 
             self.width_per_env_pixels = int(self.env_width / self.horizontal_scale) # 每个小env的宽度的单位是0.1m，宽8m，所以有80个pixels
-            self.length_per_env_pixels = int(self.env_length /
-                                            self.horizontal_scale)
+            self.length_per_env_pixels = int(self.env_length / self.horizontal_scale)
 
             self.border = int(self.border_size / self.horizontal_scale)
-            self.tot_cols = int(
-                self.env_cols * self.width_per_env_pixels) + 2 * self.border
-            self.tot_rows = int(
-                self.env_rows * self.length_per_env_pixels) + 2 * self.border
+            self.tot_cols = int(self.env_cols * self.width_per_env_pixels) + 2 * self.border
+            self.tot_rows = int(self.env_rows * self.length_per_env_pixels) + 2 * self.border
             
             # print("terrain type: ", self.type)
             # print("env_columns: ", self.env_cols)
@@ -1961,8 +1976,8 @@ class Terrain:
             # print(cfg)
 
             self.height_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
-            self.walkable_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
-        if cfg["loadTerrain"]:
+            self.walkable_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16) # paper: We follow [84, 97] to calculate a walkable map for character initialization.
+        if "loadTerrain" in cfg and cfg["loadTerrain"]:
             self.load_terrain(cfg)
         elif cfg["curriculum"]:
             self.curiculum(num_robots,
@@ -2028,12 +2043,19 @@ class Terrain:
         # print("walkable subset shape: ", self.coord_y_scale.shape)
         # raise NotImplementedError("break")
 
-    def sample_valid_locations(self, max_num_envs, env_ids):
-        
+    def sample_valid_locations(self, max_num_envs, env_ids, fixed_loc=None):
         num_envs = env_ids.shape[0]
-        idxes = np.random.randint(0, self.num_samples, size=num_envs)
-        valid_locs = torch.stack([self.coord_x_scale[idxes], self.coord_y_scale[idxes]], dim = -1)
-
+        if fixed_loc is not None:
+            if fixed_loc == "center":
+                # find median x y location that is viable
+                median_x = self.coord_x_scale.median()
+                median_y = self.coord_y_scale.median()
+                valid_locs = torch.stack([median_x, median_y], dim = -1)
+        else:  # OG code : start location always on the diagonal line index wise
+            idxes = np.random.randint(0, self.num_samples, size=num_envs)
+            valid_locs = torch.stack([self.coord_x_scale[idxes], self.coord_y_scale[idxes]], dim = -1)
+        print(f"[Info]: sample_valid_locations: valid_locs = {valid_locs}")
+        print(f"[Info]: max_env_ranges: {[self.coord_x_scale.max(), self.coord_y_scale.max()]}")
         return valid_locs
 
     def world_points_to_map(self, points):
@@ -2254,9 +2276,10 @@ class Terrain:
                                         (self.border, self.border)),
                                        mode='constant',
                                         constant_values=-2)
-        self.walkable_field_raw = np.pad(self.walkable_field_raw,
-                                        ((self.border, self.border),
-                                            (self.border, self.border)),
-                                            mode='constant',
-                                            constant_values=0)
+        # No padding to keep consistent with the original code behavior, in the original code, the padding was hardcoded to +8
+        # self.walkable_field_raw = np.pad(self.walkable_field_raw,
+        #                                 ((self.border, self.border),
+        #                                     (self.border, self.border)),
+        #                                     mode='constant',
+        #                                     constant_values=0)
 

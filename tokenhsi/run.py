@@ -222,7 +222,7 @@ def main():
     vargs = vars(args)
     args.cfg = cfg
     args.cfg_train = cfg_train
-    wandb.init(project=args.wandb_project, name=args.wandb_name, config=args, sync_tensorboard=True)
+    wandb.init(project=args.wandb_project, name=args.wandb_name, config=args, sync_tensorboard=True, mode=args.wandb_mode)
 
     algo_observer = RLGPUAlgoObserver()
 
