@@ -44,22 +44,22 @@ env:
       baseSize: [0.4, 0.4, 0.4] # unit: m
       randomSize: True
       randomModeEqualProportion: False
-      scaleRangeX: [0.5, 1.] # default range if randomModeEqualProportion: True
-      scaleRangeY: [0.5, 1.]
-      scaleRangeZ: [0.5, 1.]
+      scaleRangeX: [0.5, 1.5] # default range if randomModeEqualProportion: True
+      scaleRangeY: [0.5, 1.5]
+      scaleRangeZ: [0.5, 1.5]
       scaleSampleInterval: 0.125 # 0.05m
       randomDensity: False # if True, mass will be added into policy obs
 
       testSizes:
        - [0.22, 0.22, 0.22]
-      #  - [0.27, 0.27, 0.27]
-      #  - [0.32, 0.32, 0.32]
-      #  - [0.37, 0.37, 0.37]
-      #  - [0.42, 0.42, 0.42]
-      #  - [0.47, 0.47, 0.47]
-      #  - [0.52, 0.52, 0.52]
-      #  - [0.57, 0.57, 0.57]
-      #  - [0.30, 0.30, 0.40]
+       - [0.27, 0.27, 0.27]
+       - [0.32, 0.32, 0.32]
+       - [0.37, 0.37, 0.37]
+       - [0.42, 0.42, 0.42]
+       - [0.47, 0.47, 0.47]
+       - [0.52, 0.52, 0.52]
+       - [0.57, 0.57, 0.57]
+       - [0.30, 0.30, 0.40]
 
     reset:
       randomRot: True

@@ -370,7 +370,7 @@ def get_args(benchmark=False):
         {"name": "--wandb_project", "type": str, "default": "TokenHSI-Train"},
         {"name": "--wandb_name", "type": str, "default": "test"},
         {"name": "--wandb_mode", "type": str, "default": "disabled", "help": "wandb mode, online/offline/dryrun/disabled"},
-        {"name": "--notes", "type": str, "default": ""},
+        {"name": "--Notes", "type": str, "default": ""},
 
 
         

@@ -48,14 +48,16 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
     --num_envs 4096 \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-5/ \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-6/ \
     --headless \
     --wandb_project "TokenHSI-Train" \
-    --wandb_name "Carry-train-5" \
-    --notes "RndDensity_80cm" \
-    --box_w 0.8 \
+    --wandb_name "Carry-train-6" \
+    --wandb_mode "online" \
+    --Notes "og_train_40cm" \
+    --box_w 0.4 \
     --random_size True \
-    --random_density True
+    --random_density False \
+    --random_mode_equal_proportion True \
 
 
     # --resume 1 \
@@ -64,7 +66,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --box_h 1.5 \
     # --box_l 2.0 \
     # --random_size False \
-    # --random_mode_equal_proportion True \
+
     # --scale_sample_interval 0.1 \
     # --random_density False \
     # --num_experiments 5 \

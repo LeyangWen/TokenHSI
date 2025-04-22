@@ -1542,7 +1542,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
                 padding = self.terrain.border_size
                 new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids, fixed_loc="center") + padding # + 8 # OG code hard coded +8, which is the mapLength for test scenarios
-                # todo: og code seem to be adding 8, which is the mapLength instead of border, finde out why
+                # TODO: og code seem to be adding 8, which is the mapLength instead of border, finde out why
                 print(f"[Info]: _reset_ref_state_init: new_root_xy = {new_root_xy}, padding = {padding}")
 
                 root_pos[:, 0:2] = new_root_xy
