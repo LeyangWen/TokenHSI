@@ -361,8 +361,7 @@ def get_args(benchmark=False):
             "help": "Override env.eval.start_positions. Provide a YAML-formatted list (e.g., '[[x1,y1,z1], [x2,y2,z2]]')"},
         {"name": "--end_positions", "type": str, "default": None,
             "help": "Override env.eval.end_positions. Provide a YAML-formatted list (e.g., '[[x1,y1,z1], [x2,y2,z2]]')"},
-        {"name": "--density", "type": float, "default": None,
-            "help": "Override env.eval.density"},
+        {"name": "--density", "type": float, "default": None, "help": "Override env.eval.density, kg/m^3"},
 
         {"name": "--record_headless", "action": "store_true", "default": False,
             "help": "output pose as a csv file, use in tests"},
@@ -370,7 +369,7 @@ def get_args(benchmark=False):
         {"name": "--wandb_project", "type": str, "default": "TokenHSI-Train"},
         {"name": "--wandb_name", "type": str, "default": "test"},
         {"name": "--wandb_mode", "type": str, "default": "disabled", "help": "wandb mode, online/offline/dryrun/disabled"},
-        {"name": "--Notes", "type": str, "default": ""},
+        {"name": "--notes", "type": str, "default": ""},
 
 
         
