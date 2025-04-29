@@ -1,14 +1,14 @@
 #!/bin/bash -l
 #SBATCH --job-name=TokenHSI-train
-#SBATCH --output=output_slurm/train_log_5.txt
-#SBATCH --error=output_slurm/train_error_5.txt
+#SBATCH --output=output_slurm/train_log_8.txt
+#SBATCH --error=output_slurm/train_error_8.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=40:00:00
+#SBATCH --time=60:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -48,20 +48,20 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
     --num_envs 4096 \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-6/ \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-8/ \
     --headless \
     --wandb_project "TokenHSI-Train" \
-    --wandb_name "Carry-train-6" \
+    --wandb_name "Carry-train-8" \
     --wandb_mode "online" \
-    --Notes "og_train_40cm" \
+    --Notes "RndMass [2,36], 0.4" \
     --box_w 0.4 \
     --random_size True \
-    --random_density False \
+    --random_density True \
     --random_mode_equal_proportion True \
-
-
     # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/train_exp_1/Humanoid_09-00-42-07/nn/Humanoid.pth \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-7/Humanoid_22-19-57-01/nn/Humanoid.pth \
+    
+    
     #     --box_w 1.0 \
     # --box_h 1.5 \
     # --box_l 2.0 \

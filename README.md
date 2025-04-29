@@ -489,6 +489,9 @@ Please note that it also relies on external libraries and datasets, each of whic
 - Not going around obsticles
 
 
+-resume training
+-how long to train
+
 ### 2025-04-03 System setup
 
 #### On Windows

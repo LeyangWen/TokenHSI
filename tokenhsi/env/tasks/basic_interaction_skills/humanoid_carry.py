@@ -80,6 +80,7 @@ class HumanoidCarry(Humanoid):
         self._build_z_scale_range = box_cfg["build"]["scaleRangeZ"]
         self._build_scale_sample_interval = box_cfg["build"]["scaleSampleInterval"]
         self._build_random_density = box_cfg["build"]["randomDensity"]
+        self._mass_range = box_cfg["build"]["massRange"]
         self._build_test_sizes = box_cfg["build"]["testSizes"]
 
         self._reset_random_rot = box_cfg["reset"]["randomRot"]
@@ -307,8 +308,15 @@ class HumanoidCarry(Humanoid):
             self._box_density[:] = self._box_density_value
         else:
             if self._build_random_density:
-                dist = torch.distributions.uniform.Uniform(torch.tensor([80.0], device=self.device), torch.tensor([800.0], device=self.device))
-                self._box_density = dist.sample((self.num_envs,))
+                # og code: sample by density, but may get very heavy box
+                # dist = torch.distributions.uniform.Uniform(torch.tensor([80.0], device=self.device), torch.tensor([120.0], device=self.device))
+                # self._box_density = dist.sample((self.num_envs,))
+                
+                # wen code: sample by mass
+                dist = torch.distributions.uniform.Uniform(torch.tensor([self._mass_range[0]], device=self.device), torch.tensor([self._mass_range[1]], device=self.device))
+                box_mass = dist.sample((self.num_envs,))
+                box_volume = self._box_scale[:, 0] * self._box_scale[:, 1] * self._box_scale[:, 2]
+                self._box_density = box_mass / box_volume
             else:
                 self._box_density[:] = 100.0
 
@@ -357,7 +365,7 @@ class HumanoidCarry(Humanoid):
 
         mass = self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0].mass
         self._box_masses.append(mass)
-
+        print(f"[Info]: box mass = {mass} kg")
         return
     
     def _build_marker(self, env_id, env_ptr):

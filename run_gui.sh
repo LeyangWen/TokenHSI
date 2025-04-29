@@ -4,9 +4,9 @@
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/custom_trained/density/Humanoid.pth \
+    --checkpoint output/custom_trained/density/Humanoid_1-7.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -18,7 +18,8 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_density True \
     --density 100.0 \
     
-
+# _construction.yaml --> sth in here is breaking your trained model, but not general model
+# sth in the code is making the box location in the floor
     # --checkpoint output/single_task/ckpt_carry.pth \
 
     # # Small box
@@ -44,7 +45,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 
 
 
-# # Terrain Carry Test
+# Terrain Carry Test
 # python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 #     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
 #     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
@@ -56,7 +57,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 #     --wandb_project "TokenHSI-Test" \
 #     --wandb_name "CarryTerrain_test" \
 #     --wandb_mode "disabled" \
-#     --Notes "rand loc, test carry" \
+#     --notes "rand loc, test carry" \
 #     --box_w 0.40 \
 #     --random_size False \
 #     --random_density False \
@@ -67,4 +68,4 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/2025-04-22_19-07-11" --video_name "density_stuck.mp4" --delete_imgs 
+# python lpanlib/others/video.py --imgs_dir "output/imgs/2025-04-23_10-12-36" --video_name "density_stuck_miss.mp4" --delete_imgs 
