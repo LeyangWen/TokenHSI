@@ -165,6 +165,7 @@ class CommonAgent(a2c_continuous.A2CAgent):
                         self.writer.add_scalar('rewards{0}/frame'.format(i), mean_rewards[i], frame)
                         self.writer.add_scalar('rewards{0}/iter'.format(i), mean_rewards[i], epoch_num)
                         self.writer.add_scalar('rewards{0}/time'.format(i), mean_rewards[i], total_time)
+                        self.writer.add_scalar('wandb_x_epoch', epoch_num, frame)
 
                         if hasattr(self.vec_env.env.task, '_multiple_task_names'):
                             for n in self.vec_env.env.task._multiple_task_names:
