@@ -25,6 +25,7 @@ joints_to_use = {
 if __name__ == '__main__':
 
     all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/S01+__+Activity04_stageii/smpl_params.npy"))
 
     # parameters for motion editing
     candidates = {
@@ -47,6 +48,7 @@ if __name__ == '__main__':
         "OMOMO+__+sub7_smallbox_048": [0, 175],
         "OMOMO+__+sub7_smallbox_049": [0, 190],
         "OMOMO+__+sub7_smallbox_051": [0, 160],
+        # "S01+__+Activity04_stageii": [876//4, 1050//4],
     }
 
     # load skeleton of smpl_humanoid
