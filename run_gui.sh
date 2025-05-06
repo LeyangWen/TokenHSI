@@ -4,9 +4,9 @@
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml \
+    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/custom_trained/density/Humanoid_1-7.pth \
+    --checkpoint output/custom_trained/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -18,7 +18,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_density True \
     --density 100.0 \
     
-# _construction.yaml --> sth in here is breaking your trained model, but not general model
+# --checkpoint output/custom_trained/Carry-train-6/Humanoid_27-23-51-50/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Carry-train-10/Humanoid_29-03-42-24/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Carry-train-11/Humanoid_29-03-55-48/nn/Humanoid.pth \
 # sth in the code is making the box location in the floor
     # --checkpoint output/single_task/ckpt_carry.pth \
 
@@ -68,4 +71,4 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/2025-04-23_10-12-36" --video_name "density_stuck_miss.mp4" --delete_imgs 
+# python lpanlib/others/video.py --imgs_dir "output/imgs/100_2" --video_name "density_100_40cm_cube.mp4" --delete_imgs 
