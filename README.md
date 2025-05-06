@@ -431,68 +431,7 @@ Please note that it also relies on external libraries and datasets, each of whic
 
 # Debug notes
 
-
-## Goal:
-- Carry task + specify parameters
-  - Start/end location
-  - Size
-  - Weight
-  - Shape
-  - Obstacles in env
-
-- Make it ergo correct
-  - Ergo loss
-
-### render
-- temp solution: output 3D pose and box location, draw locally in matplotlib
-
-- problem: person stuck after putting down box, then, jump to next motion/freeze some times
-  - maybe caused by tenser not being correctly retrieved
-- problem: when goal location is too low, 
-
-### Box size
-- `tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml` 
-  - `box-build-testSizes`, does not make a difference, seem to just be a list to replace into the `box-build-boxSize`
-  - `box-build-boxSize` & `randomSize: False`
-    - Tried 1x1x1, seem to be too big for actor, failed lift
-    - Training range is 0.4*0.5 - 0.4*1.5, so lets keep in that general range, use suggested size of 0.22 & 0.57 cube, works
-
-### Start/end location and mass
-- Temp render global view
-
-- Default start location
-  - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
-  -  `def _build_box(self, env_id, env_ptr)` and `def _reset_box`, build_box is for initiating the actor, reset is for position
-  -  `self._platform_asset = self.gym.create_box(self.sim, 0.4, 0.4, self._platform_height, asset_options)`
-
-- Default target location
-  - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
-  -  `self._tar_pos` in `def _reset_task(self, env_ids)`
-
-- To modify
-  - addded parameters in skill yaml file
-  - Replace randome reset for box and task with the specified location
-
-
-#### Mass
-- set `randomDensity` to True in yaml to have it added to observation
-- Starting training another model with density=True, different checkpoint weight size (265+1=266)
-- Specify density in `def _load_box_asset(self):`
-- mass read in `def _build_box(self, env_id, env_ptr)` 
-
-### Terrain
-- Do the same modifications in
-  - `tokenhsi/env/tasks/adapt_interaction_skills/humanoid_adapt_carry_ground2terrain.py`
-  - `tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain.yaml`
-- Pass in custom using trimesh
-- `walkable_map` not working
-- Not going around obsticles
-
-
--resume training
--how long to train
-
-### 2025-04-03 System setup
+## 2025-04-03 System setup
 
 #### On Windows
 - issacgym dont support, can't import w. correct version error
@@ -695,3 +634,78 @@ Please note that it also relies on external libraries and datasets, each of whic
 
 
 #todo: maybe rand desity lead to too high, maybe box too big
+
+
+## Goal:
+- Carry task + specify parameters
+  - Start/end location
+  - Size
+  - Weight
+  - Shape
+  - Obstacles in env
+
+- Make it ergo correct
+  - Ergo loss
+
+### render
+- temp solution: output 3D pose and box location, draw locally in matplotlib
+
+- problem: person stuck after putting down box, then, jump to next motion/freeze some times
+  - maybe caused by tenser not being correctly retrieved
+- problem: when goal location is too low, 
+
+### Box size
+- `tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry.yaml` 
+  - `box-build-testSizes`, does not make a difference, seem to just be a list to replace into the `box-build-boxSize`
+  - `box-build-boxSize` & `randomSize: False`
+    - Tried 1x1x1, seem to be too big for actor, failed lift
+    - Training range is 0.4*0.5 - 0.4*1.5, so lets keep in that general range, use suggested size of 0.22 & 0.57 cube, works
+
+### Start/end location and mass
+- Temp render global view
+
+- Default start location
+  - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
+  -  `def _build_box(self, env_id, env_ptr)` and `def _reset_box`, build_box is for initiating the actor, reset is for position
+  -  `self._platform_asset = self.gym.create_box(self.sim, 0.4, 0.4, self._platform_height, asset_options)`
+
+- Default target location
+  - `tokenhsi/env/tasks/basic_interaction_skills/humanoid_carry.py`
+  -  `self._tar_pos` in `def _reset_task(self, env_ids)`
+
+- To modify
+  - addded parameters in skill yaml file
+  - Replace randome reset for box and task with the specified location
+
+
+#### Mass
+- set `randomDensity` to True in yaml to have it added to observation
+- Starting training another model with density=True, different checkpoint weight size (265+1=266)
+- Specify density in `def _load_box_asset(self):`
+- mass read in `def _build_box(self, env_id, env_ptr)` 
+- Dont use too large a range fro random density, or else will result in very heavy box, lead to training faliure
+
+### Terrain
+- Do the same modifications in
+  - `tokenhsi/env/tasks/adapt_interaction_skills/humanoid_adapt_carry_ground2terrain.py`
+  - `tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain.yaml`
+- Pass in custom using trimesh
+- `walkable_map` not working
+- Not going around obsticles
+
+
+## Goal: Add Example Carry Motion and Ergo Reward
+
+[Steps link](https://github.com/liangpan99/TokenHSI/issues/5)
+
+### Example Carry Motion
+
+- In VEHS7M dataset, annotate the timestamp for start and end of correct carry motions, put in excel
+- Look at the SMPLX file, segment them out, write a custom script, put in `vicon-read`
+- Motion frames
+  - `tokenhsi/data/dataset_carry/preprocess_amass.py` 
+  —> fps conversion here, output `smpl_params.npy`
+  - `tokenhsi/data/dataset_carry/generate_motion.py` —> index here used to cut smpl motion to clips, output `ref_motion.npy`, and render
+  - `tokenhsi/data/dataset_carry/generate_object.py` 
+  —> index here used to control box movement, outputs `box_motion.npy`, and box render
+  - `tokenhsi/data/dataset_carry/dataset_carry.yaml` —> index here used for state init

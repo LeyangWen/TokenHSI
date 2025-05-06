@@ -66,7 +66,8 @@ class HumanoidCarry(Humanoid):
         self._is_eval = cfg["args"].eval
         self._is_test = cfg["args"].test
         self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
-        self._box_density_value = cfg["env"]["box"]["build"].get("density", False)
+        self._box_density_value = cfg["env"]["eval"].get("density", False)
+        print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
         if cfg["args"].eval:
             self._mode = "test"
 
@@ -767,6 +768,8 @@ class HumanoidCarry(Humanoid):
         handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
         putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
         carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
+        #TODO: add ergo reward to carry_box_reward
+        # if xxx ergoreward
 
         power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)
         power_reward = -self._power_coefficient * power
@@ -1435,3 +1438,6 @@ def compute_putdown_reward(box_pos, tar_pos):
     reward[(pos_err_xy > 0.1 ** 2)] = 0.0
     
     return 0.2 * reward
+
+
+#TODO: add ergo reward for back bending, etc
