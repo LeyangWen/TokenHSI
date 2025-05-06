@@ -49,7 +49,7 @@ env:
       scaleRangeZ: [0.5, 1.5]
       scaleSampleInterval: 0.125 # 0.05m
       randomDensity: False # if True, mass will be added into policy obs
-
+      massRange: [2.0, 36.0]  # kg, standard brick --> concrete bag
       testSizes:
        - [0.22, 0.22, 0.22]
        - [0.27, 0.27, 0.27]
@@ -116,7 +116,7 @@ env:
     # wen custom input for weight, start and end location
     numExperiments: 3
     constructionExperiment: True
-    # start_positions:  # including edge of terraini
+    # start_positions:  # including edge of terrain
     #   - [1.0, 1.0, 1.0]
     #   - [30.0, 30.0, 0.75]
     #   - [10.0, 1.0, 0.75]
@@ -133,7 +133,7 @@ env:
       - [12.8, 13.7, 0.75]
       - [8.0, 2.9, 1.25]
       - [11.0, 5.5, 1.0]
-    density: 100.0
+    density: 100.0 # kg/m^3
   asset:
     assetRoot: "tokenhsi/data/assets"
     assetFileName: "mjcf/phys_humanoid_v3_box_foot.xml"

@@ -314,14 +314,19 @@ class HumanoidCarry(Humanoid):
                 # self._box_density = dist.sample((self.num_envs,))
                 
                 # wen code: sample by mass
-                dist = torch.distributions.uniform.Uniform(torch.tensor([self._mass_range[0]], device=self.device), torch.tensor([self._mass_range[1]], device=self.device))
+                dist = torch.distributions.uniform.Uniform(torch.tensor(self._mass_range[0], device=self.device), 
+                                                           torch.tensor(self._mass_range[1], device=self.device),)
                 box_mass = dist.sample((self.num_envs,))
-                box_volume = self._box_scale[:, 0] * self._box_scale[:, 1] * self._box_scale[:, 2]
+                box_volume = self._box_scale.prod(dim=1)
+                
                 self._box_density = box_mass / box_volume
+                # print("box_mass shape = ", box_mass.shape)
+                # print("box_volume shape = ", box_volume.shape)
+                # print("box_density shape = ", self._box_density.shape)
             else:
                 self._box_density[:] = 100.0
 
-        print(f"[Info]: _box_density = {self._box_density}")
+        # print(f"[Info]: _box_density = {self._box_density}")
 
         self._box_size = torch.tensor(self._build_base_size, device=self.device).reshape(1, 3) * self._box_scale # (num_envs, 3)
 
