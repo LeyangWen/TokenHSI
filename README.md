@@ -708,4 +708,7 @@ Please note that it also relies on external libraries and datasets, each of whic
   - `tokenhsi/data/dataset_carry/generate_motion.py` —> index here used to cut smpl motion to clips, output `ref_motion.npy`, and render
   - `tokenhsi/data/dataset_carry/generate_object.py` 
   —> index here used to control box movement, outputs `box_motion.npy`, and box render
-  - `tokenhsi/data/dataset_carry/dataset_carry.yaml` —> index here used for state init
+  - `tokenhsi/data/dataset_carry/dataset_carry.yaml` —> index here used for ref state init `def sample_time_rsi`
+
+
+[install python fbx](https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_scripting_with_python_fbx_installing_python_fbx_html)

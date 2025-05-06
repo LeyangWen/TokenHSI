@@ -3,10 +3,54 @@ sys.path.append("./")
 
 import numpy as np
 import torch
+import pickle
 
 from lpanlib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonState, SkeletonMotion
 from lpanlib.poselib.visualization.common import plot_skeleton_state, plot_skeleton_motion_interactive
 from lpanlib.poselib.core.rotation3d import quat_mul, quat_from_angle_axis, quat_mul_norm, quat_rotate, quat_identity
+
+def process_VEHS7M_seq(fname, output_path, start_end = None):
+
+    # load raw params from AMASS dataset
+    with open(fname, "rb") as f:
+        raw_params = pickle.load(f)
+        
+    
+    # dict(np.load(fname, allow_pickle=True))
+
+    poses = raw_params["fullpose"]
+    trans = raw_params["trans"]
+    
+    # clip
+    if start_end is not None:
+        start = int(start_end[0])
+        end = int(start_end[1])
+        poses = poses[start:end]
+        trans = trans[start:end]
+        
+    # downsample from 100hz to 25hz
+    source_fps = 100
+    target_fps = 25
+    skip = int(source_fps // target_fps)
+    poses = poses[::skip]
+    trans = trans[::skip]
+
+    # extract 24 SMPL joints from 55 SMPL-X joints
+    joints_to_use = np.array(
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 40]
+    )
+    joints_to_use = np.arange(0, 156).reshape((-1, 3))[joints_to_use].reshape(-1)
+    poses = poses[:, joints_to_use]
+
+    required_params = {}
+    required_params["poses"] = poses
+    required_params["trans"] = trans
+    required_params["fps"] = target_fps
+    
+    # save
+    np.save(output_path, required_params)
+    
+    return
 
 def process_amass_seq(fname, output_path):
 
@@ -40,6 +84,7 @@ def process_amass_seq(fname, output_path):
     
     return
 
+    
 def project_joints(motion):
     """ This is the original function used by ASE, designed for amp_humanoid.xml """
 
