@@ -700,7 +700,7 @@ Please note that it also relies on external libraries and datasets, each of whic
 
 ### Example Carry Motion
 
-- In VEHS7M dataset, annotate the timestamp for start and end of correct carry motions, put in excel
+- In VEHS7M dataset, annotate the timestamp for start and end of correct carry motions, put in csv
 - Look at the SMPLX file, segment them out, write a custom script, put in `vicon-read`
 - Motion frames
   - `tokenhsi/data/dataset_carry/preprocess_amass.py` 
@@ -710,5 +710,6 @@ Please note that it also relies on external libraries and datasets, each of whic
   —> index here used to control box movement, outputs `box_motion.npy`, and box render
   - `tokenhsi/data/dataset_carry/dataset_carry.yaml` —> index here used for ref state init `def sample_time_rsi`
 
+### Add Ergo Reward
 
 [install python fbx](https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_scripting_with_python_fbx_installing_python_fbx_html)
