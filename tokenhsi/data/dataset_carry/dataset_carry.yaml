@@ -8,60 +8,60 @@ motions:
       obj_file: motions/carry/ACCAD+__+Female1General_c3d+__+A5_-_pick_up_box_stageii/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: [65, 105]
       weight: 1.0
-    - file: motions/carry/S01+__+Activity03_stageii+__+4991-5267_pickUp/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity03_stageii+__+4991-5267_pickUp/box_motion.npy
+    - file: motions/carry/S01+__+Activity03_stageii+__+4991-5267_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S01+__+Activity03_stageii+__+4991-5267_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S01+__+Activity04_stageii+__+7348-7527_pickUp/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity04_stageii+__+7348-7527_pickUp/box_motion.npy
+    - file: motions/carry/S01+__+Activity04_stageii+__+7348-7527_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S01+__+Activity04_stageii+__+7348-7527_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S01+__+Activity04_stageii+__+12342-12496_pickUp/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity04_stageii+__+12342-12496_pickUp/box_motion.npy
+    - file: motions/carry/S01+__+Activity04_stageii+__+12342-12496_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S01+__+Activity04_stageii+__+12342-12496_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+733-1178_pickUp/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+733-1178_pickUp/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+733-1178_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+733-1178_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity03_stageii+__+5881-6336_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity03_stageii+__+5881-6336_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity03_stageii+__+5881-6336_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity03_stageii+__+5881-6336_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity03_stageii+__+15146-15415_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity03_stageii+__+15146-15415_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity03_stageii+__+15146-15415_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity03_stageii+__+15146-15415_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity04_stageii+__+1073-1189_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity04_stageii+__+1073-1189_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity04_stageii+__+1073-1189_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity04_stageii+__+1073-1189_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity04_stageii+__+2607-2751_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity04_stageii+__+2607-2751_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity04_stageii+__+2607-2751_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity04_stageii+__+2607-2751_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity04_stageii+__+4815-5295_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity04_stageii+__+4815-5295_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity04_stageii+__+4815-5295_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity04_stageii+__+4815-5295_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity04_stageii+__+6704-6933_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity04_stageii+__+6704-6933_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity04_stageii+__+6704-6933_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity04_stageii+__+6704-6933_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity04_stageii+__+12981-13160_pickUp/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity04_stageii+__+12981-13160_pickUp/box_motion.npy
+    - file: motions/carry/S03+__+Activity04_stageii+__+12981-13160_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity04_stageii+__+12981-13160_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S04+__+Activity04_stageii+__+3588-3991_pickUp/ref_motion.npy
-      obj_file: motions/carry/S04+__+Activity04_stageii+__+3588-3991_pickUp/box_motion.npy
+    - file: motions/carry/S04+__+Activity04_stageii+__+3588-3991_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S04+__+Activity04_stageii+__+3588-3991_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S06+__+Activity04_stageii+__+8199-8319_pickUp/ref_motion.npy
-      obj_file: motions/carry/S06+__+Activity04_stageii+__+8199-8319_pickUp/box_motion.npy
+    - file: motions/carry/S06+__+Activity04_stageii+__+8199-8319_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S06+__+Activity04_stageii+__+8199-8319_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S10+__+Activity04_stageii+__+4168-4346_pickUp/ref_motion.npy
-      obj_file: motions/carry/S10+__+Activity04_stageii+__+4168-4346_pickUp/box_motion.npy
+    - file: motions/carry/S10+__+Activity04_stageii+__+4168-4346_pickUp/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S10+__+Activity04_stageii+__+4168-4346_pickUp/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
 
@@ -70,48 +70,48 @@ motions:
       obj_file: motions/carry/ACCAD+__+Female1Walking_c3d+__+B21_-_put_down_box_to_walk_stageii/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/box_motion.npy
+    - file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+1178-1400_putDown/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+1178-1400_putDown/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+1178-1400_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+1178-1400_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+5841-6069_putDown/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+5841-6069_putDown/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+5841-6069_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+5841-6069_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+9087-9266_putDown/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+9087-9266_putDown/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+9087-9266_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+9087-9266_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity05_stageii+__+13621-13761_putDown/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity05_stageii+__+13621-13761_putDown/box_motion.npy
+    - file: motions/carry/S02+__+Activity05_stageii+__+13621-13761_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity05_stageii+__+13621-13761_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity03_stageii+__+6316-6726_putDown/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity03_stageii+__+6316-6726_putDown/box_motion.npy
+    - file: motions/carry/S03+__+Activity03_stageii+__+6316-6726_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity03_stageii+__+6316-6726_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity03_stageii+__+15387-15762_putDown/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity03_stageii+__+15387-15762_putDown/box_motion.npy
+    - file: motions/carry/S03+__+Activity03_stageii+__+15387-15762_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity03_stageii+__+15387-15762_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity04_stageii+__+12676-12847_putDown/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity04_stageii+__+12676-12847_putDown/box_motion.npy
+    - file: motions/carry/S03+__+Activity04_stageii+__+12676-12847_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity04_stageii+__+12676-12847_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S07+__+Activity04_stageii+__+1591-1738_putDown/ref_motion.npy
-      obj_file: motions/carry/S07+__+Activity04_stageii+__+1591-1738_putDown/box_motion.npy
+    - file: motions/carry/S07+__+Activity04_stageii+__+1591-1738_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S07+__+Activity04_stageii+__+1591-1738_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S10+__+Activity04_stageii+__+4442-4867_putDown/ref_motion.npy
-      obj_file: motions/carry/S10+__+Activity04_stageii+__+4442-4867_putDown/box_motion.npy
+    - file: motions/carry/S10+__+Activity04_stageii+__+4442-4867_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S10+__+Activity04_stageii+__+4442-4867_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S10+__+Activity04_stageii+__+13985-14245_putDown/ref_motion.npy
-      obj_file: motions/carry/S10+__+Activity04_stageii+__+13985-14245_putDown/box_motion.npy
+    - file: motions/carry/S10+__+Activity04_stageii+__+13985-14245_putDown/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S10+__+Activity04_stageii+__+13985-14245_putDown/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
 
@@ -120,32 +120,32 @@ motions:
       obj_file: motions/carry/ACCAD+__+Female1Walking_c3d+__+B20_-_walk_with_box_stageii/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S01+__+Activity05_stageii+__+10695-10851_carryWith/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity05_stageii+__+10695-10851_carryWith/box_motion.npy
+    - file: motions/carry/S01+__+Activity05_stageii+__+10695-10851_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S01+__+Activity05_stageii+__+10695-10851_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+4851-5001_carryWith/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+4851-5001_carryWith/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+4851-5001_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+4851-5001_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+5664-5853_carryWith/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+5664-5853_carryWith/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+5664-5853_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+5664-5853_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+8899-9137_carryWith/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+8899-9137_carryWith/box_motion.npy
+    - file: motions/carry/S02+__+Activity03_stageii+__+8899-9137_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity03_stageii+__+8899-9137_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity04_stageii+__+12780-12926_carryWith/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity04_stageii+__+12780-12926_carryWith/box_motion.npy
+    - file: motions/carry/S02+__+Activity04_stageii+__+12780-12926_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity04_stageii+__+12780-12926_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S02+__+Activity05_stageii+__+13505-13676_carryWith/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity05_stageii+__+13505-13676_carryWith/box_motion.npy
+    - file: motions/carry/S02+__+Activity05_stageii+__+13505-13676_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S02+__+Activity05_stageii+__+13505-13676_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/carry/S03+__+Activity03_stageii+__+8483-8675_carryWith/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity03_stageii+__+8483-8675_carryWith/box_motion.npy
+    - file: motions/carry/S03+__+Activity03_stageii+__+8483-8675_carryWith/phys_humanoid_v3/ref_motion.npy
+      obj_file: motions/carry/S03+__+Activity03_stageii+__+8483-8675_carryWith/phys_humanoid_v3/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
 
@@ -252,23 +252,13 @@ motions:
       weight: 1.0
     - file: motions/omomo/OMOMO+__+sub7_smallbox_051/phys_humanoid_v3/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S01+__+Activity03_stageii+__+1012-1410_pickUp/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity03_stageii+__+1012-1410_pickUp/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/carry/S01+__+Activity03_stageii+__+1012-1410_pickUp/phys_humanoid_v3/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S01+__+Activity04_stageii+__+1490-1751_putDown/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity04_stageii+__+1490-1751_putDown/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/carry/S01+__+Activity04_stageii+__+1490-1751_putDown/phys_humanoid_v3/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S01+__+Activity04_stageii+__+7912-8085_pickUp/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity04_stageii+__+7912-8085_pickUp/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/carry/S01+__+Activity04_stageii+__+7912-8085_pickUp/phys_humanoid_v3/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S04+__+Activity04_stageii+__+449-1071_pickUp/ref_motion.npy
-      obj_file: motions/carry/S04+__+Activity04_stageii+__+449-1071_pickUp/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/carry/S04+__+Activity04_stageii+__+449-1071_pickUp/phys_humanoid_v3/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S04+__+Activity04_stageii+__+1071-1394_putDown/ref_motion.npy
-      obj_file: motions/carry/S04+__+Activity04_stageii+__+1071-1394_putDown/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/carry/S04+__+Activity04_stageii+__+1071-1394_putDown/phys_humanoid_v3/ref_motion.npy
       weight: 1.0

@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=TokenHSI-train
-#SBATCH --output=output_slurm/train_log_12.txt
-#SBATCH --error=output_slurm/train_error_12.txt
+#SBATCH --output=output_slurm/train_log_1.txt
+#SBATCH --error=output_slurm/train_error_1.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -55,11 +55,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion True \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-12/ \
-    --wandb_name "Carry-train-12" \
-    --notes "RndMass [2,25], 0.4 size, scratch" \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try1/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/ \
+    --wandb_name "Try2-Carry-NewMotion-train-1-resume" \
+    --notes "RndMass [2,25], 0.4 size, resume" \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
     
     
     #     --box_w 1.0 \
