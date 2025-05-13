@@ -5,23 +5,30 @@
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/custom_trained/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    --checkpoint output/custom_trained/Carry-train-2-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
     --wandb_name "Carry_test_1" \
     --wandb_mode "disabled" \
-    --box_w 0.40 \
+    --box_w 0.25 \
+    --box_l 0.30 \
+    --box_h 0.20 \
     --random_size False \
     --random_mode_equal_proportion True \
     --random_density True \
     --density 100.0 \
+
+
+
+    # --checkpoint output/custom_trained/Carry-train-2-1/Humanoid_07-04-13-24/nn/Humanoid.pth \  # new motion
     
+# --checkpoint output/custom_trained/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
 # --checkpoint output/custom_trained/Carry-train-6/Humanoid_27-23-51-50/nn/Humanoid.pth \
 # --checkpoint output/custom_trained/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/Carry-train-10/Humanoid_29-03-42-24/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/Carry-train-11/Humanoid_29-03-55-48/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Carry-train-10/Humanoid_29-03-42-24/nn/Humanoid.pth \ # best visual, have old
+# --checkpoint output/custom_trained/Carry-train-11/Humanoid_29-03-55-48/nn/Humanoid.pth \  # best reward, have old
 # sth in the code is making the box location in the floor
     # --checkpoint output/single_task/ckpt_carry.pth \
 
