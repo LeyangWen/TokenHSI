@@ -46,7 +46,7 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --num_envs 4096 \
     --headless \
     --wandb_project "TokenHSI-Train" \
