@@ -711,5 +711,24 @@ Please note that it also relies on external libraries and datasets, each of whic
   - `tokenhsi/data/dataset_carry/dataset_carry.yaml` —> index here used for ref state init `def sample_time_rsi`
 
 ### Add Ergo Reward
+- Humanoid skeleton in `tokenhsi/data/assets/mjcf/phys_humanoid_v3.xml`
+  ```
+  0: pelvis
+  1: torso
+  2: head
+  3: right_upper_arm
+  4: right_lower_arm
+  5: right_hand
+  6: left_upper_arm
+  7: left_lower_arm
+  8: left_hand
+  9: right_thigh
+  10: right_shin
+  11: right_foot
+  12: left_thigh
+  13: left_shin
+  14: left_foot
+  ```
+  - Q: when is `def _compute_reward` called?
 
 [install python fbx](https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_scripting_with_python_fbx_installing_python_fbx_html)

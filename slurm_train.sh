@@ -60,6 +60,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "RndMass [2,25], 0.4 size, resume" \
     --resume 1 \
     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
+    --ergo_coeff 0.2 \
     
     
     #     --box_w 1.0 \
