@@ -129,6 +129,9 @@ def load_cfg(args):
 
     if args.construction_experiment is not None:
         cfg["env"]["eval"]["constructionExperiment"] = args.construction_experiment
+    
+    if args.ergo_coeff is not None:
+        cfg["env"]["ergoCoeff"] = args.ergo_coeff
 
     if args.start_positions is not None:
         cfg["env"]["eval"]["start_positions"] = eval(args.start_positions)
@@ -352,6 +355,9 @@ def get_args(benchmark=False):
         {"name": "--random_density", "type": str2bool, "default": None,
             "help": "Override env.box.build.randomDensity (e.g., --random_density True or --random_density False)"},
 
+        # Overrides for train
+        {"name": "--ergo_coeff", "type": float, "default": None, "help": "set ergo reward coeff, 0.2"},
+        
         # Overrides for env.eval
         {"name": "--num_experiments", "type": int, "default": None,
             "help": "Override env.eval.numExperiments"},

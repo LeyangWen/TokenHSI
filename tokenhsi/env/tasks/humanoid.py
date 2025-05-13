@@ -61,6 +61,23 @@ class Humanoid(BaseTask):
         
         key_bodies = self.cfg["env"]["keyBodies"]
         self._setup_character_props(key_bodies)
+        self.kp_id =  {
+                                "pelvis": 0,
+                                "torso": 1,
+                                "head": 2,
+                                "right_upper_arm": 3,
+                                "right_lower_arm": 4,
+                                "right_hand": 5,
+                                "left_upper_arm": 6,
+                                "left_lower_arm": 7,
+                                "left_hand": 8,
+                                "right_thigh": 9,
+                                "right_shin": 10,
+                                "right_foot": 11,
+                                "left_thigh": 12,
+                                "left_shin": 13,
+                                "left_foot": 14
+                            }  # wen add, would only work for the 15 kpt humanoid, set cfg["env"]["keyBodies"] in yaml to be more safe
 
         self.cfg["env"]["numObservations"] = self.get_obs_size()
         self.cfg["env"]["numActions"] = self.get_action_size()
@@ -608,7 +625,7 @@ class Humanoid(BaseTask):
         self.gym.clear_lines(self.viewer)
         return
     
-    def _fetch_humanoid_rigid_body_pos_rot_states(self, env_ids=None):
+    def _fetch_humanoid_rigid_body_pos_rot_states(self, env_ids=None):    
         if env_ids is None:
             env_ids = to_torch(np.arange(self.num_envs), dtype=torch.long, device=self.device)
 
@@ -620,6 +637,84 @@ class Humanoid(BaseTask):
         mask = (self.progress_buf[env_ids] == 0)
         rigid_body_pos_rot_states[mask] = kinematic_buffer[mask]
         return rigid_body_pos_rot_states
+
+    def humanoid_angles(self):
+        kp_id = self.kp_id
+
+        left_knee_angle  = self.angle_3D_from_ids(kp_id['left_foot'],  kp_id['left_shin'],  kp_id['left_thigh'])
+        right_knee_angle = self.angle_3D_from_ids(kp_id['right_foot'], kp_id['right_shin'], kp_id['right_thigh'])
+
+        back_angle = self.angle_3D_from_ids(kp_id['torso'], kp_id['pelvis'], "up")
+
+        left_elbow_angle  = self.angle_3D_from_ids(kp_id['left_hand'],  kp_id['left_lower_arm'],  kp_id['left_upper_arm'])
+        right_elbow_angle = self.angle_3D_from_ids(kp_id['right_hand'], kp_id['right_lower_arm'], kp_id['right_upper_arm'])
+        
+        summary_dict = {
+            "left_knee": left_knee_angle,
+            "right_knee": right_knee_angle,
+            "back": back_angle,
+            "left_elbow": left_elbow_angle,
+            "right_elbow": right_elbow_angle
+        }
+        return summary_dict
+
+    @staticmethod
+    def print_angles_degrees(summary_dict):
+        """
+        Print the angles in degrees
+        :param summary_dict: dict, keys are the names of the angles, values are the angles in radians
+        """
+        for key, value in summary_dict.items():
+            degree = value * 180 / np.pi
+            print(f"{key}: {degree} degrees")
+        return
+
+    def angle_3D_from_ids(self, id1, id_mid, id2):
+        """
+        Compute the angle between three points in 3D space, vector: id1<---id_mid, & vector id2<---id_mid
+        :param rigid_body_pos: torch.tensor, shape (batch_size, num_bodies, 3)
+        :param id1: int, index of the first point
+        :param id_mid: int, index of the middle point
+        :param id2: int, index of the third point or string "up" for up direction
+        :return: torch.tensor, shape (batch_size)
+        """
+        rigid_body_pos = self._rigid_body_pos
+        assert id1 != id2 and id1 != id_mid and id2 != id_mid, "id1, id2, and id3 must be different"
+        v1 = rigid_body_pos[:, id1, :] - rigid_body_pos[:, id_mid, :]
+        if id2 == "up":
+            v2 = torch.tensor([0.0, 0.0, 1.0], device=rigid_body_pos.device).expand_as(v1)
+        else:
+            v2 = rigid_body_pos[:, id2, :] - rigid_body_pos[:, id_mid, :]
+        
+        return self.anlge_3D(v1, v2)
+   
+    
+    @staticmethod
+    def anlge_3D(v1, v2):
+        # todo: write test
+        """
+        Compute the angle between two vectors in 3D space
+        :param v1: torch.tensor, shape (batch_size, 3)
+        :param v2: torch.tensor, shape (batch_size, 3)
+        :return: torch.tensor, shape (batch_size)
+        """
+        dot_product = torch.sum(v1 * v2, dim=-1)
+        norm_v1 = torch.norm(v1, dim=-1)
+        norm_v2 = torch.norm(v2, dim=-1)
+
+        # Avoid division by zero
+        eps = 1e-7
+        norm_v1 = torch.clamp(norm_v1, min=eps)
+        norm_v2 = torch.clamp(norm_v2, min=eps)
+
+        cos_angle = torch.clamp(dot_product / (norm_v1 * norm_v2), -1.0 + eps, 1.0 - eps)
+        angle = torch.acos(cos_angle)
+
+        # angles here should be [0, pi], otherwise, convert
+        angle = torch.min(angle, np.pi - angle)
+
+        return angle
+
 
 #####################################################################
 ###=========================jit functions=========================###
@@ -774,3 +869,5 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf, contact_body_id
     reset = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), terminated)
 
     return reset, terminated
+
+

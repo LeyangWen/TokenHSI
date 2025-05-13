@@ -90,6 +90,7 @@ env:
 
   debug:
       vel: False
+  ergo_coeff: 0.2
 
   eval:
     # override env settings

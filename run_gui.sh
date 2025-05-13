@@ -8,7 +8,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --checkpoint output/custom_trained/Carry-train-2-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
     --test \
-    --num_envs 1 \
+    --num_envs 2 \
     --wandb_project "TokenHSI-Test" \
     --wandb_name "Carry_test_1" \
     --wandb_mode "disabled" \
@@ -19,6 +19,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion True \
     --random_density True \
     --density 100.0 \
+    --ergo_coeff 0.2 \
+    # --headless \
+    # --record_headless
+
 
 
 
@@ -59,7 +63,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 #     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
 #     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
-#     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
 #     --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
 #     --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
 #     --test \
