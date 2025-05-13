@@ -89,11 +89,12 @@ if __name__ == "__main__":
         print(f"{skill_name}:")
         for d in dirs:
             # build the two motion‑file paths
-            ref = os.path.join("motions", "carry", d, "ref_motion.npy")
-            obj = os.path.join("motions", "carry", d, "box_motion.npy")
+            ref = os.path.join("motions", "carry", d, "phys_humanoid_v3", "ref_motion.npy")
+            obj = os.path.join("motions", "carry", d, "phys_humanoid_v3", "box_motion.npy")
             print(f"  - file: {ref}")
-            print(f"    obj_file: {obj}")
-            print(f"    rsi_skipped_range: []")   # leave RSI blank
+            if skill_name != "omomo":
+              print(f"    obj_file: {obj}")
+              print(f"    rsi_skipped_range: []")   # leave RSI blank
             print(f"    weight: 1.0")
         print()  # blank line between categories
 
