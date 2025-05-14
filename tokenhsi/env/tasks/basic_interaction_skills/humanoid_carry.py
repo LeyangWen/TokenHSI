@@ -31,6 +31,7 @@ import yaml
 from enum import Enum
 import numpy as np
 import torch
+import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
