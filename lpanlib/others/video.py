@@ -14,7 +14,7 @@ if __name__ == "__main__":
     fps = args.fps
     delete_imgs = args.delete_imgs
 
-    fnames = os.listdir(imgs_dir)
+    fnames = [f for f in os.listdir(imgs_dir) if f.lower().endswith('.png')]
     fnames = sorted(fnames)
 
     print(f"{os.path.join(imgs_dir, fnames[0])} -> {os.path.join(imgs_dir, fnames[-1])}")
