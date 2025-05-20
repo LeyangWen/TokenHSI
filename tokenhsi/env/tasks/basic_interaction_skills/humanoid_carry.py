@@ -800,10 +800,21 @@ class HumanoidCarry(Humanoid):
             - box_r        = {box_r * self._ergo_coeff}
             """)
         self.print_angles_degrees(humanoid_angles)
+        
+        reward_file = f"{self.save_video_dir}/joint_states.pkl"
+        # save everything to pkl
+        if (self.viewer and self.save_video) or (self.headless and self.record_headless):
+            if np.mod(self.frame_count, self.downsample) == 0:
+                cols = ["frame", "t"
+                        "carry_box_reward", "walk_r", "carry_r", "handheld_r", "putdown_r", 
+                        "1-ergo_coeff", "back_r", "elbow_r", "box_r"]
+                csv_row = []
+                
+                
+        
         # print(rigid_body_pos[0])
         # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
         # print(f"box_pos = {box_pos[0]}")
-        #TODO: tenserboard log angles and sub reward
         
         if (box_r[0]).item()>0:
             pass  # place to put breakpoint to check reward

@@ -34,6 +34,9 @@ class BaseTask():
         if self.device_type == "cuda" or self.device_type == "GPU":
             self.device = "cuda" + ":" + str(self.device_id)
 
+        
+        # wen parameters
+        self.downsample = 3
         self.headless = cfg["headless"]
         self.camera_handles = []
 
@@ -169,10 +172,31 @@ class BaseTask():
     def save_imgs(self):
         # render frame if we're saving video
         if self.save_video and self.viewer is not None:
-            num = str(self.save_img_count)
-            num = '0' * (6 - len(num)) + num
-            self.gym.write_viewer_image_to_file(self.viewer, f"{self.save_video_dir}/frame_{num}.png")
-            self.save_img_count += 1
+            if np.mod(self.frame_count, self.downsample) == 0:  # default 3
+                num = str(self.save_img_count)
+                num = '0' * (6 - len(num)) + num
+                self.gym.write_viewer_image_to_file(self.viewer, f"{self.save_video_dir}/frame_{num}.png")
+                self.save_img_count += 1
+            
+                csv_file = f"{self.save_video_dir}/joint_states.csv"
+                self.write_body_state_csv_row(csv_file)
+                
+        return
+
+    def write_body_state_csv_row(self, csv_file):
+        state_tensor = self.gym.acquire_rigid_body_state_tensor(self.sim)
+        # Wrap it in a PyTorch tensor for easier manipulation and indexing
+        rb_states = gymtorch.wrap_tensor(state_tensor)
+        data = rb_states.flatten().cpu().numpy()
+        self.write_csv_row(csv_file, data)
+        return
+    
+    @staticmethod
+    def write_csv_row(csv_file, data):
+        with open(csv_file, 'a', newline='') as f:
+            writer = csv.writer(f)
+            # write data flat as csv row
+            writer.writerow(data.tolist())
         return
 
     def get_states(self):
@@ -216,7 +240,7 @@ class BaseTask():
             if not self.record_headless:  # no need to render
                 return
 
-            if self.device != 'cpu':  # todo: change, method mianly for CPU, from graphics.py example
+            if True:  #self.device != 'cpu':  # todo: change, method mianly for CPU, from graphics.py example
                 self.gym.fetch_results(self.sim, True)
                 self.gym.step_graphics(self.sim)
                 self.gym.render_all_camera_sensors(self.sim)
@@ -226,20 +250,10 @@ class BaseTask():
                     return
 
 
-                if np.mod(self.frame_count, 5) == 0:
+                if np.mod(self.frame_count, self.downsample) == 0:
 
                     csv_file = 'joint_states.csv'
-                    # append a line to the csv file
-                    state_tensor = self.gym.acquire_rigid_body_state_tensor(self.sim)
-
-                    # Wrap it in a PyTorch tensor for easier manipulation and indexing
-                    rb_states = gymtorch.wrap_tensor(state_tensor)
-                    with open(csv_file, 'a', newline='') as f:
-                        writer = csv.writer(f)
-                        # write rb_states flat as csv row
-                        data = rb_states.flatten().cpu().numpy()
-                        writer.writerow(data.tolist())
-
+                    self.write_body_state_csv_row(csv_file)
 
                     for i in range(1):  #range(self.num_envs): # lets only print first 2 to see
                         for j in range(len(self.camera_handles[0])):
