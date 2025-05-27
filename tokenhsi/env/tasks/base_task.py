@@ -192,12 +192,29 @@ class BaseTask():
         return
     
     @staticmethod
-    def write_csv_row(csv_file, data):
-        with open(csv_file, 'a', newline='') as f:
+    def write_csv_row(csv_file, data, header=None):
+        """
+        Append a row to a CSV file, writing a header first if the file is new.
+
+        :param csv_file: Path to the CSV file.
+        :param data: Iterable of values (e.g. list or NumPy array).
+        :param header: List of column names. Required if file doesn't exist yet.
+        """
+        # Ensure directory exists
+        os.makedirs(os.path.dirname(csv_file), exist_ok=True)
+
+        is_new = not os.path.exists(csv_file)
+        mode = 'w' if is_new else 'a'
+
+        # Convert data to plain list
+        row = data.tolist() if hasattr(data, 'tolist') else list(data)
+        with open(csv_file, mode, newline='') as f:
             writer = csv.writer(f)
-            # write data flat as csv row
-            writer.writerow(data.tolist())
-        return
+            if is_new:
+                if header:
+                    header = header.tolist() if hasattr(header, 'tolist') else list(header)
+                    writer.writerow(header)
+            writer.writerow(row)
 
     def get_states(self):
         return self.states_buf
