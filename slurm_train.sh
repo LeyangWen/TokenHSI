@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --time=60:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
@@ -55,12 +55,13 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion True \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/ \
-    --wandb_name "Try2-Carry-NewMotion-train-1-resume" \
-    --notes "RndMass [2,25], 0.4 size, resume" \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-ErgoReward-train-2/ \
+    --wandb_name "Try2-Carry-NewMotion-train-2" \
+    --notes "ergo_coeff 0.2" \
     --ergo_coeff 0.2 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
+
     
     
     #     --box_w 1.0 \

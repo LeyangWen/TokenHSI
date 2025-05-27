@@ -6,7 +6,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_18-00-28-19/nn/Humanoid.pth  \
+    --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_23-14-50-08/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -27,12 +27,14 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_18-00-28-19/nn/Humanoid.pth \  Try3 -2 0.2 ergo coeff
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-1/Humanoid_18-00-27-50/nn/Humanoid.pth \  Try3 -1 0.01 ergo coeff
     # --checkpoint output/custom_trained/Carry-train-2-1/Humanoid_07-04-13-24/nn/Humanoid.pth \  # new motion
-    
-# --checkpoint output/custom_trained/Try1/lCarry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/Try1/lCarry-train-6/Humanoid_27-23-51-50/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/Try1/lCarry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/Try1/lCarry-train-10/Humanoid_29-03-42-24/nn/Humanoid.pth \ # best visual, have old
-# --checkpoint output/custom_trained/Try1/lCarry-train-11/Humanoid_29-03-55-48/nn/Humanoid.pth \  # best reward, have old
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+
+# --checkpoint output/custom_trained/Try1/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Try1/Carry-train-6/Humanoid_27-23-51-50/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Try1/Carry-train-8/Humanoid_27-23-50-50/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/Try1/Carry-train-10/Humanoid_29-03-42-24/nn/Humanoid.pth \ # best visual, have old
+# --checkpoint output/custom_trained/Try1/Carry-train-11/Humanoid_29-03-55-48/nn/Humanoid.pth \  # best reward, have old
 # sth in the code is making the box location in the floor
     # --checkpoint output/single_task/ckpt_carry.pth \
 
@@ -82,4 +84,4 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/2" --video_name "vid" --delete_imgs --fps 30
+# python lpanlib/others/video.py --imgs_dir "output/imgs/train_more" --video_name "vid" --delete_imgs --fps 10

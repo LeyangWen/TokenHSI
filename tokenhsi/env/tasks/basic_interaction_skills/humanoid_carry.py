@@ -41,6 +41,7 @@ from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
 
 from utils import torch_utils
+import wandb
 
 class HumanoidCarry(Humanoid):
     class StateInit(Enum):
@@ -70,6 +71,7 @@ class HumanoidCarry(Humanoid):
         print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
         
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
+        self._verbose = False
         
         if cfg["args"].eval:
             self._mode = "test"
@@ -782,46 +784,59 @@ class HumanoidCarry(Humanoid):
         elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos)
         box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids)
         ergo_reward = back_r + elbow_r + box_r
+        total_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
         
-        if (handheld_r[0] > 0).item():
+        if self._verbose:
+            print("#"*40)
+            print(f"""[Info] Frame {self.frame_count}
+                Ergo coeff = {self._ergo_coeff}
+                Carry_box_reward = {carry_box_reward* (1 - self._ergo_coeff)}
+                - walk_r       = {walk_r* (1 - self._ergo_coeff)}
+                - carry_r      = {carry_r* (1 - self._ergo_coeff)}
+                - handheld_r   = {handheld_r* (1 - self._ergo_coeff)}
+                - putdown_r    = {putdown_r* (1 - self._ergo_coeff)}
+                Ergo_reward  = {ergo_reward * self._ergo_coeff}
+                - back_r       = {back_r * self._ergo_coeff}
+                - elbow_r      = {elbow_r * self._ergo_coeff}
+                - box_r        = {box_r * self._ergo_coeff}
+                """)
             self.print_angles_degrees(humanoid_angles)
-            pass
-        print("#"*40)
-        print(f"""[Info] Frame {self.frame_count}
-            Ergo coeff = {self._ergo_coeff}
-            Carry_box_reward = {carry_box_reward* (1 - self._ergo_coeff)}
-            - walk_r       = {walk_r* (1 - self._ergo_coeff)}
-            - carry_r      = {carry_r* (1 - self._ergo_coeff)}
-            - handheld_r   = {handheld_r* (1 - self._ergo_coeff)}
-            - putdown_r    = {putdown_r* (1 - self._ergo_coeff)}
-            Ergo_reward  = {ergo_reward * self._ergo_coeff}
-            - back_r       = {back_r * self._ergo_coeff}
-            - elbow_r      = {elbow_r * self._ergo_coeff}
-            - box_r        = {box_r * self._ergo_coeff}
-            """)
-        self.print_angles_degrees(humanoid_angles)
+            # print(rigid_body_pos[0])
+            # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
+            # print(f"box_pos = {box_pos[0]}")
+        # only show 0th env reward
+        metrics = {
+            "reward/CARRY_BOX": carry_box_reward[0].item(),
+            "reward/walk_r": walk_r[0].item(),
+            "reward/carry_r": carry_r[0].item(),
+            "reward/handheld_r": handheld_r[0].item(),
+            "reward/putdown_r": putdown_r[0].item(),
+            "reward_ergo/ERGO": ergo_reward[0].item(),
+            "reward_ergo/back_r": back_r[0].item(),
+            "reward_ergo/elbow_r": elbow_r[0].item(),
+            "reward_ergo/box_r": box_r[0].item(),
+            "reward/frames": self.frame_count,
+            "reward/total_reward": total_reward[0].item(),
+            }
+        wandb.log(metrics, step=self.frame_count)
         
-        reward_file = f"{self.save_video_dir}/joint_states.pkl"
+        metrics["ergo_coeff"] = self._ergo_coeff
+        reward_file = f"{self.save_video_dir}/rewards.csv"
         # save everything to pkl
         if (self.viewer and self.save_video) or (self.headless and self.record_headless):
             if np.mod(self.frame_count, self.downsample) == 0:
-                cols = ["frame", "t"
-                        "carry_box_reward", "walk_r", "carry_r", "handheld_r", "putdown_r", 
-                        "1-ergo_coeff", "back_r", "elbow_r", "box_r"]
-                csv_row = []
-                
+                # metrics dict value to 
+                csv_row = metrics.values()
+                self.write_csv_row(reward_file, csv_row, header=metrics.keys())
                 
         
-        # print(rigid_body_pos[0])
-        # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
-        # print(f"box_pos = {box_pos[0]}")
         
         if (box_r[0]).item()>0:
             pass  # place to put breakpoint to check reward
         
-        carry_box_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
 
-        
+
+        carry_box_reward
         power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)
         power_reward = -self._power_coefficient * power
 
@@ -1513,7 +1528,11 @@ def compute_back_ergo_reward(back_angle, left_knee_angle, right_knee_angle):
     if adjust_knee:
         # reduce penalty for back if knees are bent
         # knee 90 --> 180, 100% --> 0% discount on back_angle_diff
-        adjusted_back_angle_diff =  back_angle_diff*(1.0 - torch.clamp_min((mean_knee_angle - 0.5 * np.pi) / (np.pi / 2), 0.0))
+        adjusted_back_angle_diff =  back_angle_diff*(1.0 - torch.clamp_min((mean_knee_angle - 0.5 * np.pi) / (0.5 * np.pi), 0.0))
+        # 1 - max[(knee-90)/90,0]
+        # 1- max[knee/90-1,0]
+        # min[1-(knee/90-1),1]
+        # min[2-knee/90,1]
     else:
         adjusted_back_angle_diff = back_angle_diff
     reward = weight * torch.exp(exp_k * adjusted_back_angle_diff)
@@ -1553,7 +1572,7 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     hands2box_mask = hands2box_pos_err < hand_threshold
     
     # if box moved, bool mask for each env
-    box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.01 ** 2
+    box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.05 ** 2
     
     # reward is 0 unless box moved and hands are close enough
     reward[~box_moved_mask] = 0.0
@@ -1570,7 +1589,7 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     ############## hyperparameters ##############
     exp_k = -5.0
     weight = 0.25
-    box_dist_threshold_precentage = 0.1 #%
+    box_dist_threshold_percentage = 0.1 # *100%
     upper_limit_angle = 1 / 9.0 * np.pi  # 20 degrees from REBA-back
     only_height= True
     hand_threshold = 0.5 
@@ -1587,7 +1606,7 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     # calculate the xy distance between the box and the humanoid body, if exceed half of box max w, l, h + threshold%, reduce reward
     box_pos_diff_xy = box_pos[..., :2] - mean_body_pos[..., :2]
     box_pos_diff_dist = torch.norm(box_pos_diff_xy, p=2, dim=1)
-    max_box_edge = torch.max(box_size)*(1.0 + box_dist_threshold_precentage)
+    max_box_edge = torch.max(box_size)*(1.0 + box_dist_threshold_percentage)
     
     box_pos_diff = torch.clamp_min(box_pos_diff_dist - max_box_edge, 0.0)
     reward = weight*torch.exp(-5.0 * box_pos_diff)
