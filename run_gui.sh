@@ -20,10 +20,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_density True \
     --density 100.0 \
     --ergo_coeff 0.2 \
+    --ergo_sub_weight "20, 40, 40" \
     # --headless \
     # --record_headless
 
-
+    # --ergo_sub_weight "50,25,25" \
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_18-00-28-19/nn/Humanoid.pth \  Try3 -2 0.2 ergo coeff
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-1/Humanoid_18-00-27-50/nn/Humanoid.pth \  Try3 -1 0.01 ergo coeff
     # --checkpoint output/custom_trained/Carry-train-2-1/Humanoid_07-04-13-24/nn/Humanoid.pth \  # new motion
@@ -84,4 +85,4 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/train_more" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/80-10-10" --video_name "vid" --delete_imgs --fps 10
