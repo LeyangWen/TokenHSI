@@ -71,6 +71,7 @@ class HumanoidCarry(Humanoid):
         print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
         
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
+        self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
         self._verbose = False
         
         if cfg["args"].eval:
@@ -780,9 +781,11 @@ class HumanoidCarry(Humanoid):
         carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
         
         humanoid_angles = self.humanoid_angles()
-        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"])
-        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos)
-        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids)
+        ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
+        ergo_sub_weight /= ergo_sub_weight.sum()
+        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], weight=ergo_sub_weight[0])
+        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, weight=ergo_sub_weight[1])
+        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, weight=ergo_sub_weight[2])
         ergo_reward = back_r + elbow_r + box_r
         total_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
         
@@ -822,7 +825,6 @@ class HumanoidCarry(Humanoid):
         
         metrics["ergo_coeff"] = self._ergo_coeff
         reward_file = f"{self.save_video_dir}/rewards.csv"
-        # save everything to pkl
         if (self.viewer and self.save_video) or (self.headless and self.record_headless):
             if np.mod(self.frame_count, self.downsample) == 0:
                 # metrics dict value to 
@@ -1506,13 +1508,12 @@ def compute_putdown_reward(box_pos, tar_pos):
     return 0.2 * reward
 
 @torch.jit.script
-def compute_back_ergo_reward(back_angle, left_knee_angle, right_knee_angle):
+def compute_back_ergo_reward(back_angle, left_knee_angle, right_knee_angle, weight):
     """
     Keep back straight, avoid side bending and twisting, avoid backward flexion, forward flexion is okay to a certain extent
     """
     ############## hyperparameters ##############
     exp_k = -5.0
-    weight = 0.5
     adjust_knee = True
     upper_limit_angle = 1 / 9.0 * np.pi  # 20 degrees from REBA
     ##############################################
@@ -1540,23 +1541,23 @@ def compute_back_ergo_reward(back_angle, left_knee_angle, right_knee_angle):
     return reward
     
 @torch.jit.script
-def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigid_body_pos, hands_ids, box_pos, prev_box_pos):
+def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigid_body_pos, hands_ids, box_pos, prev_box_pos, weight):
     """
     keep elbow angle around 5/9 * pi in power zone when near the box
     """
     
     ############## hyperparameters ##############
     exp_k = -5.0
-    weight = 0.25
     only_height = True
-    hand_threshold = 0.5 
+    hand_threshold = 0.5  # 50 cm
     desired_angle = 5.0 / 9.0 * np.pi  # 80 degrees from REBA-elbow, mean(100,60) (100 since it is the other way)
     ##############################################
     
 
 
-    left_elbow_angle_diff = torch.abs(left_elbow_angle - desired_angle)
-    right_elbow_angle_diff = torch.abs(right_elbow_angle - desired_angle)
+    left_elbow_angle_diff = np.clamp_min(torch.abs(left_elbow_angle - desired_angle) - 1/9.0 * np.pi, 0.0)
+    right_elbow_angle_diff = np.clamp_min(torch.abs(right_elbow_angle - desired_angle) - 1/9.0 * np.pi, 0.0)
+    
 
     reward = (
         weight / 2 * torch.exp(exp_k * left_elbow_angle_diff)
@@ -1572,7 +1573,7 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     hands2box_mask = hands2box_pos_err < hand_threshold
     
     # if box moved, bool mask for each env
-    box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.05 ** 2
+    box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.001 ** 2
     
     # reward is 0 unless box moved and hands are close enough
     reward[~box_moved_mask] = 0.0
@@ -1581,14 +1582,13 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     return reward
 
 @torch.jit.script
-def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoid_rigid_body_pos, hands_ids):
+def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoid_rigid_body_pos, hands_ids, weight):
     """
     keep box close to body when carrying
     """
     
     ############## hyperparameters ##############
     exp_k = -5.0
-    weight = 0.25
     box_dist_threshold_percentage = 0.1 # *100%
     upper_limit_angle = 1 / 9.0 * np.pi  # 20 degrees from REBA-back
     only_height= True

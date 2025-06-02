@@ -132,6 +132,9 @@ def load_cfg(args):
     
     if args.ergo_coeff is not None:
         cfg["env"]["ergoCoeff"] = args.ergo_coeff
+        
+    if args.ergo_sub_weight is not None:
+        cfg["env"]["ergoSubWeight"] = [float(x) for x in args.ergo_sub_weight.split(",")]
 
     if args.start_positions is not None:
         cfg["env"]["eval"]["start_positions"] = eval(args.start_positions)
@@ -357,7 +360,8 @@ def get_args(benchmark=False):
 
         # Overrides for train
         {"name": "--ergo_coeff", "type": float, "default": None, "help": "set ergo reward coeff, 0.2"},
-        
+        {"name":"--ergo_sub_weight", "type":str, "default":None, "help":"comma-separated floats, e.g. '50,25,25'"},
+          
         # Overrides for env.eval
         {"name": "--num_experiments", "type": int, "default": None,
             "help": "Override env.eval.numExperiments"},
