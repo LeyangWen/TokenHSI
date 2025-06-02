@@ -172,3 +172,4 @@ cython_debug/
 /tokenhsi/data/dataset_dynamic_objects/train/
 joint_states.csv
 gui_out.txt
+tokenhsi/data/dataset_dynamic_objects/note.txt

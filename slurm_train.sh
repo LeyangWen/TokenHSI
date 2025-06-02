@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
-#SBATCH --gres=gpu:2
+#SBATCH --gres=gpu:1
 #SBATCH --time=60:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
@@ -47,7 +47,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --num_envs 4096 \
+    --num_envs 10240 \
     --headless \
     --wandb_project "TokenHSI-Train" \
     --wandb_mode "online" \
@@ -55,15 +55,15 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion True \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-ErgoReward-train-2/ \
-    --wandb_name "Try2-Carry-NewMotion-train-2" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try3/Carry-NewMotion-resume-ErgoReward-train-2/ \
+    --wandb_name "Try3-Carry-NewMotion-resume-ErgoReward-train-2-resume" \
     --notes "ergo_coeff 0.2" \
     --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try2/Carry-NewMotion-train-1/Humanoid_07-04-13-24/nn/Humanoid.pth \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_18-00-28-19/nn/Humanoid.pth \
 
     
-    
+    # 0.01 0.2 0.4 0.6 0.8 0.99
     #     --box_w 1.0 \
     # --box_h 1.5 \
     # --box_l 2.0 \
