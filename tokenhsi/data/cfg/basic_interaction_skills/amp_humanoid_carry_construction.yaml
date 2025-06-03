@@ -90,8 +90,8 @@ env:
 
   debug:
       vel: False
-  ergo_coeff: 0.2
-  ergo_sub_weights: [50.0, 25.0, 25.0]
+  ergoCoeff: 0.2
+  ergoSubWeight: [50.0, 25.0, 25.0]
 
   eval:
     # override env settings
