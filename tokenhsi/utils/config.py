@@ -360,7 +360,7 @@ def get_args(benchmark=False):
 
         # Overrides for train
         {"name": "--ergo_coeff", "type": float, "default": None, "help": "set ergo reward coeff, 0.2"},
-        {"name":"--ergo_sub_weight", "type":str, "default":None, "help":"comma-separated floats, e.g. '50,25,25'"},
+        {"name":"--ergo_sub_weight", "type":str, "default": None, "help":"comma-separated floats, e.g. '50,25,25'"},
           
         # Overrides for env.eval
         {"name": "--num_experiments", "type": int, "default": None,

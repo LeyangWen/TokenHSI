@@ -1556,8 +1556,8 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     
 
 
-    left_elbow_angle_diff = np.clamp_min(torch.abs(left_elbow_angle - desired_angle) - 1/9.0 * np.pi, 0.0)
-    right_elbow_angle_diff = np.clamp_min(torch.abs(right_elbow_angle - desired_angle) - 1/9.0 * np.pi, 0.0)
+    left_elbow_angle_diff = torch.clamp_min(torch.abs(left_elbow_angle - desired_angle) - 1/9.0 * np.pi, 0.0)
+    right_elbow_angle_diff = torch.clamp_min(torch.abs(right_elbow_angle - desired_angle) - 1/9.0 * np.pi, 0.0)
     
 
     reward = (
