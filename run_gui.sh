@@ -25,6 +25,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --record_headless
 
     # --ergo_sub_weight "50,25,25" \
+    # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-resume-ErgoReward-train-1/Humanoid_02-14-41-35/nn/Humanoid.pth \ Try 4 -1 resumed based on good one, with good motion and updated ergo, good motion but bad lift still
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_23-14-50-08/nn/Humanoid.pth \ Try3 -2 train more
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-2/Humanoid_18-00-28-19/nn/Humanoid.pth \  Try3 -2 0.2 ergo coeff
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try3/Carry-NewMotion-resume-ErgoReward-train-1/Humanoid_18-00-27-50/nn/Humanoid.pth \  Try3 -1 0.01 ergo coeff
@@ -86,4 +87,6 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/80-10-10" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/10deg" --video_name "vid" --delete_imgs --fps 10
+
+
