@@ -36,7 +36,7 @@
         <camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom"/>
         <camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom"/>
         <joint name="abdomen_x" pos="0 0 0" axis="1 0 0" range="-60 60" stiffness="1000" damping="100" armature=".02"/>
-        <joint name="abdomen_y" pos="0 0 0" axis="0 1 0" range="-60 90" stiffness="1000" damping="100" armature=".02"/>
+        <joint name="abdomen_y" pos="0 0 0" axis="0 1 0" range="-60 90" stiffness="1000" damping="100" armature=".02"/>  # flexion -60 90
         <joint name="abdomen_z" pos="0 0 0" axis="0 0 1" range="-50 50" stiffness="1000" damping="100" armature=".02"/>
         <geom name="torso" type="sphere" pos="0 0 0.12" size="0.11" density="1794"/>
 
