@@ -834,7 +834,7 @@ class HumanoidCarry(Humanoid):
                  
         if (box_r[0]).item()>0:
             pass  # place to put breakpoint to check reward
-        carry_box_reward = total_reward
+        carry_box_reward = total_reward + 0.0
         
         power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)
         power_reward = -self._power_coefficient * power

@@ -34,7 +34,6 @@ import yaml
 import trimesh
 import pickle
 import wandb
-import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
@@ -1197,7 +1196,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                  
         if (box_r[0]).item()>0:
             pass  # place to put breakpoint to check reward
-        carry_box_reward = total_reward
+        carry_box_reward = total_reward + 0.0
         
         # power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)  # from carry.py
         power = torch.abs(torch.multiply(self.dof_force_tensor[:, self._power_dof_ids], self._dof_vel[:, self._power_dof_ids])).sum(dim = -1)
