@@ -742,7 +742,7 @@ Please note that it also relies on external libraries and datasets, each of whic
 - You can set hard limit to joints in `tokenhsi/data/assets/mjcf/phys_humanoid_v3.xml` and the box_foot one, normally, it is the y axis that is the main one
 
 ### 20250722
-- Found bug in reward, it seems that the ergo reward was never used
+- Found bug in reward, it seems that the ergo reward was never used, fix and rerun exp in try4-5 & -4
 
 
 ## Goal: Terrain adaptation from modified construction carry
@@ -756,3 +756,8 @@ Please note that it also relies on external libraries and datasets, each of whic
   ```
 - Directly deploy carry
   - From `/tokenhsi/env/tasks/adapt_interaction_skills/humanoid_adapt_traj_ground2terrain.py` add in reward policy, 
+  - random_density had to be false since it comes from pretrained weights
+  - Reward low, also slow since we have to reduce num_envs to 1/5, 10240 --> 2048
+  - verify trained terrain results, is it working
+  - Need to understand hrl checkpoint since it is still used in terrain-test
+  - cant lift
