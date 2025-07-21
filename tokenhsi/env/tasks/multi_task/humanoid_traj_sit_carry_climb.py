@@ -32,6 +32,7 @@ import numpy as np
 import torch
 import yaml
 import json
+import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
@@ -228,6 +229,16 @@ class HumanoidTrajSitCarryClimb(Humanoid):
 
         self._mode = cfg["env"]["mode"] # determine which set of objects to use (train or test)
         assert self._mode in ["train", "test"]
+        
+        self._is_eval = cfg["args"].eval
+        self._is_test = cfg["args"].test
+        self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
+        self._box_density_value = cfg["env"]["eval"].get("density", False)
+        print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
+        
+        self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
+        self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
+        self._verbose = False
 
         if cfg["args"].eval:
             self._mode = "test"

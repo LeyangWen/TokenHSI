@@ -49,7 +49,7 @@ env:
       scaleRangeZ: [0.5, 1.5]
       scaleSampleInterval: 0.125 # 0.05m
       randomDensity: False # if True, mass will be added into policy obs
-      massRange: [2.0, 36.0]  # kg, standard brick --> concrete bag
+      massRange: [2.0, 25.0]  # kg, standard brick --> concrete bag
       testSizes:
        - [0.22, 0.22, 0.22]
        - [0.27, 0.27, 0.27]
@@ -73,6 +73,8 @@ env:
 
   debug:
       vel: False
+  ergoCoeff: 0.2
+  ergoSubWeight: [50.0, 25.0, 25.0]
 
   ##### debug
   flagSmallTerrain: False # test & eval only
@@ -99,7 +101,7 @@ env:
     # terrainProportions: [0, 0, 0, 0, 0, 0, 0, 1.0]
     slopeTreshold: 0.9
     # wen task override
-    loadTerrain: True
+    loadTerrain: False
     heightFieldPath: "tokenhsi/data/terrain/height_map.npy"
     walkableFieldPath: "tokenhsi/data/terrain/height_map_walkable.npy"
 

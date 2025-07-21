@@ -33,6 +33,7 @@ import torch
 import yaml
 import trimesh
 import pickle
+import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
@@ -42,6 +43,8 @@ from utils import gym_util
 from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
 from isaacgym.terrain_utils import *
+
+from env.tasks.basic_interaction_skills.humanoid_carry import compute_back_ergo_reward, compute_box_ergo_reward, compute_elbow_ergo_reward
 
 from utils import torch_utils
 from utils import traj_generator
@@ -82,6 +85,10 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
         self._box_density_value = cfg["env"]["eval"].get("density", False)
         print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
+        
+        self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
+        self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
+        self._verbose = False
         if cfg["args"].eval:
             self._mode = "test"
 
@@ -227,7 +234,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._kinematic_humanoid_rigid_body_states = torch.zeros((self.num_envs, self.num_bodies, 13), device=self.device, dtype=torch.float)
 
         ###### evaluation!!!
-        self._is_eval = cfg["args"].eval
         if self._is_eval:
 
             self._success_buf = torch.zeros((self.num_envs), device=self.device, dtype=torch.long)
@@ -410,6 +416,11 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         if (self._enable_task_obs):
             task_obs_size = self.get_task_obs_size()
             obs_size += task_obs_size
+            
+            
+            if (self._build_random_density):
+                obs_size += 1 # obs for box mass
+
         return obs_size
     
     def get_task_obs_size(self):
@@ -680,7 +691,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         mass = self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0].mass
         self._box_masses.append(mass)
-
+        print(f"[Info]: box mass = {mass} kg")
         return
     
     def _build_platforms(self, env_id, env_ptr):
@@ -988,7 +999,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                 heights = torch.clip(heights, -3, 3.)
 
             obs = torch.cat([heights, obs], dim=1)
-
+        
         return obs
 
     def _compute_reward(self, actions):
@@ -1008,6 +1019,60 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
         putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
         carry_box_reward = 2.0 * walk_r + 2.0 * carry_r + handheld_r + putdown_r
+
+        humanoid_angles = self.humanoid_angles()
+        ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
+        ergo_sub_weight /= ergo_sub_weight.sum()
+        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], weight=ergo_sub_weight[0])
+        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, weight=ergo_sub_weight[1])
+        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, weight=ergo_sub_weight[2])
+        ergo_reward = back_r + elbow_r + box_r
+        total_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
+        
+        if self._verbose:
+            print("#"*40)
+            print(f"""[Info] Frame {self.frame_count}
+                Ergo coeff = {self._ergo_coeff}
+                Carry_box_reward = {carry_box_reward* (1 - self._ergo_coeff)}
+                - walk_r       = {walk_r* (1 - self._ergo_coeff)}
+                - carry_r      = {carry_r* (1 - self._ergo_coeff)}
+                - handheld_r   = {handheld_r* (1 - self._ergo_coeff)}
+                - putdown_r    = {putdown_r* (1 - self._ergo_coeff)}
+                Ergo_reward  = {ergo_reward * self._ergo_coeff}
+                - back_r       = {back_r * self._ergo_coeff}
+                - elbow_r      = {elbow_r * self._ergo_coeff}
+                - box_r        = {box_r * self._ergo_coeff}
+                """)
+            self.print_angles_degrees(humanoid_angles)
+            # print(rigid_body_pos[0])
+            # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
+            # print(f"box_pos = {box_pos[0]}")
+        # only show 0th env reward
+        metrics = {
+            "reward/CARRY_BOX": carry_box_reward[0].item(),
+            "reward/walk_r": walk_r[0].item(),
+            "reward/carry_r": carry_r[0].item(),
+            "reward/handheld_r": handheld_r[0].item(),
+            "reward/putdown_r": putdown_r[0].item(),
+            "reward_ergo/ERGO": ergo_reward[0].item(),
+            "reward_ergo/back_r": back_r[0].item(),
+            "reward_ergo/elbow_r": elbow_r[0].item(),
+            "reward_ergo/box_r": box_r[0].item(),
+            "reward/frames": self.frame_count,
+            "reward/total_reward": total_reward[0].item(),
+            }
+        wandb.log(metrics, step=self.frame_count)
+        
+        metrics["ergo_coeff"] = self._ergo_coeff
+        reward_file = f"{self.save_video_dir}/rewards.csv"
+        if (self.viewer and self.save_video) or (self.headless and self.record_headless):
+            if np.mod(self.frame_count, self.downsample) == 0:
+                # metrics dict value to 
+                csv_row = metrics.values()
+                self.write_csv_row(reward_file, csv_row, header=metrics.keys())
+        
+        if (box_r[0]).item()>0:
+            pass  # place to put breakpoint to check reward
 
         power = torch.abs(torch.multiply(self.dof_force_tensor[:, self._power_dof_ids], self._dof_vel[:, self._power_dof_ids])).sum(dim = -1)
         power_reward = -self._power_coefficient * power

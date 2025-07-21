@@ -42,7 +42,6 @@ from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
 
 from utils import torch_utils
-import wandb
 
 class HumanoidCarry(Humanoid):
     class StateInit(Enum):
@@ -832,14 +831,9 @@ class HumanoidCarry(Humanoid):
                 csv_row = metrics.values()
                 self.write_csv_row(reward_file, csv_row, header=metrics.keys())
                 
-        
-        
         if (box_r[0]).item()>0:
             pass  # place to put breakpoint to check reward
         
-
-
-        carry_box_reward
         power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)
         power_reward = -self._power_coefficient * power
 

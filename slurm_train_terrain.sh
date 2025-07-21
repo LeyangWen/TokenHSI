@@ -1,14 +1,14 @@
 #!/bin/bash -l
 #SBATCH --job-name=TokenHSI-train
-#SBATCH --output=output_slurm/train_log_1.txt
-#SBATCH --error=output_slurm/train_error_1.txt
+#SBATCH --output=output_slurm/train_terrain_log.txt
+#SBATCH --error=output_slurm/train_terrain_error.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=50:00:00
+#SBATCH --time=80:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -43,27 +43,29 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 
 # export MAX_JOBS=1
 
-python -u ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --num_envs 10240 \
+    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --num_envs 2048 \
     --headless \
     --wandb_project "TokenHSI-Train" \
     --wandb_mode "online" \
     --box_w 0.4 \
     --random_size True \
-    --random_density True \
+    --random_density False \
     --random_mode_equal_proportion True \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-train-debug/ \
-    --wandb_name "Terrain-GoodMotion-train-debug" \
-    --notes "good motion only, no ergo reward, resume 2 partial trained Humanoid_02-14-42-16" \
-    --ergo_coeff 0.2 \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2/Humanoid_02-14-42-16/nn/Humanoid.pth \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/ \
+    --wandb_name "Terrain-GoodMotion-pretrainStage1-train-1" \
+    --notes "" \
+    --ergo_coeff 0.0 \
 
-
-
+    #     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-Reward-pretrainStage1-train-2/ \
+    # --wandb_name "Terrain-GoodMotion-Reward-pretrainStage1-train-2" \
+    # --notes "" \
+    # --ergo_coeff 0.2 \
+    
     # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-3/ \
     # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-3" \
     # --notes "good motion only + ergo reward, resume on 2 partial trained 02-14-42-16" \
