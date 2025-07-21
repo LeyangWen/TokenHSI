@@ -46,7 +46,6 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --num_envs 10240 \
     --headless \
     --wandb_project "TokenHSI-Train" \
@@ -55,12 +54,19 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion True \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-train-debug/ \
-    --wandb_name "Terrain-GoodMotion-train-debug" \
-    --notes "good motion only, no ergo reward, resume 2 partial trained Humanoid_02-14-42-16" \
+        --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-5/ \
+    --wandb_name "Carry-GoodMotion-resume-ergoReward-train-5" \
+    --notes " ergo reward only (debug: added ergo to total), no good motion, from scratch" \
     --ergo_coeff 0.2 \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2/Humanoid_02-14-42-16/nn/Humanoid.pth \
+
+
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-4/ \
+    # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-4" \
+    # --notes "good motion only + ergo reward (debug: added ergo to total), resume on goodmotion 07-01-20-33" \
+    # --ergo_coeff 0.2 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2-resume/Humanoid_07-01-20-33/nn/Humanoid.pth \
 
 
 

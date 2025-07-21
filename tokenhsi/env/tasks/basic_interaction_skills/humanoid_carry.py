@@ -33,6 +33,7 @@ import torch
 import yaml
 import trimesh
 import pickle
+import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
