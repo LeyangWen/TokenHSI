@@ -43,7 +43,6 @@ from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
 
 from utils import torch_utils
-import wandb
 
 class HumanoidCarry(Humanoid):
     class StateInit(Enum):

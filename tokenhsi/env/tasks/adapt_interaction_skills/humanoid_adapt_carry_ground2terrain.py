@@ -34,6 +34,7 @@ import yaml
 import trimesh
 import pickle
 import wandb
+import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
@@ -416,6 +417,11 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         if (self._enable_task_obs):
             task_obs_size = self.get_task_obs_size()
             obs_size += task_obs_size
+            
+            
+            if (self._build_random_density):
+                obs_size += 1 # obs for box mass
+
         return obs_size
     
     def get_task_obs_size(self):
@@ -686,7 +692,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         mass = self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0].mass
         self._box_masses.append(mass)
-
+        print(f"[Info]: box mass = {mass} kg")
         return
     
     def _build_platforms(self, env_id, env_ptr):
