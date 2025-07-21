@@ -734,7 +734,11 @@ Please note that it also relies on external libraries and datasets, each of whic
 [install python fbx](https://help.autodesk.com/view/FBX/2020/ENU/?guid=FBX_Developer_Help_scripting_with_python_fbx_installing_python_fbx_html)
 
 
-
+### 20250611
+- working: with good lift and lower
+- Good referece motion is very important, add yours from VEHS and delete bad ones
+- Box size and density in range similar to your training is crutial for sucess
+- You can set hard limit to joints in `tokenhsi/data/assets/mjcf/phys_humanoid_v3.xml` and the box_foot one, normally, it is the y axis that is the main one
 
 
 
