@@ -67,6 +67,42 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 
 
 # Terrain Carry Test
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --checkpoint output/custom_trained/Try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "CarryTerrain_test" \
+    --wandb_mode "disabled" \
+    --notes "rand loc, test carry" \
+    --box_w 0.40 \
+    --random_size False \
+    --random_density False \
+    --density 0 \
+    --random_mode_equal_proportion False \
+
+# train - OOM
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --num_envs 1 \
+    --box_w 0.4 \
+    --random_size True \
+    --random_density False \
+    --random_mode_equal_proportion True \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "CarryTerrain_test" \
+    --wandb_mode "disabled" \
+    --ergo_coeff 0.0 \
+
+
+# OG
 # python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 #     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
 #     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
@@ -83,7 +119,6 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 #     --random_size False \
 #     --random_density False \
 #     --random_mode_equal_proportion False \
-
 
 
 # sh tokenhsi/scripts/single_task/traj_test.sh

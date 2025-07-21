@@ -1621,9 +1621,12 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                 
                 old_root_xyz = root_pos.clone()
 
+                if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
+                    padding = self.terrain.border_size
+                else:
+                    padding = 0
+                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids, fixed_loc="center") + padding  # OG code hard coded +8 inside func, which is the mapLength for test scenarios
 
-                padding = self.terrain.border_size
-                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids, fixed_loc="center") + padding # + 8 # OG code hard coded +8, which is the mapLength for test scenarios
                 # TODO: og code seem to be adding 8, which is the mapLength instead of border, finde out why
                 print(f"[Info]: _reset_ref_state_init: new_root_xy = {new_root_xy}, padding = {padding}")
 
