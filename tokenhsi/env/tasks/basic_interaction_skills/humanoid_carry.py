@@ -27,11 +27,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import yaml
 from enum import Enum
 import numpy as np
 import torch
-import wandb
+import yaml
+import trimesh
+import pickle
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
@@ -831,15 +832,11 @@ class HumanoidCarry(Humanoid):
                 # metrics dict value to 
                 csv_row = metrics.values()
                 self.write_csv_row(reward_file, csv_row, header=metrics.keys())
-                
-        
-        
+                 
         if (box_r[0]).item()>0:
             pass  # place to put breakpoint to check reward
+        carry_box_reward = total_reward
         
-
-
-        carry_box_reward
         power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)
         power_reward = -self._power_coefficient * power
 

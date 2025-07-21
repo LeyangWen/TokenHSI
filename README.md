@@ -737,9 +737,22 @@ Please note that it also relies on external libraries and datasets, each of whic
 ### 20250611
 - working: with good lift and lower
 - Good referece motion is very important, add yours from VEHS and delete bad ones
+- Reward function dont seem to be helping that much
 - Box size and density in range similar to your training is crutial for sucess
 - You can set hard limit to joints in `tokenhsi/data/assets/mjcf/phys_humanoid_v3.xml` and the box_foot one, normally, it is the y axis that is the main one
 
+### 20250722
+- Found bug in reward, it seems that the ergo reward was never used
 
 
+## Goal: Terrain adaptation from modified construction carry
+- Asked author: [response](https://github.com/liangpan99/TokenHSI/issues/5#issuecomment-3007084052)
+  ```
+  Yes, you can directly deploy the carrying policy pre-trained with flat ground into a terrain environment. Just load the terrain and make sure the humanoid and the carrying task will be correctly initialized. This means you only need to modify the environment code and do not need to modify the policy inference code. Before we adapt the pre-trained carrying policy, make sure you can directly inference it in the target terrain environment.
 
+  Then, let's consider how to adapt the pre-trained MLP-based carrying policy. First of all, we need to get a new height map observation from the environment code. The current codebase has this feature. I think you are already very familiar with it. So the question is how to incorporate this new height map observation into the MLP-based policy. Now we need to modify the policy inference code. And I would like to recommend to check out Pei Xu's paper AdaptNet. The proposed policy architecture is useful for adapting a MLP-based policy with new task inputs.
+
+  I've validated that AdaptNet's architecture works well in terrain adaptation tasks. If you have any questions during the AdaptNet implementation process, feel free to discuss with me.
+  ```
+- Directly deploy carry
+  - From `/tokenhsi/env/tasks/adapt_interaction_skills/humanoid_adapt_traj_ground2terrain.py` add in reward policy, 

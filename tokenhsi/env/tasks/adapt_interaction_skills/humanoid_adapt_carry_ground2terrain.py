@@ -33,6 +33,7 @@ import torch
 import yaml
 import trimesh
 import pickle
+import wandb
 
 from isaacgym import gymapi
 from isaacgym import gymtorch
@@ -42,12 +43,14 @@ from utils import gym_util
 from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
 from isaacgym.terrain_utils import *
+from env.tasks.basic_interaction_skills.humanoid_carry import compute_back_ergo_reward, compute_box_ergo_reward, compute_elbow_ergo_reward
 
 from utils import torch_utils
 from utils import traj_generator
 
 from tqdm import tqdm
 from scipy import ndimage
+
 
 class HumanoidAdaptCarryGround2Terrain(Humanoid):
     class StateInit(Enum):
@@ -82,6 +85,11 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
         self._box_density_value = cfg["env"]["eval"].get("density", False)
         print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
+        
+        self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
+        self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
+        self._verbose = False
+        
         if cfg["args"].eval:
             self._mode = "test"
 
@@ -112,7 +120,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         if self.num_envs > 1:
             self.show_sensors = False # only support single env for now
 
-        self._is_eval = cfg["args"].eval
         if self._is_eval:
             self._flag_small_terrain = True
         
@@ -227,7 +234,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._kinematic_humanoid_rigid_body_states = torch.zeros((self.num_envs, self.num_bodies, 13), device=self.device, dtype=torch.float)
 
         ###### evaluation!!!
-        self._is_eval = cfg["args"].eval
         if self._is_eval:
 
             self._success_buf = torch.zeros((self.num_envs), device=self.device, dtype=torch.long)
@@ -237,7 +243,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
             self._skill = cfg["env"]["eval"]["skill"]
             self._skill_init_prob = torch.tensor(cfg["env"]["eval"]["skillInitProb"], device=self.device, dtype=torch.float) # probs for state init
-
+        
 
         ###### Wen: Testing for construction experiments
         print(f"[Info]: constructionExp = {self.constructionExp}")
@@ -650,7 +656,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         
         if self._reset_random_height:
             self._build_platforms(env_id, env_ptr)
-        
+
         if (not self.headless):
             self._build_marker(env_id, env_ptr)
 
@@ -941,91 +947,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         return
     
-    def _compute_observations(self, env_ids=None):
-        humanoid_obs = self._compute_humanoid_obs(env_ids)
-        
-        if (self._enable_task_obs):
-            task_obs = self._compute_task_obs(env_ids)
-            obs = torch.cat([humanoid_obs, task_obs], dim=-1)
-        else:
-            obs = humanoid_obs
-
-        if (env_ids is None):
-            self.obs_buf[:] = obs
-        else:
-            self.obs_buf[env_ids] = obs
-        return
-
-    def _compute_task_obs(self, env_ids=None):
-        if (env_ids is None):
-            root_states = self._humanoid_root_states
-            box_states = self._box_states
-            box_bps = self._box_bps
-            tar_pos = self._tar_pos
-            box_mass = self._box_masses
-        else:
-            root_states = self._humanoid_root_states[env_ids]
-            box_states = self._box_states[env_ids]
-            box_bps = self._box_bps[env_ids]
-            tar_pos = self._tar_pos[env_ids]
-            box_mass = self._box_masses[env_ids]
-
-        obs = compute_location_observations(root_states, box_states, box_bps, tar_pos,
-                                            self._enable_bbox_obs)
-        
-        if self._build_random_density:
-            obs = torch.cat([obs, box_mass.unsqueeze(-1)], dim=-1)
-
-        if self.terrain_obs:
-
-            if self.terrain_obs_root == "pelvis":
-                measured_heights = self.get_heights(root_states=root_states, env_ids=env_ids)
-            else:
-                raise NotImplementedError
-
-            if self.cfg['env'].get("localHeightObs", False):
-                heights = measured_heights - root_states[..., 2].unsqueeze(-1)
-                heights = torch.clip(heights, -3, 3.)
-
-            obs = torch.cat([heights, obs], dim=1)
-
-        return obs
-
-    def _compute_reward(self, actions):
-        root_pos = self._humanoid_root_states[..., 0:3]
-        root_rot = self._humanoid_root_states[..., 3:7]
-        rigid_body_pos = self._rigid_body_pos
-        box_pos = self._box_states[..., 0:3]
-        box_rot = self._box_states[..., 3:7]
-        hands_ids = self._key_body_ids[[0, 1]]
-
-        walk_r = compute_walk_reward(root_pos, self._prev_root_pos, box_pos, self.dt, 1.5,
-                                     self._only_vel_reward, self.cfg["env"]["debug"]["vel"])
-        carry_r = compute_carry_reward(box_pos, self._prev_box_pos, self._tar_pos, self.dt, 1.5, self._box_size, 
-                                       self._only_vel_reward,
-                                       self._box_vel_penalty, self._box_vel_pen_coeff, self._box_vel_pen_thre,
-                                       self.cfg["env"]["debug"]["vel"])
-        handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
-        putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
-        carry_box_reward = 2.0 * walk_r + 2.0 * carry_r + handheld_r + putdown_r
-
-        power = torch.abs(torch.multiply(self.dof_force_tensor[:, self._power_dof_ids], self._dof_vel[:, self._power_dof_ids])).sum(dim = -1)
-        power_reward = -self._power_coefficient * power
-
-        if self._power_reward:
-            self.rew_buf[:] = carry_box_reward + power_reward
-        else:
-            self.rew_buf[:] = carry_box_reward
-
-        return
     
-    def render(self, sync_frame_time=False):
-        super().render(sync_frame_time)
-
-        if self.viewer:
-            self._draw_task()
-        return
-
     def _draw_task(self):
         self._update_marker()
 
@@ -1148,6 +1070,147 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         return
     
+    def _compute_observations(self, env_ids=None):
+        humanoid_obs = self._compute_humanoid_obs(env_ids)
+        
+        if (self._enable_task_obs):
+            task_obs = self._compute_task_obs(env_ids)
+            obs = torch.cat([humanoid_obs, task_obs], dim=-1)
+        else:
+            obs = humanoid_obs
+
+        if (env_ids is None):
+            self.obs_buf[:] = obs
+        else:
+            self.obs_buf[env_ids] = obs
+        return
+    
+    def _compute_task_obs(self, env_ids=None):
+        if (env_ids is None):
+            root_states = self._humanoid_root_states
+            box_states = self._box_states
+            box_bps = self._box_bps
+            tar_pos = self._tar_pos
+            box_mass = self._box_masses
+        else:
+            root_states = self._humanoid_root_states[env_ids]
+            box_states = self._box_states[env_ids]
+            box_bps = self._box_bps[env_ids]
+            tar_pos = self._tar_pos[env_ids]
+            box_mass = self._box_masses[env_ids]
+        
+        obs = compute_location_observations(root_states, box_states, box_bps, tar_pos,
+                                            self._enable_bbox_obs)
+        
+        if self._build_random_density:
+            obs = torch.cat([obs, box_mass.unsqueeze(-1)], dim=-1)
+
+        if self.terrain_obs:
+
+            if self.terrain_obs_root == "pelvis":
+                measured_heights = self.get_heights(root_states=root_states, env_ids=env_ids)
+            else:
+                raise NotImplementedError
+
+            if self.cfg['env'].get("localHeightObs", False):
+                heights = measured_heights - root_states[..., 2].unsqueeze(-1)
+                heights = torch.clip(heights, -3, 3.)
+
+            obs = torch.cat([heights, obs], dim=1)
+
+        return obs
+
+    def _compute_reward(self, actions):
+        root_pos = self._humanoid_root_states[..., 0:3]
+        root_rot = self._humanoid_root_states[..., 3:7]
+        rigid_body_pos = self._rigid_body_pos
+        box_pos = self._box_states[..., 0:3]
+        box_rot = self._box_states[..., 3:7]
+        hands_ids = self._key_body_ids[[0, 1]]
+
+        walk_r = compute_walk_reward(root_pos, self._prev_root_pos, box_pos, self.dt, 1.5,
+                                     self._only_vel_reward, self.cfg["env"]["debug"]["vel"])
+        carry_r = compute_carry_reward(box_pos, self._prev_box_pos, self._tar_pos, self.dt, 1.5, self._box_size, 
+                                       self._only_vel_reward,
+                                       self._box_vel_penalty, self._box_vel_pen_coeff, self._box_vel_pen_thre,
+                                       self.cfg["env"]["debug"]["vel"])
+        handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
+        putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
+        carry_box_reward = 2.0 * walk_r + 2.0 * carry_r + handheld_r + putdown_r
+        
+        humanoid_angles = self.humanoid_angles()
+        ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
+        ergo_sub_weight /= ergo_sub_weight.sum()
+        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], weight=ergo_sub_weight[0])
+        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, weight=ergo_sub_weight[1])
+        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, weight=ergo_sub_weight[2])
+        ergo_reward = back_r + elbow_r + box_r
+        total_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
+        
+        if self._verbose:
+            print("#"*40)
+            print(f"""[Info] Frame {self.frame_count}
+                Ergo coeff = {self._ergo_coeff}
+                Carry_box_reward = {carry_box_reward* (1 - self._ergo_coeff)}
+                - walk_r       = {walk_r* (1 - self._ergo_coeff)}
+                - carry_r      = {carry_r* (1 - self._ergo_coeff)}
+                - handheld_r   = {handheld_r* (1 - self._ergo_coeff)}
+                - putdown_r    = {putdown_r* (1 - self._ergo_coeff)}
+                Ergo_reward  = {ergo_reward * self._ergo_coeff}
+                - back_r       = {back_r * self._ergo_coeff}
+                - elbow_r      = {elbow_r * self._ergo_coeff}
+                - box_r        = {box_r * self._ergo_coeff}
+                """)
+            self.print_angles_degrees(humanoid_angles)
+            # print(rigid_body_pos[0])
+            # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
+            # print(f"box_pos = {box_pos[0]}")
+        # only show 0th env reward
+        metrics = {
+            "reward/CARRY_BOX": carry_box_reward[0].item(),
+            "reward/walk_r": walk_r[0].item(),
+            "reward/carry_r": carry_r[0].item(),
+            "reward/handheld_r": handheld_r[0].item(),
+            "reward/putdown_r": putdown_r[0].item(),
+            "reward_ergo/ERGO": ergo_reward[0].item(),
+            "reward_ergo/back_r": back_r[0].item(),
+            "reward_ergo/elbow_r": elbow_r[0].item(),
+            "reward_ergo/box_r": box_r[0].item(),
+            "reward/frames": self.frame_count,
+            "reward/total_reward": total_reward[0].item(),
+            }
+        wandb.log(metrics, step=self.frame_count)
+        
+        metrics["ergo_coeff"] = self._ergo_coeff
+        reward_file = f"{self.save_video_dir}/rewards.csv"
+        if (self.viewer and self.save_video) or (self.headless and self.record_headless):
+            if np.mod(self.frame_count, self.downsample) == 0:
+                # metrics dict value to 
+                csv_row = metrics.values()
+                self.write_csv_row(reward_file, csv_row, header=metrics.keys())
+                 
+        if (box_r[0]).item()>0:
+            pass  # place to put breakpoint to check reward
+        carry_box_reward = total_reward
+        
+        # power = torch.abs(torch.multiply(self.dof_force_tensor, self._dof_vel)).sum(dim = -1)  # from carry.py
+        power = torch.abs(torch.multiply(self.dof_force_tensor[:, self._power_dof_ids], self._dof_vel[:, self._power_dof_ids])).sum(dim = -1)
+        power_reward = -self._power_coefficient * power
+
+        if self._power_reward:
+            self.rew_buf[:] = carry_box_reward + power_reward
+        else:
+            self.rew_buf[:] = carry_box_reward
+
+        return
+    
+    def render(self, sync_frame_time=False):
+        super().render(sync_frame_time)
+
+        if self.viewer:
+            self._draw_task()
+        return
+    
     def save_imgs(self):
         if self.cfg["args"].record:
             # render frame if we're saving video
@@ -1220,7 +1283,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             self.extras["precision"] = self._precision_buf
 
         return
-    
+
     def _compute_metrics_evaluation(self):
         box_root_pos = self._box_states[..., 0:3]
 
