@@ -56,19 +56,39 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_density False \
     --random_mode_equal_proportion True \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-resume-ergoReward-train-3/ \
-    --wandb_name "Terrain-GoodMotion-resume-ergoReward-train-3" \
-    --notes "good motion only, then ergo reward (debug: added ergo to total), resume on exp1 (Humanoid_22-18-43-04)" \
-    --ergo_coeff 0.2 \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
-
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-pretrainStage1-train-1/ \
+    --wandb_name "Try6-Terrain-GoodMotion-pretrainStage1-train-1" \
+    --notes "motion only" \
+    --ergo_coeff 0.0 \
 
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-Reward-pretrainStage1-train-4/ \
-    # --wandb_name "Terrain-Reward-pretrainStage1-train-4" \
-    # --notes "reward (debug: added ergo to total) only" \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-Reward-pretrainStage1-train-3/ \
+    # --wandb_name "Try6-Terrain-Reward-pretrainStage1-train-3" \
+    # --notes "reward only" \
     # --ergo_coeff 0.2 \
+
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-Reward-pretrainStage1-train-2/ \
+    # --wandb_name "Try6-Terrain-GoodMotion-Reward-pretrainStage1-train-2" \
+    # --notes "good motion + reward" \
+    # --ergo_coeff 0.2 \
+
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-pretrainStage1-train-1/ \
+    # --wandb_name "Try6-Terrain-GoodMotion-pretrainStage1-train-1" \
+    # --notes "motion only" \
+    # --ergo_coeff 0.0 \
+
+
+
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-resume-ergoReward-train-3/ \
+    # --wandb_name "Terrain-GoodMotion-resume-ergoReward-train-3" \
+    # --notes "good motion only, then ergo reward (debug: added ergo to total), resume on exp1 (Humanoid_22-18-43-04)" \
+    # --ergo_coeff 0.2 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
+
 
     # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-resume-ergoReward-train-3/ \
     # --wandb_name "Terrain-GoodMotion-resume-ergoReward-train-3" \
@@ -77,16 +97,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     # --resume 1 \
     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
 
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-Reward-pretrainStage1-train-2/ \
-    # --wandb_name "Terrain-GoodMotion-Reward-pretrainStage1-train-2" \
-    # --notes "good motion + reward (debug: added ergo to total)" \
-    # --ergo_coeff 0.2 \
 
-
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/ \
-    # --wandb_name "Terrain-GoodMotion-pretrainStage1-train-1" \
-    # --notes "" \
-    # --ergo_coeff 0.0 \
 
 
 
