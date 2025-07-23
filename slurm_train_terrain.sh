@@ -45,7 +45,7 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
-    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
     --num_envs 2048 \

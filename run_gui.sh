@@ -6,7 +6,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-3/Humanoid_07-01-14-58/nn/Humanoid.pth  \
+    --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-scratch-train-5/Humanoid_21-12-43-18/nn//Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -19,12 +19,15 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion True \
     --random_density True \
     --density 200.0 \
-    --ergo_coeff 0.2 \
+    --ergo_coeff 0.0 \
     # --ergo_sub_weight "20, 40, 40" \
     # --headless \
     # --record_headless
 
     # --ergo_sub_weight "50,25,25" \
+    
+    # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-scratch-train-5/Humanoid_21-12-43-18/nn//Humanoid.pth  \ # not working, not lifting, only hugging
+    # above: bug fix on the ergo reward
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-3/Humanoid_07-01-14-58/nn/Humanoid.pth \ Try4 -3 good for both lieft and lower, some faliure on lowering, first train on good motion, then tune on good motion and ergo reward
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-train-2-resume/Humanoid_07-01-20-33/nn/Humanoid.pth \ # Try4 -2 good lift, but lower frequent fails, only trained on good motion
     # --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-resume-ErgoReward-train-1/Humanoid_02-14-41-35/nn/Humanoid.pth \ Try 4 -1 resumed based on good one, with good motion and updated ergo, good motion but bad lift still
@@ -63,8 +66,25 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --box_l 0.75 \
     # --box_h 0.50 \
 
-
-
+# basic carry in terrain --> blind policy for terrain grid
+python -u ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_terrain_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    --checkpoint /home/leyang/Documents/TokenHSI/output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-3/Humanoid_07-01-14-58/nn/Humanoid.pth  \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "Carry_test_1" \
+    --wandb_mode "disabled" \
+    --box_w 0.4 \
+    --box_l 0.4 \
+    --box_h 0.4 \
+    --random_size False \
+    --random_mode_equal_proportion True \
+    --random_density True \
+    --density 200.0 \
+    --ergo_coeff 0.2 \
 
 # Terrain Carry Test
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
@@ -72,7 +92,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
-    --checkpoint output/custom_trained/Try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/Try6/Terrain-GoodMotion-Reward-pretrainStage1-train-2/Humanoid_21-16-17-51/nn//Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -83,9 +103,11 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_size False \
     --random_density False \
     --density 0 \
-    --random_mode_equal_proportion False \
+    --random_mode_equal_proportion True \
+    --ergo_coeff 0.2 \
 
-# train - OOM
+
+# Terrain train - OOM
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
@@ -102,7 +124,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --ergo_coeff 0.0 \
 
 
-# OG
+# OG Terrain
 # python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 #     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
 #     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
@@ -124,6 +146,6 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/abdomen_y_45_3" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/terrain_fail_1" --video_name "vid" --delete_imgs --fps 10
 
 

@@ -1,7 +1,7 @@
 # if given, will override the device setting in gym. 
 env: 
   numEnvs: 4096
-  envSpacing: 0
+  envSpacing: 5
   episodeLength: 600 # 20s
   isFlagrun: False
   enableDebugVis: False
@@ -24,15 +24,21 @@ env:
 
   enableSelfCollisionDetection: True
   enableTrackInitState: False
-  
-  skill: ["omomo", "loco", "loco_terrain", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.0, 0.3, 0.3, 0.0, 0.4, 0.0]
-  skillDiscProb: [0.3, 0.2, 0.2, 0.1, 0.1, 0.1]
 
+  # power reward
+  power_reward: True
+  power_coefficient: 0.0005
+
+  skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
+  skillInitProb: [0.0, 0.5, 0.1, 0.3, 0.1]
+  skillDiscProb: [0.3, 0.3, 0.1, 0.1, 0.1]
+
+  # task
   enableTaskObs: True
-  onlyVelReward: False
+  onlyVelReward: True
   onlyHeightHandHeldReward: False
-  
+  basicCarryObs: True # wen
+
   box_vel_penalty: True # to avoid stiff grasping
   box_vel_pen_coeff: 1.0
   box_vel_pen_threshold: 2.5
@@ -60,11 +66,24 @@ env:
        - [0.52, 0.52, 0.52]
        - [0.57, 0.57, 0.57]
        - [0.30, 0.30, 0.40]
+      #  - [0.95, 0.22, 0.40]
+      #  - [0.22, 0.95, 0.40]
+      #  - [0.40, 0.22, 0.95]
+      #  - [0.80, 0.40, 0.40]
+      #  - [0.40, 0.80, 0.40]
+      #  - [0.40, 0.40, 0.80]
+      #  - [1.5, 1.5, 0.40]
+      #  - [0.40, 1.5, 1.5]
+      #  - [1.5, 0.40, 1.5]
+      #  - [1.5, 0.5, 0.5]
+      #  - [0.5, 1.5, 0.5]
+      #  - [0.5, 0.5, 1.5]
+
 
     reset:
       randomRot: True
       randomHeight: True
-      randomHeightProb: 1.0
+      randomHeightProb: 0.5
       maxTopSurfaceHeight: 1.2
       minBottomSurfaceHeight: 0.5 # do not place the box on the irregular terrain!
 
@@ -81,8 +100,8 @@ env:
   flagShowSensors: True # only works when headless==False & num_envs==1
 
   ##### height map sensor
-  terrain_obs: True
-  localHeightObs: True
+  terrain_obs: False #True
+  localHeightObs: False #True
   terrain_obs_type: "square"
   terrain_obs_root: "pelvis"
 
@@ -118,15 +137,6 @@ env:
     # wen custom input for weight, start and end location
     numExperiments: 3
     constructionExperiment: True
-    # start_positions:  # including edge of terrain
-    #   - [1.0, 1.0, 1.0]
-    #   - [30.0, 30.0, 0.75]
-    #   - [10.0, 1.0, 0.75]
-    # end_positions:
-    #   - [5.0, 5.0, 0.5]
-    #   - [1.0, 10.0, 0.75]
-    #   - [1.0, 10.0, 0.75]
-
     start_positions:
       - [1.7, 13.4, 0.9]
       - [3.6, 17.9, 0.85]

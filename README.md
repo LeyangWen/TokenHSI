@@ -749,7 +749,9 @@ Please note that it also relies on external libraries and datasets, each of whic
 - Asked author: [response](https://github.com/liangpan99/TokenHSI/issues/5#issuecomment-3007084052)
   ```
   Yes, you can directly deploy the carrying policy pre-trained with flat ground into a terrain environment. Just load the terrain and make sure the humanoid and the carrying task will be correctly initialized. This means you only need to modify the environment code and do not need to modify the policy inference code. Before we adapt the pre-trained carrying policy, make sure you can directly inference it in the target terrain environment.
-
+  ```
+  --> tripped on terrain
+  ```
   Then, let's consider how to adapt the pre-trained MLP-based carrying policy. First of all, we need to get a new height map observation from the environment code. The current codebase has this feature. I think you are already very familiar with it. So the question is how to incorporate this new height map observation into the MLP-based policy. Now we need to modify the policy inference code. And I would like to recommend to check out Pei Xu's paper AdaptNet. The proposed policy architecture is useful for adapting a MLP-based policy with new task inputs.
 
   I've validated that AdaptNet's architecture works well in terrain adaptation tasks. If you have any questions during the AdaptNet implementation process, feel free to discuss with me.
@@ -761,3 +763,4 @@ Please note that it also relies on external libraries and datasets, each of whic
   - verify trained terrain results, is it working
   - Need to understand hrl checkpoint since it is still used in terrain-test
   - cant lift
+    - Error in padding in train

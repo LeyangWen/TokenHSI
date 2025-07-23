@@ -72,6 +72,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._enable_task_obs = cfg["env"]["enableTaskObs"]
         self._only_vel_reward = cfg["env"]["onlyVelReward"]
         self._only_height_handheld_reward = cfg["env"]["onlyHeightHandHeldReward"]
+        self._basic_carry_obs = cfg["env"].get("basicCarryObs", False) # wen addition, for basic carry policy in terrain
 
         self._box_vel_penalty = cfg["env"]["box_vel_penalty"]
         self._box_vel_pen_coeff = cfg["env"]["box_vel_pen_coeff"]
@@ -411,24 +412,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self.height_samples = torch.tensor(self.terrain.heightsamples).view(self.terrain.tot_rows, self.terrain.tot_cols).to(self.device)
         return
     
-    def get_obs_size(self):
-        obs_size = super().get_obs_size()
-        if (self._enable_task_obs):
-            task_obs_size = self.get_task_obs_size()
-            obs_size += task_obs_size
-            
-            
-            if (self._build_random_density):
-                obs_size += 1 # obs for box mass
-
-        return obs_size
-    
-    def get_task_obs_size(self):
-        obs_size = 0
-        if (self._enable_task_obs):
-            obs_size += sum(self._each_subtask_obs_size[:-1]) # exclude redundant one
-        return obs_size
-
     def pre_physics_step(self, actions):
         super().pre_physics_step(actions)
         self._prev_root_pos[:] = self._humanoid_root_states[..., 0:3]
@@ -848,6 +831,30 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._box_surface_bps_ids = to_torch(self._box_surface_bps_ids, dtype=torch.long, device=self.device) # (6, 4)
 
         return
+    
+    def get_obs_size(self):
+        obs_size = super().get_obs_size()
+
+        if (self._enable_task_obs):
+            task_obs_size = self.get_task_obs_size()
+            obs_size += task_obs_size
+
+            if (self._build_random_density):
+                obs_size += 1 # obs for box mass
+
+        return obs_size
+    
+    def get_task_obs_size(self):
+        obs_size = 0
+        if (self._enable_task_obs):
+            if self._basic_carry_obs:
+                obs_size += 3 # target box location
+                obs_size += 3 + 6 + 3 + 3 # box state: pos (3) + rot (6) + lin vel (3) + ang vel (6)
+                if (self._enable_bbox_obs):
+                    obs_size += 3 * 8 # bps
+            else:
+                obs_size += sum(self._each_subtask_obs_size[:-1]) # exclude redundant one
+        return obs_size
 
     def _reset_task(self, env_ids):
         if self._is_test and self.constructionExp:  # wen: specify target location from yaml instead of random
@@ -1106,7 +1113,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         
         obs = compute_location_observations(root_states, box_states, box_bps, tar_pos,
                                             self._enable_bbox_obs)
-        
+
         if self._build_random_density:
             obs = torch.cat([obs, box_mass.unsqueeze(-1)], dim=-1)
 
