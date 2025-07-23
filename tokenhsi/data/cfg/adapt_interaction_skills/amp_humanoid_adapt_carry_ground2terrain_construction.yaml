@@ -32,7 +32,8 @@ env:
   enableTaskObs: True
   onlyVelReward: False
   onlyHeightHandHeldReward: False
-  
+  basicCarryObs: False # wen
+
   box_vel_penalty: True # to avoid stiff grasping
   box_vel_pen_coeff: 1.0
   box_vel_pen_threshold: 2.5
