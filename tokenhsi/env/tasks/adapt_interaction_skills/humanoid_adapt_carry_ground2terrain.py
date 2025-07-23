@@ -1153,9 +1153,9 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         humanoid_angles = self.humanoid_angles()
         ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
         ergo_sub_weight /= ergo_sub_weight.sum()
-        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], weight=ergo_sub_weight[0])
-        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, weight=ergo_sub_weight[1])
-        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, weight=ergo_sub_weight[2])
+        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], ergo_sub_weight[0])
+        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, ergo_sub_weight[1], self._tar_pos)
+        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, ergo_sub_weight[2], self._tar_pos)
         ergo_reward = back_r + elbow_r + box_r
         total_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
         

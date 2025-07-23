@@ -785,9 +785,9 @@ class HumanoidCarry(Humanoid):
         humanoid_angles = self.humanoid_angles()
         ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
         ergo_sub_weight /= ergo_sub_weight.sum()
-        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], weight=ergo_sub_weight[0])
-        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, weight=ergo_sub_weight[1])
-        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, weight=ergo_sub_weight[2])
+        back_r = compute_back_ergo_reward(humanoid_angles["back"], humanoid_angles["left_knee"], humanoid_angles["right_knee"], ergo_sub_weight[0])
+        elbow_r = compute_elbow_ergo_reward(humanoid_angles["left_elbow"], humanoid_angles["right_elbow"], rigid_body_pos, hands_ids, box_pos, self._prev_box_pos, ergo_sub_weight[1], self._tar_pos)
+        box_r = compute_box_ergo_reward(humanoid_angles["back"], self._box_size, box_pos, self._prev_box_pos, rigid_body_pos, hands_ids, ergo_sub_weight[2], self._tar_pos)
         ergo_reward = back_r + elbow_r + box_r
         total_reward = carry_box_reward * (1 - self._ergo_coeff) + ergo_reward * self._ergo_coeff
         
@@ -1539,9 +1539,10 @@ def compute_back_ergo_reward(back_angle, left_knee_angle, right_knee_angle, weig
     return reward
     
 @torch.jit.script
-def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigid_body_pos, hands_ids, box_pos, prev_box_pos, weight):
+def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigid_body_pos, hands_ids, box_pos, prev_box_pos, weight, tar_pos):
     """
     keep elbow angle around 5/9 * pi in power zone when near the box
+    set to full after putting
     """
     
     ############## hyperparameters ##############
@@ -1573,17 +1574,27 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     # if box moved, bool mask for each env
     box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.001 ** 2
     
+    # if box is close enough to target position, give full reward so that reward never drops (which stops it from going to next stage)
+    box_z_reached_mask = torch.abs((box_pos[:, -1] - tar_pos[:, -1])) <= 0.01  # 0.001
+    box_xy_reached_mask = torch.sum((tar_pos[..., :2] - box_pos[..., :2]) ** 2, dim=-1) <= 0.1 ** 2
+    box_reached_mask = torch.logical_and(box_z_reached_mask, box_xy_reached_mask)
+    
     # reward is 0 unless box moved and hands are close enough
     reward[~box_moved_mask] = 0.0
     reward[~hands2box_mask] = 0.0
+    reward[box_reached_mask] = weight # full reward when box is close enough to target position
+    
     
     return reward
 
 @torch.jit.script
-def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoid_rigid_body_pos, hands_ids, weight):
+def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoid_rigid_body_pos, hands_ids, weight, tar_pos):
     """
     keep box close to body when carrying
+    set to full after putting
     """
+
+    ############## hyperparameters ##############
     
     ############## hyperparameters ##############
     exp_k = -5.0
@@ -1625,11 +1636,17 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     
     # if box moved, bool mask for each env
     box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.01 ** 2
+    
+    # if box is close enough to target position, give full reward so that reward never drops (which stops it from going to next stage)
+    box_z_reached_mask = torch.abs((box_pos[:, -1] - tar_pos[:, -1])) <= 0.01  # 0.001
+    box_xy_reached_mask = torch.sum((tar_pos[..., :2] - box_pos[..., :2]) ** 2, dim=-1) <= 0.1 ** 2
+    box_reached_mask = torch.logical_and(box_z_reached_mask, box_xy_reached_mask)
 
     # reward is 0 unless back is straight and box moved and hands are close enough
     reward[~box_moved_mask] = 0.0
     reward[~hands2box_mask] = 0.0
     reward[~back_straight_mask] = 0.0
+    reward[box_reached_mask] = weight # full reward when box is close enough to target position
     
     return reward
 

@@ -54,28 +54,35 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion True \
-        --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-5/ \
-    --wandb_name "Carry-GoodMotion-resume-ergoReward-train-5" \
-    --notes " ergo reward only (debug: added ergo to total), no good motion, from scratch" \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-6/ \
+    --wandb_name "Carry-GoodMotion-resume-ergoReward-train-6" \
+    --notes "good motion only + ergo reward (debug: added ergo to total), resume on goodmotion 07-01-20-33" \
     --ergo_coeff 0.2 \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2-resume/Humanoid_07-01-20-33/nn/Humanoid.pth \
+
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-ergoReward-scratch-train-7/ \
+    # --wandb_name "Try4-Carry-GoodMotion-ergoReward-scratch-train-7" \
+    # --notes "good motion only + ergo reward (debug: added ergo to total), from scratch" \
+    # --ergo_coeff 0.2 \
 
 
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-4/ \
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-6/ \
     # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-4" \
     # --notes "good motion only + ergo reward (debug: added ergo to total), resume on goodmotion 07-01-20-33" \
     # --ergo_coeff 0.2 \
     # --resume 1 \
     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2-resume/Humanoid_07-01-20-33/nn/Humanoid.pth \
 
-
-
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-3/ \
-    # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-3" \
-    # --notes "good motion only + ergo reward, resume on 2 partial trained 02-14-42-16" \
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-5/ \
+    # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-5" \
+    # --notes " ergo reward only (debug: added ergo to total), no good motion, from scratch" \
     # --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2/Humanoid_02-14-42-16/nn/Humanoid.pth \
+
 
     # 0.01 0.2 0.4 0.6 0.8 0.99
     #     --box_w 1.0 \
