@@ -743,6 +743,7 @@ Please note that it also relies on external libraries and datasets, each of whic
 
 ### 20250722
 - Found bug in reward, it seems that the ergo reward was never used, fix and rerun exp in try4-5 & -4
+- Another bug in reward, it prevent lowering the box
 
 
 ## Goal: Terrain adaptation from modified construction carry
@@ -764,3 +765,26 @@ Please note that it also relies on external libraries and datasets, each of whic
   - Need to understand hrl checkpoint since it is still used in terrain-test
   - cant lift
     - Error in padding in train
+- Deploy from pretrained carry - 2024-07-24
+  - Verify start location
+    - Added `loadTerrain` bool in config, but overwrite is not working --> need to overwrite to `cfg["env"]["terrain"]["loadTerrain"]`, now working
+    - To run training on local gpu, need to reduce     mapLength: and    mapWidth: in yaml config
+      - got error, also humanoid flys off
+        ```
+          Traceback (most recent call last):
+        File "./tokenhsi/run.py", line 238, in <module>
+          main()
+        File "./tokenhsi/run.py", line 232, in main
+          runner.run(vargs)
+        File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/rl_games/torch_runner.py", line 139, in run
+          self.run_train()
+        File "/home/leyang/miniconda3/envs/tokenhsi/lib/python3.8/site-packages/rl_games/torch_runner.py", line 125, in run_train
+          agent.train()
+        File "/home/leyang/Documents/TokenHSI/tokenhsi/learning/common_agent.py", line 134, in train
+          train_info = self.train_epoch()
+        File "/home/leyang/Documents/TokenHSI/tokenhsi/learning/amp_agent.py", line 303, in train_epoch
+          av_kls = torch_ext.mean_list(train_info['kl'])
+        TypeError: 'NoneType' object is not subscriptable
+        ```
+      - change `numTerrains: 4 #20 ` instead, no flying off, but same error
+      - Seem to started in the right location

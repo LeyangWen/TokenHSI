@@ -2011,7 +2011,7 @@ def compute_humanoid_reset(reset_buf, progress_buf, contact_buf, contact_body_id
 
 class Terrain:
     def __init__(self, cfg, num_robots, device) -> None:
-        print(cfg)
+        print("[Info]: Terrain config", cfg)
         self.type = cfg["terrainType"]
         self.device = device
         if self.type in ["none", 'plane']:

@@ -122,6 +122,9 @@ def load_cfg(args):
 
     if args.random_density is not None:
         cfg["env"]["box"]["build"]["randomDensity"] = args.random_density
+    
+    if args.load_terrain is not None:
+        cfg["env"]["terrain"]["loadTerrain"] = args.load_terrain
 
     # === Overrides for env.eval ===
     if args.num_experiments is not None:
@@ -357,6 +360,8 @@ def get_args(benchmark=False):
             "help": "Override env.box.build.randomModeEqualProportion (e.g., --random_mode_equal_proportion True)"},
         {"name": "--random_density", "type": str2bool, "default": None,
             "help": "Override env.box.build.randomDensity (e.g., --random_density True or --random_density False)"},
+        {"name": "--load_terrain", "type": str2bool, "default": None,
+            "help": "Override terrain.loadTerrain (e.g., --load_terrain True or --load_terrain False)"},
 
         # Overrides for train
         {"name": "--ergo_coeff", "type": float, "default": None, "help": "set ergo reward coeff, 0.2"},

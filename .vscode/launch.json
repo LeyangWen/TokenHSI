@@ -1,6 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [
+    
         {
             "name": "Debug TokenHSI Carry Test",
             "type": "debugpy",
@@ -28,6 +29,31 @@
                 "--density", "100.0",
                 "--ergo_coeff", "0.2", 
                 // "--headless"
+            ]
+        },
+        {
+            "name": "Debug TokenHSI CarryTerrain train",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/tokenhsi/run.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "args": [
+                "--task", "HumanoidAdaptCarryGround2Terrain",
+                "--cfg_train", "tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml",
+                "--cfg_env", "tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml",
+                "--motion_file", "tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml",
+                "--hrl_checkpoint", "output/tokenhsi/ckpt_stage1.pth",
+                "--num_envs", "1",
+                "--box_w", "0.4",
+                "--random_size", "True",
+                "--random_density", "False",
+                "--random_mode_equal_proportion", "True",
+                "--wandb_project", "TokenHSI-Test",
+                "--wandb_name", "CarryTerrain_test",
+                "--wandb_mode", "disabled",
+                "--ergo_coeff", "0.0",
+                "--load_terrain", "False"
             ]
         }
     ]
