@@ -173,3 +173,6 @@ cython_debug/
 joint_states.csv
 gui_out.txt
 tokenhsi/data/dataset_dynamic_objects/note.txt
+tokenhsi/scripts/Liang_training_logs/multi_task_transformer/events.out.tfevents.1737722684.rlgpu
+tokenhsi/scripts/Liang_training_logs/single_task_mlp/carry/events.out.tfevents.1730137609.rlgpu-2
+tokenhsi/scripts/Liang_training_logs/.DS_Store
