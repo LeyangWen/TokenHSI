@@ -32,7 +32,7 @@ env:
   enableTaskObs: True
   onlyVelReward: False
   onlyHeightHandHeldReward: False
-  basicCarryObs: False # wen
+  basicCarryObs: False # wen: for using amp basic carry policy .pth on terrain
 
   box_vel_penalty: True # to avoid stiff grasping
   box_vel_pen_coeff: 1.0
@@ -96,11 +96,13 @@ env:
     mapLength: 20.  # these parameters are only used in train, o.w. get overridden to 8,8,
     mapWidth: 20.
     numLevels: 5
-    numTerrains: 20 #!!! change back in training
+    numTerrains: 20 # Make this smaller if OOM on local GPU, e.g., 4
     # terrain types: [smooth slope, rough slope, stairs up, stairs down, discrete, stepping, poles, flat]
     terrainProportions: [0.0, 0.0, 0.35, 0.35, 0.2, 0, 0, 0.1]
     # terrainProportions: [0, 0, 0, 0, 0, 0, 0, 1.0]
     slopeTreshold: 0.9
+    # wen: add unwalkable obstacles
+    unwalkableObstacles: 30
     # wen task override
     loadTerrain: False  # config overwrite not working just yet
     heightFieldPath: "tokenhsi/data/terrain/height_map.npy"

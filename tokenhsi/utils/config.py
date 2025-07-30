@@ -123,6 +123,9 @@ def load_cfg(args):
     if args.random_density is not None:
         cfg["env"]["box"]["build"]["randomDensity"] = args.random_density
     
+    if args.nums_terrains is not None:
+        cfg["env"]["terrain"]["numTerrains"] = args.nums_terrains
+        
     if args.load_terrain is not None:
         cfg["env"]["terrain"]["loadTerrain"] = args.load_terrain
 
@@ -360,6 +363,8 @@ def get_args(benchmark=False):
             "help": "Override env.box.build.randomModeEqualProportion (e.g., --random_mode_equal_proportion True)"},
         {"name": "--random_density", "type": str2bool, "default": None,
             "help": "Override env.box.build.randomDensity (e.g., --random_density True or --random_density False)"},
+        {"name": "--nums_terrains", "type": int, "default": None,
+            "help": "Override env.terrain.numTerrains, number of terrains to load"},
         {"name": "--load_terrain", "type": str2bool, "default": None,
             "help": "Override terrain.loadTerrain (e.g., --load_terrain True or --load_terrain False)"},
 

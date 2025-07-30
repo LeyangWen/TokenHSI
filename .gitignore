@@ -176,3 +176,9 @@ tokenhsi/data/dataset_dynamic_objects/note.txt
 tokenhsi/scripts/Liang_training_logs/multi_task_transformer/events.out.tfevents.1737722684.rlgpu
 tokenhsi/scripts/Liang_training_logs/single_task_mlp/carry/events.out.tfevents.1730137609.rlgpu-2
 tokenhsi/scripts/Liang_training_logs/.DS_Store
+.idea/misc.xml
+.idea/modules.xml
+.idea/TokenHSI.iml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/inspectionProfiles/profiles_settings.xml

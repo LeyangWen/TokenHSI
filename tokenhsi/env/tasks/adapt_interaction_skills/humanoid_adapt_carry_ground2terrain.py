@@ -2047,6 +2047,7 @@ class Terrain:
             self.env_cols = cfg["numTerrains"]
             self.num_maps = self.env_rows * self.env_cols # 一共100块地形
             self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
+            self.unwalkableObstacles = cfg["unwalkableObstacles"] if "unwalkableObstacles" in cfg else 0
 
             self.width_per_env_pixels = int(self.env_width / self.horizontal_scale) # 每个小env的宽度的单位是0.1m，宽8m，所以有80个pixels
             self.length_per_env_pixels = int(self.env_length / self.horizontal_scale)
@@ -2244,6 +2245,43 @@ class Terrain:
             y2 = int((self.env_width / 2. + 1) / self.horizontal_scale)
             env_origin_z = np.max(terrain.height_field_raw[x1:x2, y1:y2]) * self.vertical_scale # 乘上vertical_scale后才是真实尺度
             self.env_origins[i, j] = [env_origin_x, env_origin_y, env_origin_z]
+            
+        # wen: add additional obstacles that cant be walked on
+        for _ in range(self.unwalkableObstacles):
+            obstacle_choice = np.random.uniform(0, 1)
+            # Convert environment length from meters to discrete units for the height_field dimensions
+            env_length_units = int(self.env_length / self.horizontal_scale)
+            if obstacle_choice < 0.3:
+                # Add a rectangular obstacle
+                width = np.random.randint(int(0.05 * env_length_units), int(0.3 * env_length_units) + 1)
+                length = np.random.randint(int(0.05 * env_length_units), int(0.3 * env_length_units) + 1)
+            elif obstacle_choice < 0.7:
+                # Add a horizontal line obstacle
+                width = np.random.randint(int(0.05 * env_length_units), int(0.6 * env_length_units) + 1)
+                length = np.random.randint(1, 4)  # horizontal line
+            else:
+                # Add a vertical line obstacle
+                width = np.random.randint(1, 4)  # vertical line
+                length = np.random.randint(int(0.05 * env_length_units), int(0.6 * env_length_units) + 1)
+            
+            # Determine random starting indices ensuring the obstacle fits in the height_field
+            max_i = self.height_field_raw.shape[0] - length - self.border
+            max_j = self.height_field_raw.shape[1] - width - self.border
+            start_i = np.random.randint(self.border, max_i)
+            start_j = np.random.randint(self.border, max_j)
+
+            # Mark these locations as obstacles in walkable_field_raw (i.e. non-walkable set to 1)
+            self.walkable_field_raw[start_i:start_i+length, start_j:start_j+width] = 1
+            
+            # Determine a random obstacle height (in meters) within the given range and convert to discrete units, with shape of (length, width)
+            obs_h = np.random.normal(0.4, 0.3, size=(length, width))  # meters
+            # smooth out peak and valley
+            obs_h = ndimage.gaussian_filter(obs_h, sigma=1.0)  # smooth the height
+            obs_h = np.clip(obs_h, 0.2, 0.7)
+            obs_h_units = (obs_h / self.vertical_scale).astype(np.int16)
+            cur_max = self.height_field_raw[start_i:start_i+length, start_j:start_j+width].max()
+            self.height_field_raw[start_i:start_i+length, start_j:start_j+width] = cur_max + obs_h_units  # add obstacle height to the height field
+            
         self.walkable_field_raw = ndimage.binary_dilation(self.walkable_field_raw, iterations=3).astype(int)
 
     def curiculum(self, num_robots, num_terrains, num_levels):
