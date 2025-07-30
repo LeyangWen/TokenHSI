@@ -54,6 +54,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion True \
+    --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-6/ \
     --wandb_name "Carry-GoodMotion-resume-ergoReward-train-6" \

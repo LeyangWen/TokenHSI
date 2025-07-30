@@ -41,7 +41,6 @@ from env.tasks.humanoid import Humanoid, dof_to_obs
 from utils import gym_util
 from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
-from env.tasks.basic_interaction_skills.humanoid_carry import compute_back_ergo_reward, compute_box_ergo_reward, compute_elbow_ergo_reward
 
 from utils import torch_utils
 from utils import traj_generator
@@ -137,7 +136,6 @@ class BoxLib():
         self._build_y_scale_range = box_cfg["build"]["scaleRangeY"]
         self._build_z_scale_range = box_cfg["build"]["scaleRangeZ"]
         self._build_scale_sample_interval = box_cfg["build"]["scaleSampleInterval"]
-        self._mass_range = box_cfg["build"]["massRange"]
         self._build_test_sizes = box_cfg["build"]["testSizes"]
 
         # rescale

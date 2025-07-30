@@ -49,7 +49,7 @@ env:
   enableApplyMaskOnTaskObs: True
 
   task: ["traj", "sit", "carry", "climb"]
-  taskInitProb: [0.1, 0.3, 0.3, 0.3]
+  taskInitProb: [0.3, 0.0, 0.7, 0.0]
 
   # IET: Interaction Early Termination
   enableIET: True

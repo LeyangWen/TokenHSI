@@ -1,5 +1,8 @@
 {
     "vscode-pets.theme": "forest",
     "vscode-pets.throwBallWithMouse": true,
-    "vscode-pets.petSize": "nano"
+    "vscode-pets.petSize": "nano",
+    "editor.fontSize": 16,
+    "editor.minimap.sectionHeaderFontSize": 12,
+    "python.defaultInterpreterPath": "/home/leyang/miniconda3/envs/tokenhsi/bin/python"
 }

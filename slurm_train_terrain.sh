@@ -55,6 +55,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_size True \
     --random_density False \
     --random_mode_equal_proportion True \
+    --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-pretrainStage1-train-1/ \
     --wandb_name "Try6-Terrain-GoodMotion-pretrainStage1-train-1" \

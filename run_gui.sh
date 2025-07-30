@@ -6,7 +6,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-7/Humanoid_23-09-37-42/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -24,12 +24,15 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --headless \
     # --record_headless
 
-    # --ergo_sub_weight "50,25,25" \
     
 
 
 
     # Try 4 famliy - fails
+    # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-8/Humanoid_28-16-04-43/nn/Humanoid.pth \ # Try4 -8, good lift, no lower - walk pass instead.
+    # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \ # Try4 -9, good lift and lower, sometime bad aim at lower and not stable,  drop box
+    # --checkpoint output/custom_trained/Try4/
+
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-6/Humanoid_23-09-40-17/nn/Humanoid.pth \ # Try4 -6 # good lift, no lower - stop at target, I think the reward is higher then
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-7/Humanoid_23-09-37-42/nn/Humanoid.pth \ # Try4 -7, good lift, no lower - walk pass instead. also walking is slow
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-scratch-train-5/Humanoid_21-12-43-18/nn//Humanoid.pth  \ # Try4 -5,not working, not lifting, only hugging
@@ -76,7 +79,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --box_l 0.75 \
     # --box_h 0.50 \
 
-# basic carry in terrain --> blind policy for terrain grid
+# basic carry in terrain --> blind policy for terrain grid, trip over terrain
 python -u ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_terrain_construction.yaml \
@@ -112,19 +115,21 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --wandb_name "CarryTerrain_test" \
     --wandb_mode "disabled" \
     --notes "rand loc, test carry" \
-    --box_w 0.20 \
+    --box_w 0.40 \
     --random_size False \
     --random_density False \
     --density 0 \
     --random_mode_equal_proportion True \
-    --load_terrain True \
+    --construction_experiment False \
+    --nums_terrains 4 \
+    --load_terrain False \
     --ergo_coeff 0.0 \
-
+    # --load_terrain True \
 # --checkpoint output/custom_trained/Try6/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_21-16-18-08/nn/Humanoid.pth \ # only hug
     # --checkpoint output/custom_trained/Try6/Terrain-GoodMotion-Reward-pretrainStage1-train-2/Humanoid_21-16-17-51/nn//Humanoid.pth \ # only hug, trouble walking
 
 # Terrain train 
-python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
@@ -164,6 +169,6 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/try4-6 cant lower" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/Try4-9_reward_motion_1Carry" --video_name "vid" --delete_imgs --fps 10
 
 
