@@ -67,7 +67,7 @@ env:
       randomHeight: True
       randomHeightProb: 1.0
       maxTopSurfaceHeight: 1.2
-      minBottomSurfaceHeight: 0.5 # do not place the box on the irregular terrain!
+      minBottomSurfaceHeight: 0.05 # do not place the box on the irregular terrain!
 
     obs:
       enableBboxObs: True
