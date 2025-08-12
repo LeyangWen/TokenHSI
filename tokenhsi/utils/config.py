@@ -385,6 +385,8 @@ def get_args(benchmark=False):
 
         {"name": "--record_headless", "action": "store_true", "default": False,
             "help": "output pose as a csv file, use in tests"},
+        {"name": "--skip_img", "action": "store_true", "default": False,
+            "help": "skip saving images, only save csv file"},
 
         {"name": "--wandb_project", "type": str, "default": "TokenHSI-Train"},
         {"name": "--wandb_name", "type": str, "default": "test"},

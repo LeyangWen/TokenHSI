@@ -84,6 +84,7 @@ class BaseTask():
 
         # create envs, sim and viewer
         self.record_headless = cfg["args"].record_headless
+        self.skip_img = cfg["args"].skip_img
         self.create_sim()
         self.gym.prepare_sim(self.sim)
 
@@ -175,7 +176,8 @@ class BaseTask():
             if np.mod(self.frame_count, self.downsample) == 0:  # default 3
                 num = str(self.save_img_count)
                 num = '0' * (6 - len(num)) + num
-                self.gym.write_viewer_image_to_file(self.viewer, f"{self.save_video_dir}/frame_{num}.png")
+                if not self.skip_img:  # skip and only get csv, faster this way
+                    self.gym.write_viewer_image_to_file(self.viewer, f"{self.save_video_dir}/frame_{num}.png")
                 self.save_img_count += 1
             
                 csv_file = f"{self.save_video_dir}/joint_states.csv"

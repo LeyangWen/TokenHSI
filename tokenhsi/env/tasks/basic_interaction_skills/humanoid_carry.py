@@ -865,6 +865,8 @@ class HumanoidCarry(Humanoid):
         if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
             ids = env_ids.to(dtype=torch.long)
             # Use the same or a separate experiment counter as needed (here we assume the same)
+            if self._box_counter[ids] >= 42:
+                raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
             start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
             root_pos = self._fixed_start_positions[start_indices]
             self._box_states[ids, 0:3] = root_pos
