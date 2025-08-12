@@ -50,12 +50,8 @@ python ./tokenhsi/run.py --task HumanoidTrajSitCarryClimb \
     --headless \
     --wandb_project "TokenHSI-Train" \
     --wandb_mode "online" \
-    --box_w 0.4 \
-    --random_size True \
-    --random_density False \
-    --random_mode_equal_proportion True \
-    --construction_experiment False \
     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/ \
     --wandb_name "Try8-Stage1-GoodMotion-scratch-train-1" \
     --notes "motion only" \
-    --ergo_coeff 0.0 \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \

@@ -39,35 +39,35 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 
 # export MAX_JOBS=1
 
-> joint_states.csv
+HOROVOD_WITH_PYTORCH=1 pip install horovod[pytorch]
 
-# # sh tokenhsi/scripts/single_task/carry_test.sh
-python -u ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --checkpoint output/single_task/ckpt_carry.pth \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry1/ \
-    --test \
-    --num_envs 1 \
-    --headless \
-    --record_headless \
+# # # sh tokenhsi/scripts/single_task/carry_test.sh
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+#     --checkpoint output/single_task/ckpt_carry.pth \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry1/ \
+#     --test \
+#     --num_envs 1 \
+#     --headless \
+#     --record_headless \
 
-# sh tokenhsi/scripts/tokenhsi/stage2_terrain_carry_test.sh
-python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
-    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
-    --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry_terrain1/ \
-    --test \
-    --num_envs 1 \
-    --wandb_project "TokenHSI-Test" \
-    --wandb_name "CarryTerrain_test" \
-    --notes "rand loc, test carry" \
-    --headless \
-    --record_headless \
+# # sh tokenhsi/scripts/tokenhsi/stage2_terrain_carry_test.sh
+# python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+#     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
+#     --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+#     --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/carry_terrain1/ \
+#     --test \
+#     --num_envs 1 \
+#     --wandb_project "TokenHSI-Test" \
+#     --wandb_name "CarryTerrain_test" \
+#     --notes "rand loc, test carry" \
+#     --headless \
+#     --record_headless \
 
 # python lpanlib/others/video.py --imgs_dir output/imgs/example_path --delete_imgs
 

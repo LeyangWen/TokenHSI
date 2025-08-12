@@ -35,10 +35,10 @@ env:
     "loco_climb", "climb", "climbNoRSI"
   ]
   skillDiscProb: [
-    0.1,
-    0.1, 0.2,
-    0.1, 0.1, 0.05, 0.0, 0.05,
-    0.1, 0.1, 0.1,
+    0.2,
+    0.0, 0.0,
+    0.2, 0.2, 0.2, 0.0, 0.2,
+    0.0, 0.0, 0.0,
   ]
   commonSkill: ""
   enableTaskSpecificDisc: True
@@ -76,18 +76,6 @@ env:
       successThreshold: 0.3
       skill: ["loco"]
       skillInitProb: [1.0]
-          # wen custom input for weight, start and end location
-      numExperiments: 3
-      constructionExperiment: True
-      start_positions:
-        - [-4.0, -4.0, 0.2]
-        - [4.0, -4.0, 0.4]
-        - [4.0,  4.0, 0.8]
-      end_positions:
-        - [0.5, 0.5, 0.2]
-        - [-0.5, 0.5, 0.4]
-        - [-0.5, -0.5, 0.8]
-      density: 100.0  # kg/m^3
   
   sit:
     # object
@@ -152,7 +140,7 @@ env:
         scaleRangeY: [0.5, 1.5]
         scaleRangeZ: [0.5, 1.5]
         scaleSampleInterval: 0.125 # 0.05m
-        massRange: [2.0, 25.0]  # kg, standard brick --> concrete bag
+
         testSizes:
         - [0.22, 0.22, 0.22]
         - [0.27, 0.27, 0.27]
@@ -208,7 +196,3 @@ sim:
   flex:
     num_inner_iterations: 10
     warm_start: 0.25
-
-
-  ergoCoeff: 0.2
-  ergoSubWeight: [50.0, 25.0, 25.0]

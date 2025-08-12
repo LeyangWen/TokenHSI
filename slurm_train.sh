@@ -56,10 +56,19 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion True \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-6/ \
-    --wandb_name "Carry-GoodMotion-resume-ergoReward-train-6" \
-    --notes "good motion only + ergo reward (debug: added ergo to total), resume on goodmotion 07-01-20-33" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/ \
+    --wandb_name "Carry-GoodMotion-resume-ergoReward-train-9" \
+    --notes "good motion only + ergo reward (debug: added ergo to total, always increase), resume on goodmotion 07-01-20-33, then try8- 9/Humanoid_28-16-04-15" \
     --ergo_coeff 0.2 \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \
+
+
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-6/ \
+    # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-6" \
+    # --notes "good motion only + ergo reward (debug: added ergo to total), resume on goodmotion 07-01-20-33" \
+    # --ergo_coeff 0.2 \
 
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-ergoReward-scratch-train-8/ \
@@ -67,13 +76,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --notes "good motion only + ergo reward (debug: added ergo to total, always increase), from scratch" \
     # --ergo_coeff 0.2 \
 
-    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/ \
-    # --wandb_name "Carry-GoodMotion-resume-ergoReward-train-9" \
-    # --notes "good motion only + ergo reward (debug: added ergo to total, always increase), resume on goodmotion 07-01-20-33" \
-    # --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-train-2-resume/Humanoid_07-01-20-33/nn/Humanoid.pth \
+
 
 
 

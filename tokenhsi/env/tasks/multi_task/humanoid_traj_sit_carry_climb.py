@@ -137,7 +137,7 @@ class BoxLib():
         self._build_y_scale_range = box_cfg["build"]["scaleRangeY"]
         self._build_z_scale_range = box_cfg["build"]["scaleRangeZ"]
         self._build_scale_sample_interval = box_cfg["build"]["scaleSampleInterval"]
-        self._mass_range = box_cfg["build"]["massRange"]
+        # self._mass_range = box_cfg["build"]["massRange"]
         self._build_test_sizes = box_cfg["build"]["testSizes"]
 
         # rescale
@@ -234,9 +234,9 @@ class HumanoidTrajSitCarryClimb(Humanoid):
         
         self._is_eval = cfg["args"].eval
         self._is_test = cfg["args"].test
-        self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
-        self._box_density_value = cfg["env"]["eval"].get("density", False)
-        print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
+        # self.constructionExp = cfg["env"]["eval"].get("constructionExperiment", False)
+        # self._box_density_value = cfg["env"]["eval"].get("density", False)
+        # print(f"[Info]: Value or False: _box_density_value = {self._box_density_value}")
         
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
         self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
