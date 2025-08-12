@@ -126,6 +126,9 @@ def load_cfg(args):
     if args.nums_terrains is not None:
         cfg["env"]["terrain"]["numTerrains"] = args.nums_terrains
         
+    if args.unwalkable_obstacles is not None:
+        cfg["env"]["terrain"]["unwalkableObstacles"] = args.unwalkable_obstacles
+        
     if args.load_terrain is not None:
         cfg["env"]["terrain"]["loadTerrain"] = args.load_terrain
 
@@ -367,6 +370,8 @@ def get_args(benchmark=False):
             "help": "Override env.terrain.numTerrains, number of terrains to load"},
         {"name": "--load_terrain", "type": str2bool, "default": None,
             "help": "Override terrain.loadTerrain (e.g., --load_terrain True or --load_terrain False)"},
+        {"name": "--unwalkable_obstacles", "type": int, "default": None,
+            "help": "Override env.terrain.unwalkableObstacles, number of unwalkable obstacles to spawn in the terrain"},
 
         # Overrides for train
         {"name": "--ergo_coeff", "type": float, "default": None, "help": "set ergo reward coeff, 0.2"},

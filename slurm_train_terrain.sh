@@ -46,7 +46,7 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
-    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --hrl_checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_04-10-54-37/nn/Humanoid.pth \
     --num_envs 2048 \
     --headless \
     --wandb_project "TokenHSI-Train" \
@@ -57,47 +57,56 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_mode_equal_proportion True \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-pretrainStage1-train-1/ \
-    --wandb_name "Try6-Terrain-GoodMotion-pretrainStage1-train-1" \
-    --notes "motion only" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-resume-pretrained-7/ \
+    --wandb_name "Try8-Terrain-GoodMotion-pretrained-7" \
+    --notes "good motion, resume, resume on pretrained tokenhsi stage2 terrain carry" \
     --ergo_coeff 0.0 \
+    --resume 1 \
+    --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
 
-    # --motion_file tokenhsi/data/dataset_carry/dataset_carry.yaml \
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-Reward-pretrainStage1-train-3/ \
-    # --wandb_name "Try6-Terrain-Reward-pretrainStage1-train-3" \
-    # --notes "reward only" \
-    # --ergo_coeff 0.2 \
-
+    # --construction_experiment False \
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-Reward-pretrainStage1-train-2/ \
-    # --wandb_name "Try6-Terrain-GoodMotion-Reward-pretrainStage1-train-2" \
-    # --notes "good motion + reward" \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/ \
+    # --wandb_name "Try8-TerrainObstacles-GoodMotion-Reward-pretrained-5" \
+    # --notes "good motion reward, resume, obstacles, resume on pretrained tokenhsi stage2 terrain carry" \
     # --ergo_coeff 0.2 \
+    # --unwalkable_obstacles 30 \
+    # --resume 1 \
+    # --checkpoint output/tokenhsi/ckpt_stage2_terrainShape_carry.pth \
 
+
+    # --construction_experiment False \
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try6/Terrain-GoodMotion-pretrainStage1-train-1/ \
-    # --wandb_name "Try6-Terrain-GoodMotion-pretrainStage1-train-1" \
-    # --notes "motion only" \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-8-1-train-4/ \
+    # --wandb_name "Try8-TerrainObstacles-GoodMotion-Reward-resume-8-1-train-4 (spgpu)" \
+    # --notes "good motion, resume, obstacles, resume on try8-4" \
+    # --ergo_coeff 0.2 \
+    # --unwalkable_obstacles 30 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-8-1-train-4/Humanoid_04-11-32-47/nn/Humanoid.pth \
+
+
+    # --construction_experiment False \
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-Reward-resume-8-1-train-2/ \
+    # --wandb_name "Try8-Terrain-GoodMotion-resume-8-1-train-3" \
+    # --notes "good motion, resume on try8-3" \
+    # --ergo_coeff 0.2 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-Reward-resume-8-1-train-2/Humanoid_04-11-31-15/nn/Humanoid.pth \
+
+
+
+
+
+    # --construction_experiment False \
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-resume-8-1-train-3/ \
+    # --wandb_name "Try8-Terrain-GoodMotion-Reward-resume-8-1-train-2" \
+    # --notes "good motion reward, resume on try8-2" \
     # --ergo_coeff 0.0 \
-
-
-
-    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-resume-ergoReward-train-3/ \
-    # --wandb_name "Terrain-GoodMotion-resume-ergoReward-train-3" \
-    # --notes "good motion only, then ergo reward (debug: added ergo to total), resume on exp1 (Humanoid_22-18-43-04)" \
-    # --ergo_coeff 0.2 \
     # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
-
-
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-resume-ergoReward-train-3/ \
-    # --wandb_name "Terrain-GoodMotion-resume-ergoReward-train-3" \
-    # --notes "good motion only, then ergo reward (debug: added ergo to total), resume on exp1 (Humanoid_22-18-43-04)" \
-    # --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try5/Terrain-GoodMotion-pretrainStage1-train-1/Humanoid_22-18-43-04/nn/Humanoid.pth \
-
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-resume-8-1-train-3/Humanoid_04-11-29-42/nn/Humanoid.pth \
 
 
 
