@@ -102,7 +102,7 @@ env:
     # terrainProportions: [0, 0, 0, 0, 0, 0, 0, 1.0]
     slopeTreshold: 0.9
     # wen: add unwalkable obstacles
-    unwalkableObstacles: 30
+    unwalkableObstacles: 0
     # wen task override
     loadTerrain: False  # config overwrite not working just yet
     heightFieldPath: "tokenhsi/data/terrain/height_map.npy"
