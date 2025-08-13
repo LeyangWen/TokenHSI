@@ -55,15 +55,17 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_size True \
     --random_density False \
     --random_mode_equal_proportion True \
-    --construction_experiment False \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/ \
-    --wandb_name "Try8-Terrain-GoodMotion-Reward-pretrained-6" \
-    --notes "good motion reward, resume, obstacles, resume on pretrained tokenhsi stage2 terrain carry" \
-    --ergo_coeff 0.2 \
-    --unwalkable_obstacles 0 \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_08-15-59-52/nn/Humanoid.pth \
+
+
+    # --construction_experiment False \
+    # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/ \
+    # --wandb_name "Try8-Terrain-GoodMotion-Reward-pretrained-6" \
+    # --notes "good motion reward, resume, obstacles, resume on pretrained tokenhsi stage2 terrain carry" \
+    # --ergo_coeff 0.2 \
+    # --unwalkable_obstacles 0 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_12-17-31-06/nn/Humanoid.pth \
 
     # --construction_experiment False \
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
@@ -71,9 +73,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     # --wandb_name "Try8-TerrainObstacles-GoodMotion-Reward-pretrained-5" \
     # --notes "good motion reward, resume, obstacles, resume on pretrained tokenhsi stage2 terrain carry" \
     # --ergo_coeff 0.2 \
-    # --unwalkable_obstacles 30 \
+    # --unwalkable_obstacles 60 \
     # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_08-15-55-51/nn/Humanoid.pth \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_12-17-29-35/nn/Humanoid.pth \
 
     # --construction_experiment False \
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
@@ -83,7 +85,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     # --ergo_coeff 0.0 \
     # --resume 1 \
     # --unwalkable_obstacles 0 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_12-17-28-41/nn/Humanoid.pth
 
 
 
