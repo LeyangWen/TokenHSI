@@ -19,7 +19,7 @@ env:
   rootHeightObsPolicy: False # policy obs
   keyBodies: ["right_hand", "left_hand", "right_foot", "left_foot"]
   contactBodies: ["right_foot", "left_foot", "right_shin", "left_shin", "right_thigh", "left_thigh"]
-  terminationHeight: 0.15
+  terminationHeight: 0.05
   enableEarlyTermination: True
 
   enableSelfCollisionDetection: True
