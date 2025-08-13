@@ -557,9 +557,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         # randomize mass
         self._box_density = torch.zeros((self.num_envs), dtype=torch.float32, device=self.device)
         if self._is_test and self.constructionExp:  # _box_density from the yaml file
-            if self._box_density_value:
-                assert self._build_random_density, "Please set build_random_density to True in the yaml file to put mass in observation"
-            else:
+            if not self._box_density_value:
                 self._box_density_value = 100.0
             self._box_density[:] = self._box_density_value
         else:
@@ -1630,10 +1628,12 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
                 if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
                     padding = self.terrain.border_size
-                else:
-                    padding = 0
-                new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids, fixed_loc="center") + padding  # OG code hard coded +8 inside func, which is the mapLength for test scenarios
+                    new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids, fixed_loc="center") + padding  # OG code hard coded +8 inside func, which is the mapLength for test scenarios
 
+                else:  # OG code
+                    new_root_xy = self.terrain.sample_valid_locations(len(curr_env_ids), curr_env_ids)
+                    padding=0
+                
                 # TODO: og code seem to be adding 8, which is the mapLength instead of border, finde out why
                 print(f"[Info]: _reset_ref_state_init: new_root_xy = {new_root_xy}, padding = {padding}")
 
