@@ -67,7 +67,7 @@ env:
       randomHeight: True
       randomHeightProb: 1.0
       maxTopSurfaceHeight: 1.2
-      minBottomSurfaceHeight: 0.05 # do not place the box on the irregular terrain!
+      minBottomSurfaceHeight: 0.00 # do not place the box on the irregular terrain!
 
     obs:
       enableBboxObs: True
@@ -122,21 +122,21 @@ env:
     numExperiments: 3
     constructionExperiment: True
     # start_positions:  # including edge of terrain
+    #   - [1.7, 13.4, 0.3]
+    #   - [1.7, 13.4, 0.4]
     #   - [1.7, 13.4, 0.8]
-    #   - [1.7, 13.4, 0.8]
-    #   - [1.7, 13.4, 0.6]
     # end_positions:
-    #   - [12.8, 13.7, 0.8]
-    #   - [12.8, 13.7, 0.8]
+    #   - [12.8, 13.7, 0.3]
+    #   - [12.8, 13.7, 0.4]
     #   - [12.8, 13.7, 0.8]
     start_positions:
-      - [1.7, 13.4, 0.9]
-      - [3.6, 17.9, 1.25]
-      - [2.0,  17.0, 1.0]
+      - [1.7, 13.4, 0.3]
+      - [3.6, 15.9, 0.4]
+      - [2.0,  17.0, 0.8]
     end_positions:
-      - [12.8, 13.7, 0.9]
-      - [8.0, 2.9, 1.25]
-      - [11.0, 5.5, 1.0]
+      - [12.8, 13.7, 0.3]
+      - [8.0, 2.9, 0.4]
+      - [11.0, 5.5, 0.8]
     density: 100.0 # kg/m^3
   asset:
     assetRoot: "tokenhsi/data/assets"
