@@ -139,7 +139,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_12-17-29-35/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_13-14-42-32/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -149,7 +149,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --box_w 0.40 \
     --random_size False \
     --random_density False \
-    --density 150.0 \
+    --density 100.0 \
     --random_mode_equal_proportion True \
     --construction_experiment True \
     --ergo_coeff 0.2 \
@@ -164,7 +164,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_12-17-29-35/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth \
     --test \
     --num_envs 3 \
     --wandb_project "TokenHSI-Test" \
@@ -183,14 +183,13 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 
 # Try 8 family
-# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_04-10-54-37/nn/Humanoid.pth
-# --checkpoint output/custom_trained/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_08-15-55-51/nn/Humanoid.pth # motion+reward + obstacles (very good reward)
-# --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth # motion (okay reward)
-# --checkpoint output/custom_trained/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_08-15-59-52/nn/Humanoid.pth # motion+reward
-# --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-8-1-train-3/Humanoid_04-11-29-42/nn/Humanoid.pth # scratch motion (best reward in 234, but still not as good as 567) --> very bad even on easy cases (high targets)
+# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_12-15-07-56/nn/Humanoid.pth \
 
-# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_30-12-55-46/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-8-1-train-3/Humanoid_04-11-29-42/nn/Humanoid.pth # old, not working
+
+# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_13-14-46-43/nn/Humanoid.pth \ # obstacles, motion + reward, do not trip can MMH if min_h >0.05, bad lower
+# --checkpoint output/custom_trained/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_13-14-42-32/nn/Humanoid.pth \ # motion + reward, Trips, can MMH, bad lower
+# --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth \ # motion only, unstable walk, can not MMH
 
 # Terrain train 
 python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
@@ -233,6 +232,6 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/low_fail" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/Terrain_MMH_bad_lower" --video_name "vid" --delete_imgs --fps 10
 
 
