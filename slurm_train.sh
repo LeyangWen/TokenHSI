@@ -58,10 +58,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/ \
     --wandb_name "Carry-GoodMotion-resume-ergoReward-train-9" \
-    --notes "good motion only + ergo reward (debug: added ergo to total, always increase), resume on goodmotion 07-01-20-33, then try8- 9/Humanoid_28-16-04-15" \
+    --notes "good motion only + ergo reward (debug: added ergo to total, always increase), resume on goodmotion 07-01-20-33, then try8- 9, 9 08-15-58-26 again" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_08-15-58-26/nn/Humanoid.pth \
 
 
     # --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
