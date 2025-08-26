@@ -97,10 +97,10 @@ env:
     mapWidth: 20.
     numLevels: 5
     numTerrains: 20 # Make this smaller if OOM on local GPU, e.g., 4
-    # terrain types: [smooth slope, rough slope, stairs up, stairs down, discrete, stepping, poles, flat]
-    terrainProportions: [0.0, 0.0, 0.35, 0.35, 0.2, 0, 0, 0.1]
+    # terrain types: [smooth slope, rough slope, stairs up, stairs down, discrete, stepping, flat, poles]
+    terrainProportions: [0.4, 0.4, 0.1, 0.1, 0.0, 0, 0.0, 0]
     # terrainProportions: [0, 0, 0, 0, 0, 0, 0, 1.0]
-    slopeTreshold: 0.9
+    slopeTreshold: 0.90
     # wen: add unwalkable obstacles
     unwalkableObstacles: 0
     # wen task override
@@ -130,13 +130,13 @@ env:
     #   - [12.8, 13.7, 0.4]
     #   - [12.8, 13.7, 0.8]
     start_positions:
-      - [1.7, 13.4, 0.2]
-      - [3.6, 15.9, 0.2]
-      - [2.0,  17.0, 0.2]
+      - [1.7, 13.4, 0.3]
+      - [3.6, 15.9, 0.4]
+      - [2.0,  17.0, 0.8]
     end_positions:
-      - [12.8, 13.7, 0.2]
-      - [8.0, 2.9, 0.2]
-      - [11.0, 5.5, 0.2]
+      - [12.8, 13.7, 0.3]
+      - [8.0, 2.9, 0.4]
+      - [11.0, 5.5, 0.8]
     density: 100.0 # kg/m^3
   asset:
     assetRoot: "tokenhsi/data/assets"

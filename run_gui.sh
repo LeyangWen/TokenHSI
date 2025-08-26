@@ -6,7 +6,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-3/Humanoid_07-01-14-58/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_23-03-39-52/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -21,6 +21,8 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 156.25 \
     --ergo_coeff 0.2 \
     --skip_img \
+    --headless \
+    --record_headless
 
     # --ergo_sub_weight "20, 40, 40" \
     # --headless \
@@ -34,7 +36,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-8/Humanoid_28-16-04-43/nn/Humanoid.pth \ # Try4 -8, good lift, no lower - walk pass instead.
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \ # Try4 -9, good lift and lower, sometime bad aim at lower and not stable,  drop box 
     # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_08-15-58-26/nn/Humanoid.pth \ # Try4 -9, continues train, quite stable, werid sidestep when lifting, sometimes pick up multiple times ***
-    # --checkpoint output/custom_trained/Try4/
+    # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_23-03-39-52/nn/Humanoid.pth \ # Try4 -9, continues train, side step to carry ***
 
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-6/Humanoid_23-09-40-17/nn/Humanoid.pth \ # Try4 -6 # good lift, no lower - stop at target, I think the reward is higher then
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-7/Humanoid_23-09-37-42/nn/Humanoid.pth \ # Try4 -7, good lift, no lower - walk pass instead. also walking is slow
@@ -103,7 +105,8 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 30.0 \
     --ergo_coeff 0.0 \
     --skip_img \
-
+    --headless \
+    --record_headless
 
 
 #########################################################################################################################
@@ -138,8 +141,8 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_13-14-42-32/nn/Humanoid.pth \
+    --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -161,10 +164,10 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # Terrain Carry Test, og env
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
-    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_slope.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth \
+    --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
     --test \
     --num_envs 3 \
     --wandb_project "TokenHSI-Test" \
@@ -180,14 +183,19 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --ergo_coeff 0.2 \
     --load_terrain False \
 
-
+# Try 9 family
+# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
+# --checkpoint output/custom_trained/try9/TerrainObstacles-GoodMotion-Reward-scratch-1/Humanoid_23-03-57-15/nn/Humanoid.pth \ # obstacles, motion + reward, 
+# --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \ # motion + reward, good posture, stuck sometimes
+# --checkpoint output/custom_trained/try9/Terrain-GoodMotion-scratch-3/Humanoid_23-03-55-05/nn/Humanoid.pth \ # motion only
 
 # Try 8 family
-# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_12-15-07-56/nn/Humanoid.pth \
-
+# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
 
 # --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
-# --checkpoint output/custom_trained/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_13-14-46-43/nn/Humanoid.pth \ # obstacles, motion + reward, do not trip can MMH if min_h >0.05, bad lower
+# --checkpoint output/custom_trained/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_23-03-58-31/nn/Humanoid.pth \ # obstacles, motion + reward, do not trip can MMH if min_h >0.05, bad lower ***
+
+# --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
 # --checkpoint output/custom_trained/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_13-14-42-32/nn/Humanoid.pth \ # motion + reward, Trips, can MMH, bad lower
 # --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth \ # motion only, unstable walk, can not MMH
 
@@ -232,6 +240,6 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/Terrain_MMH_bad_lower" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/2" --video_name "vid" --delete_imgs --fps 10
 
 

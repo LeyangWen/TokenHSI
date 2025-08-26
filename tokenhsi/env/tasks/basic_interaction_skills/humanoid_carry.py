@@ -865,7 +865,7 @@ class HumanoidCarry(Humanoid):
         if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
             ids = env_ids.to(dtype=torch.long)
             # Use the same or a separate experiment counter as needed (here we assume the same)
-            if self._box_counter[ids] >= 42:
+            if self._box_counter[ids] >= 60:
                 raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
             start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
             root_pos = self._fixed_start_positions[start_indices]
@@ -1613,6 +1613,7 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     torso_pos = humanoid_rigid_body_pos[:, 1, :]
     pelvis_pos = humanoid_rigid_body_pos[:, 0, :]
     mean_body_pos = (torso_pos + pelvis_pos) / 2.0
+    mean_body_pos = pelvis_pos
 
     # calculate the xy distance between the box and the humanoid body, if exceed half of box max w, l, h + threshold%, reduce reward
     box_pos_diff_xy = box_pos[..., :2] - mean_body_pos[..., :2]
