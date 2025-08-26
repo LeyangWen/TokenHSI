@@ -54,4 +54,4 @@ python ./tokenhsi/run.py --task HumanoidTrajSitCarryClimb \
     --wandb_name "Try8-Stage1-GoodMotion-scratch-train-1" \
     --notes "motion only" \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_08-10-42-05/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_12-15-07-56/nn/Humanoid.pth \
