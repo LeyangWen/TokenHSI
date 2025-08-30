@@ -1613,7 +1613,7 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     
     ############## hyperparameters ##############
     exp_k = -5.0
-    box_dist_threshold_percentage = 0.1 # *100%
+    box_dist_threshold_percentage = 0.05 # *100%
     upper_limit_angle = 1 / 9.0 * np.pi  # 20 degrees from REBA-back
     only_height= True
     hand_threshold = 0.5 
@@ -1631,9 +1631,10 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     # calculate the xy distance between the box and the humanoid body, if exceed half of box max w, l, h + threshold%, reduce reward
     box_pos_diff_xy = box_pos[..., :2] - mean_body_pos[..., :2]
     box_pos_diff_dist = torch.norm(box_pos_diff_xy, p=2, dim=1)
-    max_box_edge = torch.max(box_size)*(1.0 + box_dist_threshold_percentage)
-    
-    box_pos_diff = torch.clamp_min(box_pos_diff_dist - max_box_edge, 0.0)
+    max_edge = box_size.max(dim=1).values           # (N,)
+    allowed_xy = 0.5 * max_edge * (1.0 + box_dist_threshold_percentage)  # (N,)
+
+    box_pos_diff = torch.clamp_min(box_pos_diff_dist - allowed_xy, 0.0)
     reward = weight*torch.exp(-5.0 * box_pos_diff)
     
     
