@@ -12,9 +12,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --wandb_project "TokenHSI-Test" \
     --wandb_name "Carry_test_1" \
     --wandb_mode "disabled" \
-    --box_w 0.4 \
-    --box_l 0.4 \
-    --box_h 0.4 \
+    --box_w 0.2 \
     --random_size False \
     --random_mode_equal_proportion True \
     --random_density True \
@@ -240,6 +238,6 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/2" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_box" --video_name "vid" --delete_imgs --fps 10
 
 

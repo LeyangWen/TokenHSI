@@ -347,8 +347,13 @@ class HumanoidCarry(Humanoid):
             asset_options.max_angular_velocity = 100.0
             asset_options.density = self._box_density[i]
             asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
-            self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
-        
+            if True:
+                self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
+            else:
+                asset_root = "tokenhsi/data/assets/carry_box/"
+                self._box_assets.append(self.gym.load_asset(self.sim, asset_root, f"indented_box.urdf", asset_options))
+                # TODO: mass & size are taken from urdf file, not asset_options
+
         return
 
     def _build_env(self, env_id, env_ptr, humanoid_asset):
@@ -376,7 +381,8 @@ class HumanoidCarry(Humanoid):
     
         box_handle = self.gym.create_actor(env_ptr, self._box_assets[env_id], default_pose, "box", col_group, col_filter, segmentation_id)
         self._box_handles.append(box_handle)
-
+        
+        print(self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0])
         mass = self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0].mass
         self._box_masses.append(mass)
         print(f"[Info]: box mass = {mass} kg")
