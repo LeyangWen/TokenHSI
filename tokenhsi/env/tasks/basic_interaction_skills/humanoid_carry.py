@@ -247,9 +247,12 @@ class HumanoidCarry(Humanoid):
         asset_options.density = 1.0
         asset_options.fix_base_link = True
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
-
+        
+        platform_size = 0.4
+        # if self.constructionExp and self._is_test:
+        #     platform_size = max(self._build_base_size)
         self._platform_height = 0.02
-        self._platform_asset = self.gym.create_box(self.sim, 0.4, 0.4, self._platform_height, asset_options)
+        self._platform_asset = self.gym.create_box(self.sim, platform_size, platform_size, self._platform_height, asset_options)
 
         return
 
@@ -325,8 +328,10 @@ class HumanoidCarry(Humanoid):
                 dist = torch.distributions.uniform.Uniform(torch.tensor(self._mass_range[0], device=self.device), 
                                                            torch.tensor(self._mass_range[1], device=self.device),)
                 box_mass = dist.sample((self.num_envs,))
-                box_volume = self._box_scale.prod(dim=1)
-                
+                scale_volume = self._box_scale.prod(dim=1) 
+                base_size = torch.tensor(self._build_base_size, device=self.device)
+                base_volume = base_size.prod()
+                box_volume = base_volume * scale_volume
                 self._box_density = box_mass / box_volume
                 # print("box_mass shape = ", box_mass.shape)
                 # print("box_volume shape = ", box_volume.shape)
@@ -1530,12 +1535,14 @@ def compute_back_ergo_reward(back_angle, left_knee_angle, right_knee_angle, weig
     
     # left_knee_angle = humanoid_angles["left_knee"]
     # right_knee_angle = humanoid_angles["right_knee"]
-    mean_knee_angle = (left_knee_angle + right_knee_angle) / 2.0
+    # mean_knee_angle = (left_knee_angle + right_knee_angle) / 2.0
+    max_knee_angle = torch.min(left_knee_angle, right_knee_angle)  # use max knee angle to be more conservative i.e. less bent knee
     
     if adjust_knee:
         # reduce penalty for back if knees are bent
         # knee 90 --> 180, 100% --> 0% discount on back_angle_diff
-        adjusted_back_angle_diff =  back_angle_diff*(1.0 - torch.clamp_min((mean_knee_angle - 0.5 * np.pi) / (0.5 * np.pi), 0.0))
+        knee_straightness = torch.clamp((max_knee_angle - 0.25 * np.pi) / (0.75 * np.pi), min=0.0, max=1.0)
+        adjusted_back_angle_diff =  back_angle_diff * knee_straightness
         # 1 - max[(knee-90)/90,0]
         # 1- max[knee/90-1,0]
         # min[1-(knee/90-1),1]

@@ -12,12 +12,16 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --wandb_project "TokenHSI-Test" \
     --wandb_name "Carry_test_1" \
     --wandb_mode "disabled" \
-    --box_w 0.2 \
+    --box_w 0.45 \
+    --box_l 0.60 \
+    --box_h 0.40 \
     --random_size False \
     --random_mode_equal_proportion True \
     --random_density True \
-    --density 156.25 \
+    --density 180 \
     --ergo_coeff 0.2 \
+
+
     --skip_img \
     --headless \
     --record_headless
@@ -25,7 +29,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --ergo_sub_weight "20, 40, 40" \
     # --headless \
     # --record_headless
-
+    --density 156.25 \
     
 
 

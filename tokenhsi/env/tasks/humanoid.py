@@ -682,15 +682,16 @@ class Humanoid(BaseTask):
         assert id1 != id2 and id1 != id_mid and id2 != id_mid, "id1, id2, and id3 must be different"
         v1 = rigid_body_pos[:, id1, :] - rigid_body_pos[:, id_mid, :]
         if id2 == "up":
-            v2 = torch.tensor([0.0, 0.0, 1.0], device=rigid_body_pos.device).expand_as(v1)
+            up = torch.tensor([0.0, 0.0, 1.0], device=rigid_body_pos.device, dtype=rigid_body_pos.dtype)
+            v2 = up.expand_as(v1)
         else:
             v2 = rigid_body_pos[:, id2, :] - rigid_body_pos[:, id_mid, :]
         
-        return self.anlge_3D(v1, v2)
+        return self.angle_3D(v1, v2)
    
     
     @staticmethod
-    def anlge_3D(v1, v2):
+    def angle_3D(v1, v2):
         # todo: write test
         """
         Compute the angle between two vectors in 3D space
@@ -698,20 +699,20 @@ class Humanoid(BaseTask):
         :param v2: torch.tensor, shape (batch_size, 3)
         :return: torch.tensor, shape (batch_size)
         """
-        dot_product = torch.sum(v1 * v2, dim=-1)
-        norm_v1 = torch.norm(v1, dim=-1)
-        norm_v2 = torch.norm(v2, dim=-1)
+        # Normalize magnitudes (avoid div-by-zero)
+        eps = 1e-8
+        v1n = torch.clamp(v1.norm(dim=-1), min=eps)
+        v2n = torch.clamp(v2.norm(dim=-1), min=eps)
 
-        # Avoid division by zero
-        eps = 1e-7
-        norm_v1 = torch.clamp(norm_v1, min=eps)
-        norm_v2 = torch.clamp(norm_v2, min=eps)
+        # Dot and cross magnitudes
+        dot = (v1 * v2).sum(dim=-1) / (v1n * v2n)
+        # Clamp dot to valid range to avoid NaNs from tiny numerical overshoots
+        dot = torch.clamp(dot, -1.0, 1.0)
 
-        cos_angle = torch.clamp(dot_product / (norm_v1 * norm_v2), -1.0 + eps, 1.0 - eps)
-        angle = torch.acos(cos_angle)
+        cross = torch.linalg.vector_norm(torch.cross(v1, v2, dim=-1), dim=-1) / (v1n * v2n)
 
-        # angles here should be [0, pi], otherwise, convert
-        angle = torch.min(angle, np.pi - angle)
+        # Angle in [0, pi]
+        angle = torch.atan2(cross, dot)
 
         return angle
 
