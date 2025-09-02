@@ -247,6 +247,16 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         
 
         ###### Wen: Testing for construction experiments
+        # slope placement controls for loadSlopes only
+        terr_cfg = self.cfg["env"]["terrain"]
+        self.load_slopes = terr_cfg.get("loadSlopes", False)
+        self._slope_fraction  = float(terr_cfg.get("slopeFraction", 0.25))
+        self._slope_mode      = terr_cfg.get("slopeMode", "bottom_up")  # bottom_up | top_down | alternate
+        self._slope_toggle    = torch.zeros((self.num_envs,), dtype=torch.long, device=self.device)  # for alternate mode
+
+        
+        
+        
         print(f"[Info]: constructionExp = {self.constructionExp}")
         print(f"[Info]: _is_eval = {self._is_eval}")
         print(f"[Info]: _is_test = {self._is_test}")
@@ -269,6 +279,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             print(f"[Info]: _box_density_value = {self._box_density_value}")
             print(f"[Info]: init done {'#'*40}")
         return
+
     
     def get_multi_task_info(self):
 
@@ -855,12 +866,22 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         return obs_size
 
     def _reset_task(self, env_ids):
-        if self._is_test and self.constructionExp:  # wen: specify target location from yaml instead of random
+        if self._is_test and self.constructionExp:  
+            # wen: specify target location from yaml instead of random
             ids = env_ids.to(dtype=torch.long)
-            target_indices = self._target_counter[ids] % self._fixed_target_positions.shape[0]
-            root_pos = self._fixed_target_positions[target_indices]
-
-            new_target_pos = self._process_box_root_pos(root_pos)
+            
+            # deterministic slope target for loadSlopes
+            if self.load_slopes:
+                start_indices = self._target_counter[ids] % (2) 
+                assert ids.max().item() < self.terrain.env_rows * self.terrain.env_cols, "Too many envs for the number of slope tiles"
+                root_pos = self.terrain.box_end[start_indices, ids, :]
+                root_pos[ids, -1] = root_pos[:, -1] + self._box_size[ids, 2] / 2 + self._platform_height / 2
+                new_target_pos = root_pos
+                
+            else:
+                target_indices = self._target_counter[ids] % self._fixed_target_positions.shape[0]
+                root_pos = self._fixed_target_positions[target_indices]
+                new_target_pos = self._process_box_root_pos(root_pos)
 
             # Check if the new target is too close to the humanoid or box.
             min_dist = 1.0
@@ -1402,6 +1423,10 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._reset_ref_motion_ids = {}
         self._reset_ref_motion_times = {}
         self._reset_human_root_pos_offset = {}
+        # flip slope direction next time if needed
+        if self.load_slopes and self._slope_mode == "alternate":
+            self._slope_toggle[env_ids] = 1 - self._slope_toggle[env_ids]
+
         if (len(env_ids) > 0):
             self._reset_actors(env_ids)
             self._reset_boxes(env_ids)
@@ -1436,11 +1461,22 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
     
     def _reset_boxes(self, env_ids):
         if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
+            # deterministic slope box start for loadSlopes
+            # Loc from yaml config
             ids = env_ids.to(dtype=torch.long)
-            start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
-            root_pos = self._fixed_start_positions[start_indices]
-
-            root_pos = self._process_box_root_pos(root_pos)
+            if self._box_counter[ids] >= 45:
+                raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
+            if self.load_slopes:
+                start_indices = self._box_counter[ids] % (2) 
+                assert ids.max().item() < self.terrain.env_rows * self.terrain.env_cols, "Too many envs for the number of slope tiles"
+                root_pos = self.terrain.box_start[start_indices, ids, :]
+                root_pos[ids, -1] = root_pos[:, -1] + self._box_size[ids, 2] / 2 + self._platform_height / 2
+                
+            else:
+                start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
+                root_pos = self._fixed_start_positions[start_indices]
+                root_pos = self._process_box_root_pos(root_pos)
+            
             self._box_states[ids, 0:3] = root_pos
             axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
             # if self._reset_random_rot:
@@ -1459,7 +1495,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
 
             self._box_states[ids, 2] += 0.05 # add 0.05 to enable correct collision detection
-            
 
             print(f"[Info]: _box_counter = {self._box_counter[ids]}")
             print(f"[Info]: _reset_boxes: box_pos = {self._box_states[ids, 0:3]}")
@@ -1579,7 +1614,20 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         return
     
     def _reset_default(self, env_ids):
+        
         self._humanoid_root_states[env_ids] = self._initial_humanoid_root_states[env_ids]
+        
+        if self._is_test and self.constructionExp and self.load_slopes:  # wen: deterministic slope box start for loadSlopes
+            ids = env_ids.to(dtype=torch.long)
+            start_indices = self._box_counter[ids] % (2) 
+            assert ids.max().item() < self.terrain.env_rows * self.terrain.env_cols, "Too many envs for the number of slope tiles"
+            root_pos = self.terrain.humanoid_start[start_indices, ids, :]
+            root_pos[ids, -1] = root_pos[:, -1]
+            self._humanoid_root_states[env_ids] = self._initial_humanoid_root_states[env_ids]
+
+            self._humanoid_root_states[env_ids, 0:2] = root_pos[ids,0:2]
+            self._humanoid_root_states[env_ids, 2] = root_pos[ids, 2] + 1.0  # add pelvis height
+
         self._dof_pos[env_ids] = self._initial_dof_pos[env_ids]
         self._dof_vel[env_ids] = self._initial_dof_vel[env_ids]
         self._reset_default_env_ids = env_ids
@@ -1588,7 +1636,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             self._kinematic_humanoid_rigid_body_states[self._reset_default_env_ids] = self._initial_humanoid_rigid_body_states[self._reset_default_env_ids]
 
         self._every_env_init_dof_pos[self._reset_default_env_ids] = self._initial_dof_pos[env_ids] # for "enableTrackInitState"
-
         return
 
     def _reset_ref_state_init(self, env_ids):
@@ -2014,11 +2061,17 @@ class Terrain:
         print("[Info]: Terrain config", cfg)
         self.type = cfg["terrainType"]
         self.device = device
+        self.fixed_slope_placements = cfg.get("fixedSlopePlacements", False)
+        self.slope_fraction = float(cfg.get("slopeFraction", 0.20))
+        self.slope_mode = cfg.get("slopeMode", "alternate")
+
         if self.type in ["none", 'plane']:
             return
         if "loadTerrain" in cfg and cfg["loadTerrain"]:  # wen: added custom load function
-            self.horizontal_scale = 0.1 # resolution 0.1
-            self.vertical_scale = 0.2
+            height_field_path = cfg["heightFieldPath"]
+            self.horizontal_scale = float(height_field_path.split("_")[-1].replace(".npy", "")) # extract scale from filename
+            # self.horizontal_scale = 0.1 # resolution 0.1
+            self.vertical_scale = 1
             self.border_size = 1 # keep some edge in the scaned model
             self.proportions = [
                 np.sum(cfg["terrainProportions"][:i + 1])
@@ -2027,7 +2080,22 @@ class Terrain:
 
             self.env_rows = 1
             self.env_cols = 1
-            self.num_maps = self.env_rows * self.env_cols # 一共100块地形
+            self.num_maps = self.env_rows * self.env_cols # 一共1块地形
+            self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
+
+            # other init put into load_terrain function since it depend on terrain size
+        elif "loadSlopes" in cfg and cfg["loadSlopes"]:  # wen: added custom load function
+            self.horizontal_scale = 0.1 # resolution 0.1
+            self.vertical_scale = 0.005
+            self.border_size = 2 # keep some edge in the scaned model
+            self.proportions = [
+                np.sum(cfg["terrainProportions"][:i + 1])
+                for i in range(len(cfg["terrainProportions"]))
+            ]
+
+            self.env_rows = 3
+            self.env_cols = 5
+            self.num_maps = self.env_rows * self.env_cols # 一共15块地形
             self.env_origins = np.zeros((self.env_rows, self.env_cols, 3))
 
             # other init put into load_terrain function since it depend on terrain size
@@ -2071,7 +2139,14 @@ class Terrain:
             self.height_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
             self.walkable_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16) # paper: We follow [84, 97] to calculate a walkable map for character initialization.
         if "loadTerrain" in cfg and cfg["loadTerrain"]:
+            if "loadSlopes" in cfg and cfg["loadSlopes"]:
+                raise ValueError("Cannot load both terrain and slopes")
             self.load_terrain(cfg)
+        elif "loadSlopes" in cfg and cfg["loadSlopes"]:
+            self.load_slopes(cfg)
+            self.humanoid_start = torch.from_numpy(self.humanoid_start).to(self.device).view(2, -1, 3)
+            self.box_start      = torch.from_numpy(self.box_start).to(self.device).view(2, -1, 3)
+            self.box_end        = torch.from_numpy(self.box_end).to(self.device).view(2, -1, 3)
         elif cfg["curriculum"]:
             self.curiculum(num_robots,
                            num_terrains=self.env_cols,
@@ -2377,6 +2452,8 @@ class Terrain:
     def load_terrain(self, cfg):
 
         self.height_field_raw = np.load(cfg["heightFieldPath"])
+        # nan to 0
+        self.height_field_raw[np.isnan(self.height_field_raw)] = 0
         self.walkable_field_raw = np.load(cfg["walkableFieldPath"])
         self.walkable_field_raw = ndimage.binary_dilation(self.walkable_field_raw, iterations=3).astype(int)
         
@@ -2413,3 +2490,151 @@ class Terrain:
         #                                     mode='constant',
         #                                     constant_values=0)
 
+    # Terrain.load_slopes  wen implementation
+    def load_slopes(self, cfg):
+        # size per small env in meters
+        self.env_length = cfg["mapLength"]
+        self.env_width = cfg["mapWidth"]
+
+        # pixels per small env
+        self.width_per_env_pixels = int(self.env_width / self.horizontal_scale)
+        self.length_per_env_pixels = int(self.env_length / self.horizontal_scale)
+
+        # full map with border
+        self.border = int(self.border_size / self.horizontal_scale)
+        self.tot_cols = int(self.env_cols * self.width_per_env_pixels) + 2 * self.border
+        self.tot_rows = int(self.env_rows * self.length_per_env_pixels) + 2 * self.border
+
+        self.height_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
+        self.walkable_field_raw = np.zeros((self.tot_rows, self.tot_cols), dtype=np.int16)
+
+        angle_degs = [-20, -10, 0, 10, 20]
+        
+        # init (2, env_rows, env_cols, 3)
+        self.humanoid_start = np.empty((2, self.env_rows, self.env_cols, 3), dtype=np.float32)
+        self.box_start      = np.empty((2, self.env_rows, self.env_cols, 3), dtype=np.float32)
+        self.box_end        = np.empty((2, self.env_rows, self.env_cols, 3), dtype=np.float32)
+
+        for i in range(self.env_rows):
+            for j in range(self.env_cols):
+                # select subregion
+                start_x = self.border + i * self.length_per_env_pixels
+                end_x = self.border + (i + 1) * self.length_per_env_pixels
+                start_y = self.border + j * self.width_per_env_pixels
+                end_y = self.border + (j + 1) * self.width_per_env_pixels
+
+                # build a square SubTerrain tile
+                terrain = SubTerrain(
+                    "terrain",
+                    width=self.width_per_env_pixels,
+                    length=self.width_per_env_pixels,
+                    vertical_scale=self.vertical_scale,
+                    horizontal_scale=self.horizontal_scale,
+                )
+
+                theta = np.deg2rad(angle_degs[j])
+                slope = float(np.tan(theta))  # negative angles produce downhill
+                platform_size = 1.0
+                if i == 0:
+                    # stairs row  approximate slope with signed step height
+                    step_width_m = 0.31
+                    step_h_m = slope * step_width_m
+                    # small angles yield tiny steps  clamp to zero to keep flat
+                    if abs(step_h_m) < 1e-4:
+                        step_h_m = 0.0
+                    pyramid_stairs_terrain(
+                        terrain,
+                        step_width=step_width_m,
+                        step_height=step_h_m,
+                        platform_size=platform_size,
+                    )
+                elif i == 1:
+                    # smooth sloped row
+                    pyramid_sloped_terrain(
+                        terrain,
+                        slope=slope,
+                        platform_size=platform_size,
+                    )
+                else:
+                    # rough sloped row  slope plus surface noise
+                    pyramid_sloped_terrain(
+                        terrain,
+                        slope=slope,
+                        platform_size=platform_size,
+                    )
+                    random_uniform_terrain(
+                        terrain,
+                        min_height=-0.02,
+                        max_height=0.02,
+                        step=0.02,
+                        downsampled_scale=0.2,
+                    )
+
+                # write tile into full heightfield
+                self.height_field_raw[start_x:end_x, start_y:end_y] = terrain.height_field_raw
+
+                # compute env origin z from tile center
+                env_origin_x = (i + 0.5) * self.env_length
+                env_origin_y = (j + 0.5) * self.env_width
+                x1 = int((self.env_length / 2.0 - 1.0) / self.horizontal_scale)  # in test, (8/2 -1)/0.1 --> 30, 
+                x2 = int((self.env_length / 2.0 + 1.0) / self.horizontal_scale)  # --> 50
+                y1 = int((self.env_width / 2.0 - 1.0) / self.horizontal_scale)
+                y2 = int((self.env_width / 2.0 + 1.0) / self.horizontal_scale)
+                env_origin_z = np.max(terrain.height_field_raw[x1:x2, y1:y2]) * self.vertical_scale  # max(center_h of 2mx2m square)*0.05
+                self.env_origins[i, j] = [env_origin_x, env_origin_y, env_origin_z]
+                
+                # self.slope_fraction  #0.2
+                # print("start, end xy",start_x, end_x, start_y, end_y)
+                
+                mid_x = int((start_x + end_x) / 2)
+                mid_y = int((start_y + end_y) / 2)
+                slope_x_pixel_per_side = self.length_per_env_pixels * (1 - platform_size / self.horizontal_scale/self.length_per_env_pixels) / 2  # 80 total px, 30 in platform, 20 in each slope
+
+                # print(slope_x_pixel_per_side)
+                # one-liners (inside your i,j loops)
+                # self.humanoid_start[0, i, j] = self.get_ground_xyz(start_x, mid_y)
+                # self.humanoid_start[1, i, j] = self.get_ground_xyz(mid_x, mid_y)
+                # self.box_start[0, i, j]      = self.get_ground_xyz(start_x + self.slope_fraction * slope_x_pixel_per_side, mid_y)
+                # self.box_start[1, i, j]      = self.get_ground_xyz(end_x - (1-self.slope_fraction) * slope_x_pixel_per_side, mid_y) 
+                # self.box_end[0, i, j]        = self.get_ground_xyz(start_x + slope_x_pixel_per_side, mid_y)
+                # self.box_end[1, i, j]        = self.get_ground_xyz(end_x, mid_y)
+                
+                self.humanoid_start[0, i, j] = self.get_ground_xyz(mid_x, mid_y)
+                self.humanoid_start[1, i, j] = self.get_ground_xyz(mid_x, mid_y)
+                self.box_start[1, i, j]      = self.get_ground_xyz(end_x - self.slope_fraction * slope_x_pixel_per_side, mid_y) 
+                self.box_start[0, i, j]      = self.get_ground_xyz(start_x + self.slope_fraction * slope_x_pixel_per_side, mid_y)
+                self.box_end[1, i, j]        = self.get_ground_xyz(start_x + self.slope_fraction * slope_x_pixel_per_side, mid_y)
+                self.box_end[0, i, j]        = self.get_ground_xyz(end_x - self.slope_fraction * slope_x_pixel_per_side, mid_y)
+        
+        # slight dilation to expand nonwalkable mask margins  keeps default behavior consistent
+        self.walkable_field_raw = ndimage.binary_dilation(self.walkable_field_raw, iterations=3).astype(int)
+        
+
+        
+        
+    def get_ground_z(self, x, y, surrounding_square_dim=0.85):
+        """_summary_
+
+        Args:
+            x (_type_): _description_
+            y (_type_): _description_
+            surrounding_square_dim (float, optional): _description_. Defaults to 0.75. in m, if too small, foot get stuck
+
+        Returns:
+            _type_: _description_
+        """
+        surrounding_square_dim = int(surrounding_square_dim/self.horizontal_scale)
+        x = int(x)
+        y = int(y)
+        x1 = int(x - surrounding_square_dim)
+        x2 = int(x + surrounding_square_dim)
+        y1 = int(y - surrounding_square_dim)
+        y2 = int(y + surrounding_square_dim)
+        print(x1, x2, y1, y2)
+        return np.max(self.height_field_raw[x1:x2, y1:y2]) * self.vertical_scale
+
+    def get_ground_xyz(self, x, y):
+        z = self.get_ground_z(x, y)
+        x = x * self.horizontal_scale
+        y = y * self.horizontal_scale
+        return [x, y, z]

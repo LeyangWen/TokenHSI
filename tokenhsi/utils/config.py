@@ -132,6 +132,12 @@ def load_cfg(args):
     if args.load_terrain is not None:
         cfg["env"]["terrain"]["loadTerrain"] = args.load_terrain
 
+    if args.load_slopes is not None:
+        cfg["env"]["terrain"]["loadSlopes"] = args.load_slopes
+
+    if args.user_urdf is not None:
+        cfg["env"]["box"]["build"]["userUrdf"] = args.user_urdf
+
     # === Overrides for env.eval ===
     if args.num_experiments is not None:
         cfg["env"]["eval"]["numExperiments"] = args.num_experiments
@@ -359,6 +365,8 @@ def get_args(benchmark=False):
             "help": "Override height for env.box.build.baseSize. If not provided and --box_w is specified, assumes a cube."},
         {"name": "--box_l", "type": float, "default": None,
             "help": "Override length for env.box.build.baseSize. If not provided and --box_w is specified, assumes a cube."},
+        {"name": "--user_urdf", "type": str, "default": None,
+            "help": "Path to the user-defined URDF file for the box."},
 
         {"name": "--random_size", "type": str2bool, "default": None,
             "help": "Override env.box.build.randomSize (e.g., --random_size True or --random_size False)"},
@@ -370,8 +378,11 @@ def get_args(benchmark=False):
             "help": "Override env.terrain.numTerrains, number of terrains to load"},
         {"name": "--load_terrain", "type": str2bool, "default": None,
             "help": "Override terrain.loadTerrain (e.g., --load_terrain True or --load_terrain False)"},
+        {"name": "--load_slopes", "type": str2bool, "default": None,
+            "help": "Override terrain.loadSlopes (e.g., --load_slopes True or --load_slopes False)"},
         {"name": "--unwalkable_obstacles", "type": int, "default": None,
             "help": "Override env.terrain.unwalkableObstacles, number of unwalkable obstacles to spawn in the terrain"},
+        
 
         # Overrides for train
         {"name": "--ergo_coeff", "type": float, "default": None, "help": "set ergo reward coeff, 0.2"},

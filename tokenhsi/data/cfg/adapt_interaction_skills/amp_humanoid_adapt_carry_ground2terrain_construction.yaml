@@ -105,8 +105,10 @@ env:
     unwalkableObstacles: 0
     # wen task override
     loadTerrain: False  
-    heightFieldPath: "tokenhsi/data/terrain/height_map.npy"
-    walkableFieldPath: "tokenhsi/data/terrain/height_map_walkable.npy"
+    heightFieldPath: "tokenhsi/data/assets/terrain/vicon_lab/height_map_processed_0.01.npy"
+    walkableFieldPath: "tokenhsi/data/assets/terrain/vicon_lab/height_map_walkable.npy"
+    # heightFieldPath: "tokenhsi/data/assets/terrain/pipeline-construction-site/height_map.npy"
+    # walkableFieldPath: "tokenhsi/data/assets/terrain/pipeline-construction-site/height_map_walkable.npy"
 
 
   # power reward
@@ -129,12 +131,22 @@ env:
     #   - [12.8, 13.7, 0.3]
     #   - [12.8, 13.7, 0.4]
     #   - [12.8, 13.7, 0.8]
+    # start_positions:
+    #   - [1.7, 13.4, 0.2]
+    #   - [3.6, 15.9, 0.2]
+    #   - [2.0,  17.0, 0.2]
+    # end_positions:
+    #   - [12.8, 13.7, 0.2]
+    #   - [8.0, 2.9, 0.2]
+    #   - [11.0, 5.5, 0.2]
+
+    # vicon-lab
     start_positions:
-      - [1.7, 13.4, 0.2]
+      - [2., 4., 0.2]
       - [3.6, 15.9, 0.2]
       - [2.0,  17.0, 0.2]
     end_positions:
-      - [12.8, 13.7, 0.2]
+      - [7., 2., 0.2]
       - [8.0, 2.9, 0.2]
       - [11.0, 5.5, 0.2]
     density: 100.0 # kg/m^3

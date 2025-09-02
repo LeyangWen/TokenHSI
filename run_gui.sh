@@ -6,20 +6,19 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/basic_interaction_skills/amp_humanoid_carry_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_23-03-39-52/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-11/Humanoid_29-23-04-07/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
     --wandb_name "Carry_test_1" \
     --wandb_mode "disabled" \
-    --box_w 0.45 \
-    --box_l 0.60 \
-    --box_h 0.40 \
+    --box_w 0.4 \
     --random_size False \
     --random_mode_equal_proportion True \
     --random_density True \
     --density 180 \
     --ergo_coeff 0.2 \
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  # not linked yet, dont change here
 
 
     --skip_img \
@@ -37,8 +36,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # Try 4 famliy
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-8/Humanoid_28-16-04-43/nn/Humanoid.pth \ # Try4 -8, good lift, no lower - walk pass instead.
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \ # Try4 -9, good lift and lower, sometime bad aim at lower and not stable,  drop box 
-    # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_08-15-58-26/nn/Humanoid.pth \ # Try4 -9, continues train, quite stable, werid sidestep when lifting, sometimes pick up multiple times ***
+    # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_08-15-58-26/nn/Humanoid.pth \ # Try4 -9, continues train, quite stable, werid sidestep when lifting, sometimes pick up multiple times
     # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_23-03-39-52/nn/Humanoid.pth \ # Try4 -9, continues train, side step to carry ***
+    # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-11/Humanoid_29-23-04-07/nn/Humanoid.pth \ # Try4 -11, continues train, reward bug fix
 
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-6/Humanoid_23-09-40-17/nn/Humanoid.pth \ # Try4 -6 # good lift, no lower - stop at target, I think the reward is higher then
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-7/Humanoid_23-09-37-42/nn/Humanoid.pth \ # Try4 -7, good lift, no lower - walk pass instead. also walking is slow
@@ -66,25 +66,23 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sth in the code is making the box location in the floor
     # --checkpoint output/single_task/ckpt_carry.pth \
 
-    # # Small box
-    # --box_w 0.25 \
-    # --box_l 0.30 \
-    # --box_h 0.20 \
 
-    # # Medium box
-    # --box_w 0.35 \
-    # --box_l 0.45 \
-    # --box_h 0.30 \
+# Homedepot cardboard box sizes
+# # Small box
+# --box_w 0.41 \
+# --box_l 0.25 \
+# --box_h 0.31 \
 
-    # # Large box
-    # --box_w 0.45 \
-    # --box_l 0.60 \
-    # --box_h 0.40 \
+# # Medium box
+# --box_w 0.51 \
+# --box_l 0.38 \
+# --box_h 0.41 \
 
-    # # Extra large box
-    # --box_w 0.60 \
-    # --box_l 0.75 \
-    # --box_h 0.50 \
+# # Large box
+# --box_w 0.66 \
+# --box_l 0.38 \
+# --box_h 0.41 \
+
 
 
 # OG, no motion, no ergo reward
@@ -144,7 +142,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try9/TerrainObstacles-GoodMotion-Reward-scratch-1/Humanoid_23-03-57-15/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -169,9 +167,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_slope.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try9/TerrainObstacles-GoodMotion-Reward-scratch-1/Humanoid_23-03-57-15/nn/Humanoid.pth \
     --test \
-    --num_envs 3 \
+    --num_envs 15 \
     --wandb_project "TokenHSI-Test" \
     --wandb_name "CarryTerrain_test" \
     --wandb_mode "disabled" \
@@ -184,12 +182,39 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --construction_experiment False \
     --ergo_coeff 0.2 \
     --load_terrain False \
+    
+# Terrain Carry Test, slope env
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_slope_test.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+    --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try9/TerrainObstacles-GoodMotion-Reward-scratch-1/Humanoid_23-03-57-15/nn/Humanoid.pth \
+    --test \
+    --num_envs 15 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "CarryTerrain_test" \
+    --wandb_mode "disabled" \
+    --notes "rand loc, test carry" \
+    --box_w 0.40 \
+    --random_size False \
+    --random_density False \
+    --density 100.0 \
+    --random_mode_equal_proportion True \
+    --construction_experiment True \
+    --ergo_coeff 0.2 \
+    --load_terrain False \
+    --load_slopes True \
+    --skip_img \
+    --headless \
+    --record_headless
 
 # Try 9 family
 # --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
 # --checkpoint output/custom_trained/try9/TerrainObstacles-GoodMotion-Reward-scratch-1/Humanoid_23-03-57-15/nn/Humanoid.pth \ # obstacles, motion + reward, 
 # --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \ # motion + reward, good posture, stuck sometimes
 # --checkpoint output/custom_trained/try9/Terrain-GoodMotion-scratch-3/Humanoid_23-03-55-05/nn/Humanoid.pth \ # motion only
+# output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-4/Humanoid_29-23-25-41/nn/Humanoid.pth # motion+ reward continue, reward bug fix
 
 # Try 8 family
 # --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
@@ -242,6 +267,6 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_box" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/Try9-1_vicon_lab_example" --video_name "vid" --delete_imgs --fps 10
 
 

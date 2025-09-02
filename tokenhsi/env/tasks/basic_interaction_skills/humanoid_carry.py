@@ -98,6 +98,8 @@ class HumanoidCarry(Humanoid):
         self._reset_maxTopSurfaceHeight = box_cfg["reset"]["maxTopSurfaceHeight"]
 
         self._enable_bbox_obs = box_cfg["obs"]["enableBboxObs"]
+        
+        self.user_urdf = box_cfg["build"].get("userUrdf", None)
 
         # configs for amp
         state_init = cfg["env"]["stateInit"]
@@ -352,12 +354,15 @@ class HumanoidCarry(Humanoid):
             asset_options.max_angular_velocity = 100.0
             asset_options.density = self._box_density[i]
             asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
-            if True:
-                self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
-            else:
-                asset_root = "tokenhsi/data/assets/carry_box/"
+            if self.user_urdf is not None:
+                # todo: load root from userURDF
+                asset_root = "tokenhsi/data/assets/carry_box"
                 self._box_assets.append(self.gym.load_asset(self.sim, asset_root, f"indented_box.urdf", asset_options))
                 # TODO: mass & size are taken from urdf file, not asset_options
+            else: 
+                self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
+
+
 
         return
 
@@ -876,7 +881,7 @@ class HumanoidCarry(Humanoid):
         if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
             ids = env_ids.to(dtype=torch.long)
             # Use the same or a separate experiment counter as needed (here we assume the same)
-            if self._box_counter[ids] >= 60:
+            if self._box_counter[ids] >= 45:
                 raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
             start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
             root_pos = self._fixed_start_positions[start_indices]
