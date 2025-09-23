@@ -1464,7 +1464,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             # deterministic slope box start for loadSlopes
             # Loc from yaml config
             ids = env_ids.to(dtype=torch.long)
-            if self._box_counter[ids] >= 45:
+            if self._box_counter[0] >= 45:
                 raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
             if self.load_slopes:
                 start_indices = self._box_counter[ids] % (2) 

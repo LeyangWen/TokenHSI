@@ -1597,6 +1597,7 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     # if box is close enough to target position, give full reward so that reward never drops (which stops it from going to next stage)
     box_z_reached_mask = torch.abs((box_pos[:, -1] - tar_pos[:, -1])) <= 0.01  # 0.001
     box_xy_reached_mask = torch.sum((tar_pos[..., :2] - box_pos[..., :2]) ** 2, dim=-1) <= 0.1 ** 2
+    # TODO: double check, threshold, and logic, and why not xyz together
     box_reached_mask = torch.logical_and(box_z_reached_mask, box_xy_reached_mask)
     
     # reward is 0 unless box moved and hands are close enough

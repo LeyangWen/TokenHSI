@@ -18,9 +18,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_density True \
     --density 180 \
     --ergo_coeff 0.2 \
-    --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  # not linked yet, dont change here
-
-
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
     --skip_img \
     --headless \
     --record_headless
@@ -102,11 +100,13 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_size False \
     --random_mode_equal_proportion True \
     --random_density True \
-    --density 30.0 \
+    --density 100.0 \
     --ergo_coeff 0.0 \
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"
+
     --skip_img \
     --headless \
-    --record_headless
+    --record_headless \
 
 
 #########################################################################################################################
@@ -157,7 +157,8 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --construction_experiment True \
     --ergo_coeff 0.2 \
     --load_terrain True \
-
+   --headless \
+    --record_headless \
 #     --nums_terrains 0 \
 
 
@@ -189,7 +190,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_slope_test.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
     --hrl_checkpoint output/custom_trained/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
-    --checkpoint output/custom_trained/try9/TerrainObstacles-GoodMotion-Reward-scratch-1/Humanoid_23-03-57-15/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/try9/Terrain-GoodMotion-Reward-scratch-4/Humanoid_29-23-25-41/nn/Humanoid.pth \
     --test \
     --num_envs 15 \
     --wandb_project "TokenHSI-Test" \
@@ -267,6 +268,13 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/Try9-1_vicon_lab_example" --video_name "vid" --delete_imgs --fps 10
+# python lpanlib/others/video.py --imgs_dir "output/imgs/lab_vid" --video_name "vid"  --fps 10 --delete_imgs
 
 
+# | Keyboard | Function |
+# | ---- | --- |
+# | F | focus on humanoid |
+# | Right Click + WASD | change view port |
+# | Shift + Right Click + WASD | change view port fast |
+# | K | visualize lines |
+# | L | record screenshot, press again to stop recording|
