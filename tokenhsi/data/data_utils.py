@@ -9,6 +9,78 @@ from lpanlib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonState, Ske
 from lpanlib.poselib.visualization.common import plot_skeleton_state, plot_skeleton_motion_interactive
 from lpanlib.poselib.core.rotation3d import quat_mul, quat_from_angle_axis, quat_mul_norm, quat_rotate, quat_identity
 
+def process_smplest_seq(fname, output_path):
+
+    # load raw params from smplest batch inference
+    with open(fname, "rb") as f:
+        raw_params = pickle.load(f)
+        
+    
+    # dict(np.load(fname, allow_pickle=True))
+
+    poses = raw_params["poses"]
+    trans = raw_params["trans"]
+    fps = raw_params["fps"]
+    
+    # center
+    trans = trans - trans[0]
+
+
+    # downsample from 20hz to 20hz
+    source_fps = fps
+    target_fps = 20
+    assert source_fps % target_fps == 0, f"source_fps {source_fps} not divisible by target_fps {target_fps}"
+    skip = int(source_fps // target_fps)
+    poses = poses[::skip]
+    trans = trans[::skip]
+
+    # extract 24 SMPL joints from 55 SMPL-X joints
+    joints_to_use = np.array(
+        [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 40]
+    )
+    joints_to_use = np.arange(0, 156).reshape((-1, 3))[joints_to_use].reshape(-1)
+    poses = poses[:, joints_to_use]
+    
+    
+    Rx = rot_x(-np.pi / 2.0).astype(np.float32)      # MOD: choose sign per your viewer
+    # rotate translations
+    trans = trans*0
+    # rotate root orientation (first 3 dims)
+    root_aa = poses[:, :3]                           # MOD
+    R_root = axis_angle_to_matrix_batch(root_aa)     # MOD
+    R_root_new = Rx[None] @ R_root                   # MOD: left-multiply
+    poses[:, :3] = matrix_to_axis_angle_batch(R_root_new)  # MOD
+    
+    trans = smooth_trans_butter(trans, fps=20, cutoff_hz=2.0, order=2)
+    for j in range(24):  # J = number of joints
+        start = j * 3
+        end = start + 3
+        poses[:, start:end] = smooth_axis_angle_butter(
+            poses[:, start:end],
+            fps=20,
+            cutoff_hz=(4.0 if j == 0 else 8.0),
+            order=2
+        )
+    
+    print(trans.shape)
+    print(trans[0:10])
+    print(trans[-10:])
+    
+    print(poses.shape)
+    print(poses[0:10])
+    print(poses[-10:])
+    # raise NotImplementedError
+
+    required_params = {}
+    required_params["poses"] = poses
+    required_params["trans"] = trans
+    required_params["fps"] = target_fps
+    
+    # save
+    np.save(output_path, required_params)
+    
+    return
+
 def process_VEHS7M_seq(fname, output_path, start_end = None):
 
     # load raw params from AMASS dataset
@@ -335,3 +407,62 @@ def project_joints_simple(motion):
     new_motion = SkeletonMotion.from_skeleton_state(new_sk_state, fps=motion.fps)
 
     return new_motion
+
+
+# wen helper for smplest output
+def axis_angle_to_matrix_batch(aa):  # (T,3)
+    theta = np.linalg.norm(aa, axis=1, keepdims=True) + 1e-12
+    k = aa / theta
+    kx, ky, kz = k[:, 0], k[:, 1], k[:, 2]
+    z = np.zeros_like(kx)
+    K = np.stack([
+        np.stack([z,   -kz,  ky], axis=1),
+        np.stack([kz,   z,  -kx], axis=1),
+        np.stack([-ky,  kx,  z],  axis=1),
+    ], axis=1)                               # (T,3,3)
+    I = np.eye(3)[None]
+    s = np.sin(theta)[:, None]
+    c = np.cos(theta)[:, None]
+    return I + s*K + (1 - c)*(K @ K)         # (T,3,3)
+
+def matrix_to_axis_angle_batch(R):           # (T,3,3) -> (T,3)
+    tr = np.clip(R[:, 0, 0] + R[:, 1, 1] + R[:, 2, 2], -1.0, 3.0)
+    cos_t = np.clip((tr - 1.0) / 2.0, -1.0, 1.0)
+    theta = np.arccos(cos_t)
+    rx = R[:, 2, 1] - R[:, 1, 2]
+    ry = R[:, 0, 2] - R[:, 2, 0]
+    rz = R[:, 1, 0] - R[:, 0, 1]
+    axis = np.stack([rx, ry, rz], axis=1)
+    out = np.zeros_like(axis)
+    big = theta >= 1e-6
+    if np.any(big):
+        out[big] = axis[big] / (2.0*np.sin(theta[big]))[:, None] * theta[big][:, None]
+    if np.any(~big):
+        out[~big] = axis[~big] * 0.5  # series approx
+    return out
+
+def rot_x(angle_rad):
+    c, s = np.cos(angle_rad), np.sin(angle_rad)
+    return np.array([[1, 0,  0],
+                     [0, c, -s],
+                     [0, s,  c]], dtype=np.float32)
+    
+from scipy.signal import butter, filtfilt
+
+def butter_lowpass_filtfilt(x, cutoff_hz, fps, order=2):
+    # x: (T,) 1D
+    nyq = 0.5 * fps
+    b, a = butter(order, cutoff_hz / nyq, btype='low')
+    return filtfilt(b, a, x, method="gust", padlen=min(31, len(x)-1))
+
+def smooth_trans_butter(trans, fps, cutoff_hz=4.0, order=2):
+    out = np.zeros_like(trans)
+    for d in range(3):
+        out[:, d] = butter_lowpass_filtfilt(trans[:, d], cutoff_hz, fps, order)
+    return out
+
+def smooth_axis_angle_butter(aa, fps, cutoff_hz=4.0, order=2):
+    out = np.zeros_like(aa)
+    for d in range(3):
+        out[:, d] = butter_lowpass_filtfilt(aa[:, d], cutoff_hz, fps, order)
+    return out
