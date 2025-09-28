@@ -9,7 +9,7 @@ from lpanlib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonState, Ske
 from lpanlib.poselib.visualization.common import plot_skeleton_state, plot_skeleton_motion_interactive
 from lpanlib.poselib.core.rotation3d import quat_mul, quat_from_angle_axis, quat_mul_norm, quat_rotate, quat_identity
 
-def process_smplest_seq(fname, output_path):
+def process_smplest_seq(fname, output_path, visualize=False):
 
     # load raw params from smplest batch inference
     with open(fname, "rb") as f:
@@ -20,10 +20,12 @@ def process_smplest_seq(fname, output_path):
 
     poses = raw_params["poses"]
     trans = raw_params["trans"]
+    J = raw_params.get("smplx_joints_cam", None)
     fps = raw_params["fps"]
+    assert J is not None, "Missing key 'smplx_joints_cam' in input pkl"
     
     # center
-    trans = trans - trans[0]
+    # trans = trans - trans[0]
 
 
     # downsample from 20hz to 20hz
@@ -33,25 +35,23 @@ def process_smplest_seq(fname, output_path):
     skip = int(source_fps // target_fps)
     poses = poses[::skip]
     trans = trans[::skip]
+    J = J[::skip]
 
     # extract 24 SMPL joints from 55 SMPL-X joints
     joints_to_use = np.array(
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 40]
     )
     joints_to_use = np.arange(0, 156).reshape((-1, 3))[joints_to_use].reshape(-1)
+    print("joints_to_use", joints_to_use)
     poses = poses[:, joints_to_use]
     
     
     Rx = rot_x(-np.pi / 2.0).astype(np.float32)      # MOD: choose sign per your viewer
-    # rotate translations
-    trans = trans*0
-    # rotate root orientation (first 3 dims)
+
     root_aa = poses[:, :3]                           # MOD
     R_root = axis_angle_to_matrix_batch(root_aa)     # MOD
     R_root_new = Rx[None] @ R_root                   # MOD: left-multiply
     poses[:, :3] = matrix_to_axis_angle_batch(R_root_new)  # MOD
-    
-    trans = smooth_trans_butter(trans, fps=20, cutoff_hz=2.0, order=2)
     for j in range(24):  # J = number of joints
         start = j * 3
         end = start + 3
@@ -61,16 +61,90 @@ def process_smplest_seq(fname, output_path):
             cutoff_hz=(4.0 if j == 0 else 8.0),
             order=2
         )
-    
-    print(trans.shape)
-    print(trans[0:10])
-    print(trans[-10:])
-    
-    print(poses.shape)
-    print(poses[0:10])
-    print(poses[-10:])
-    # raise NotImplementedError
 
+    ##### trans from foot contact: assume walking
+    # Y-up → Z-up: (x, y, z) -> (x, z, y)
+    J_zup = np.stack([J[..., 0], J[..., 2], -J[..., 1]], axis=-1)  # (T, J, 3)
+    
+    if visualize:
+        # plot all J[frame] with index, to see which joints to use for foot contact
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        J = J_zup[:15, :,:]
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        for j in range(J.shape[1]):
+            ax.plot(J[:, j, 0], J[:, j, 1], J[:, j, 2], label=str(j))
+            ax.text(J[0, j, 0], J[0, j, 1], J[0, j, 2], str(j))
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        # xyz all same scale
+        max_range = np.array([J[:, :, 0].max()-J[:, :, 0].min(), J[:, :, 1].max()-J[:, :, 1].min(), J[:, :, 2].max()-J[:, :, 2].min()]).max() / 2.0
+        mid_x = (J[:, :, 0].max()+J[:, :, 0].min()) * 0.5
+        mid_y = (J[:, :, 1].max()+J[:, :, 1].min()) * 0.5
+        mid_z = (J[:, :, 2].max()+J[:, :, 2].min()) * 0.5
+        ax.set_xlim(mid_x - max_range, mid_x + max_range)
+        ax.set_ylim(mid_y - max_range, mid_y + max_range)
+        ax.set_zlim(mid_z - max_range, mid_z + max_range)
+        
+        plt.title('Joint Trajectories')
+        plt.legend()
+        # plt.show()
+    
+    
+    L_ANK, R_ANK = 5, 6
+    L_KNEE, R_KNEE = 3, 4
+    foot_ids = [19,18,17,16,14,15]
+    smoothed = {}
+    for idx in foot_ids:
+        traj = J_zup[:, idx, :]                          # (T,3) for one joint
+        # smoothed[idx] = smooth_trans_butter(traj, fps, cutoff_hz=4.0, order=2)
+        smoothed[idx] = traj
+    
+    # Stack the smoothed candidate joints into (T, len(foot_ids), 3)
+    foot_stack = np.stack([smoothed[idx] for idx in foot_ids], axis=1)  # (T,4,3)
+    T = foot_stack.shape[0]
+    
+    foot_height = foot_stack[..., 2]    # (T,4)
+    
+    
+    # Find per-frame min speed foot
+    idx_min_per_frame = np.argmin(foot_height, axis=1)     # (T,)
+    min_speed_per_frame = np.min(foot_height, axis=1)    # (T,)
+    
+    # Height offsets (meters) per foot_id
+    toe_height   = 0.025
+    
+    # Frame 0: place chosen contact at (0,0,0) after subtracting its height
+    idx0 = int(idx_min_per_frame[0])
+    trans[0] = np.array([0.0, 0.0, foot_stack[0, idx0, 2] - toe_height], dtype=np.float32)
+    
+    # Frames 1..T-1: carry previous frame's contact
+    for t in range(1, T):
+        idx_prev = int(idx_min_per_frame[t-1])
+        foot_movement = foot_stack[t, idx_prev, :] - foot_stack[t-1, idx_prev, :]
+        # print(foot_movement)
+        trans[t] = trans[t-1] - foot_movement
+
+    # Optional: smooth translation
+    trans = smooth_trans_butter(trans, fps=fps, cutoff_hz=2.0, order=2)
+
+    if visualize:
+        J_zup = trans.reshape(-1,1,3)   # visualize
+        J = J_zup[:, :1,:]
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        for j in range(J.shape[1]):
+            ax.plot(J[:, j, 0], J[:, j, 1], J[:, j, 2], label=str(j))
+            ax.text(J[0, j, 0], J[0, j, 1], J[0, j, 2], str(j))
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        plt.title('Joint Trajectories')
+        plt.legend()
+        plt.show()
+        
     required_params = {}
     required_params["poses"] = poses
     required_params["trans"] = trans
