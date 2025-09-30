@@ -57,7 +57,7 @@ if __name__ == '__main__':
     smpl_humanoid_skeleton = SkeletonTree.from_mjcf(smpl_humanoid_xml_path)
 
     # load skeleton of phys_humanoid_v3
-    phys_humanoid_v3_xml_path = osp.join(osp.dirname(__file__), "../assets/mjcf/phys_humanoid_v3.xml")
+    phys_humanoid_v3_xml_path = osp.join(osp.dirname(__file__), "../assets/mjcf/phys_humanoid_v3_box_foot_tall.xml")
     phys_humanoid_v3_skeleton = SkeletonTree.from_mjcf(phys_humanoid_v3_xml_path)
 
     # load skeleton of smpl_original
@@ -118,8 +118,7 @@ if __name__ == '__main__':
         fps = raw_params["fps"]
 
         # compute world absolute position of root joint
-        print(trans.shape, poses.shape)
-        print(trans[0:10])
+        # print(trans.shape, poses.shape)
         trans = body_model(
             global_orient=poses[:, 0:3], 
             body_pose=poses[:, 3:72],

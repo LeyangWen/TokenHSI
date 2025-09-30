@@ -42,7 +42,6 @@ def process_smplest_seq(fname, output_path, visualize=False):
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 40]
     )
     joints_to_use = np.arange(0, 156).reshape((-1, 3))[joints_to_use].reshape(-1)
-    print("joints_to_use", joints_to_use)
     poses = poses[:, joints_to_use]
     
     
@@ -52,15 +51,11 @@ def process_smplest_seq(fname, output_path, visualize=False):
     R_root = axis_angle_to_matrix_batch(root_aa)     # MOD
     R_root_new = Rx[None] @ R_root                   # MOD: left-multiply
     poses[:, :3] = matrix_to_axis_angle_batch(R_root_new)  # MOD
-    for j in range(24):  # J = number of joints
-        start = j * 3
-        end = start + 3
-        poses[:, start:end] = smooth_axis_angle_butter(
-            poses[:, start:end],
-            fps=20,
-            cutoff_hz=(4.0 if j == 0 else 8.0),
-            order=2
-        )
+    for j in range(24):
+        seg = poses[:, j*3:(j+1)*3]
+        seg = smooth_axis_angle_butter(seg, fps=fps, cutoff_hz=1.0, order=4)
+        seg = smooth_axis_angle_butter(seg, fps=fps, cutoff_hz=1.0, order=4)  # second pass
+        poses[:, j*3:(j+1)*3] = seg
 
     ##### trans from foot contact: assume walking
     # Y-up → Z-up: (x, y, z) -> (x, z, y)
@@ -124,7 +119,6 @@ def process_smplest_seq(fname, output_path, visualize=False):
     for t in range(1, T):
         idx_prev = int(idx_min_per_frame[t-1])
         foot_movement = foot_stack[t, idx_prev, :] - foot_stack[t-1, idx_prev, :]
-        # print(foot_movement)
         trans[t] = trans[t-1] - foot_movement
 
     # Optional: smooth translation
