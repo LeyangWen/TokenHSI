@@ -23,10 +23,13 @@ Pick your dataset **root** (the motion folder) and save it as a shell variable. 
 ```bash
 # MMH box_pickUp example
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_01/phys_humanoid_v3"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.66920734.20250919201305+__+clip_02/phys_humanoid_v3"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_03/phys_humanoid_v3"
 # MMH handle_pickUp example
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.51470934.20250919200241+__+clip_02/phys_humanoid_v3"
 # MMH timber_pickUp example
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v3"
+
 
 # Absolute variant (recommended for Blender scripts)
 ABS_ROOT="/home/leyang/Documents/TokenHSI/${ROOT}"
@@ -121,8 +124,9 @@ python tokenhsi/data/dataset_carry/blender/motion_render_and_check.py \
   --root "$ROOT" \
   --humanoid-xml "$HUMANOID_XML" \
   --out-html "box_motion_render.html" \
-  --box-size 0.095 1.8 0.045 
-  # --box-size 0.34 0.34 0.38
+  --box-size 0.34 0.34 0.38
+
+    # --box-size 0.095 1.8 0.045 
 ```
 
 This will produce:

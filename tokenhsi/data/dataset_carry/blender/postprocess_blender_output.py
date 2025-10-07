@@ -1,101 +1,110 @@
+#!/usr/bin/env python3
 import sys
 sys.path.append("./")
+
 import os
 import os.path as osp
 import argparse
 import numpy as np
 import torch
+
 from lpanlib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonState, SkeletonMotion
 
-def _arr_of(v):
-    return v["arr"] if isinstance(v, dict) and "arr" in v else v
+# ---------- utils ----------
+def _unwrap_arr(x):
+    """Accept {'arr': ndarray, ...} or ndarray -> ndarray"""
+    if isinstance(x, dict) and "arr" in x:
+        return x["arr"]
+    return x
 
-def _wrap_with_context(arr, dtype):
+def _wrap_arr(arr, dtype):
     a = np.asarray(arr, dtype=dtype)
     return {"arr": a, "context": {"dtype": str(a.dtype)}}
 
+def load_any(path):
+    """Load .npy (pickled dict) or .npz (keyed) into a flat dict."""
+    if not osp.exists(path):
+        raise FileNotFoundError(path)
+    if path.endswith(".npz"):
+        with np.load(path, allow_pickle=True) as z:
+            out = {}
+            for k in z.files:
+                v = z[k]
+                if v.dtype == "O" and v.shape == ():  # nested dict packed as 0-d object
+                    try:
+                        out[k] = v.item()
+                    except Exception:
+                        out[k] = v
+                else:
+                    out[k] = v
+            return out
+    elif path.endswith(".npy"):
+        return np.load(path, allow_pickle=True).item()
+    else:
+        raise ValueError(f"Unsupported file extension: {path}")
+
 def load_ref(path):
-    x = np.load(path, allow_pickle=True)
-    data = x.item() if hasattr(x, "item") else x
+    """Normalize a ref_motion dict to plain numpy arrays + metadata."""
+    data = load_any(path)
     return {
-        "rotation":                _arr_of(data.get("rotation")),
-        "root_translation":        _arr_of(data.get("root_translation")),
-        "global_velocity":         _arr_of(data.get("global_velocity")),
-        "global_angular_velocity": _arr_of(data.get("global_angular_velocity")),
+        "rotation":                _unwrap_arr(data.get("rotation")),
+        "root_translation":        _unwrap_arr(data.get("root_translation")),
+        "global_velocity":         _unwrap_arr(data.get("global_velocity")),
+        "global_angular_velocity": _unwrap_arr(data.get("global_angular_velocity")),
         "skeleton_tree":           data.get("skeleton_tree"),
         "is_local":                bool(data.get("is_local", True)),
         "fps":                     int(data.get("fps", 20)),
     }
 
-def save_ref(path, motion: SkeletonMotion):
-    # Use TokenHSI to_dict() to stay canonical (no global_* saved)
-    d = {
-        "rotation": motion.to_dict()["rotation"],
-        "root_translation": motion.to_dict()["root_translation"],
-        "global_velocity": motion.to_dict()["global_velocity"],
-        "global_angular_velocity": motion.to_dict()["global_angular_velocity"],
-        "skeleton_tree": motion.to_dict()["skeleton_tree"],
-        "is_local": motion.to_dict()["is_local"],
-        "fps": motion.to_dict()["fps"],
-    }
-    np.save(path, d)
+# ---------- main ----------
+def main():
+    ap = argparse.ArgumentParser(description="Post-process Blender ref_motion to canonical TokenHSI format")
+    ap.add_argument("--root", required=True,
+                    help="Root folder of the motion (contains ref_motion.npy and blender/ref_motion.npy)")
+    ap.add_argument("--old_name", default="ref_motion.npy", help="Old/canonical ref file name (under --root)")
+    ap.add_argument("--new_rel", default="blender/ref_motion.npy", help="New Blender export relative path (under --root)")
+    ap.add_argument("--out_rel", default="blender/ref_motion.npy", help="Output relative path (under --root)")
+    args = ap.parse_args()
 
-def _wrap_with_context(arr, dtype):
-    a = np.asarray(arr, dtype=dtype)
-    return {"arr": a, "context": {"dtype": str(a.dtype)}}
+    old_ref_path = osp.join(args.root, args.old_name)
+    new_ref_path = osp.join(args.root, args.new_rel)
+    out_path     = osp.join(args.root, args.out_rel)
 
-def _norm_wrap(x, dtype):
-    """
-    Normalize TokenHSI tensor dicts:
-      - If x is {'arr': ..., ...}, unwrap to the array.
-      - Convert to desired dtype.
-      - Return {'arr': ndarray, 'context': {'dtype': '<dtype>'}}.
-    """
-    if isinstance(x, dict) and "arr" in x:
-        x = x["arr"]
-    a = np.asarray(x, dtype=dtype)
-    return {"arr": a, "context": {"dtype": str(a.dtype)}}
-
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Post-process Blender ref_motion to match TokenHSI skeleton offsets")
-    parser.add_argument("--root", default="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_01/phys_humanoid_v3")
-    args = parser.parse_args()
-    
-    old_ref_path = osp.join(args.root, "ref_motion.npy")
-    new_blender_ref_path = osp.join(args.root, "blender", "ref_motion.npy")
-    out_path = osp.join(args.root, "blender", "ref_motion.npy")
-    
+    print(f"[Load] OLD: {old_ref_path}")
     old = load_ref(old_ref_path)
-    newb = load_ref(new_blender_ref_path)
-    
-    # build fixed skeleton_tree (use NEW names/parents, OLD local_translation)
+
+    print(f"[Load] NEW: {new_ref_path}")
+    newb = load_ref(new_ref_path)
+
+    # Build fixed skeleton_tree: NEW node_names/parents + OLD local_translation (offsets)
     sk_new = newb["skeleton_tree"]
     sk_old = old["skeleton_tree"]
-    
-    def _norm_wrap(x, dtype):
-        if isinstance(x, dict) and "arr" in x:
-            x = x["arr"]
-        a = np.asarray(x, dtype=dtype)
-        return {"arr": a, "context": {"dtype": str(a.dtype)}}
-    
+
+    if sk_new is None or sk_old is None:
+        raise RuntimeError("Missing skeleton_tree in input files.")
+
     sk_fixed = {
         "node_names": sk_new["node_names"],
-        "parent_indices": _norm_wrap(sk_new["parent_indices"], np.int64),
-        "local_translation": _norm_wrap(sk_old["local_translation"], np.float32),
+        "parent_indices": _wrap_arr(_unwrap_arr(sk_new["parent_indices"]), np.int64),
+        "local_translation": _wrap_arr(_unwrap_arr(sk_old["local_translation"]), np.float32),
     }
     skeleton_tree = SkeletonTree.from_dict(sk_fixed)
-    
-    # rebuild motion with Blender rotations & roots, TokenHSI velocities
-    r = torch.from_numpy(newb["rotation"]).float()
-    t = torch.from_numpy(newb["root_translation"]).float()
+
+    # Rebuild motion using Blender rotations + roots
+    r = torch.from_numpy(newb["rotation"]).float()            # (T,J,4) local xyzw
+    t = torch.from_numpy(newb["root_translation"]).float()    # (T,3)    world root
     is_local = bool(newb["is_local"])
     fps = int(newb["fps"])
-    
-    state = SkeletonState.from_rotation_and_root_translation(skeleton_tree=skeleton_tree, r=r, t=t, is_local=is_local)
+
+    state = SkeletonState.from_rotation_and_root_translation(
+        skeleton_tree=skeleton_tree, r=r, t=t, is_local=is_local
+    )
     motion = SkeletonMotion.from_skeleton_state(state, fps=fps)
-    
+
+    # Save canonically via poselib (includes __name__ etc.)
     os.makedirs(osp.dirname(out_path), exist_ok=True)
-    save_ref(out_path, motion)
+    motion.to_file(out_path)
     print(f"[OK] Wrote matched motion: {out_path}")
+
+if __name__ == "__main__":
+    main()
