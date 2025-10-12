@@ -1,5 +1,5 @@
 #!/bin/bash -l
-#SBATCH --job-name=TokenHSI-train
+#SBATCH --job-name=TokenHSI-train-terrain
 #SBATCH --output=output_slurm/train_terrain_log.txt
 #SBATCH --error=output_slurm/train_terrain_error.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
@@ -57,13 +57,13 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_mode_equal_proportion True \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/ \
-    --wandb_name "Try8-TerrainObstacles-GoodMotion-Reward-pretrained-5" \
-    --notes "good motion reward, resume, obstacles, resume on pretrained tokenhsi stage2 terrain carry" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try9/Terrain-GoodMotion-Reward-scratch-4/ \
+    --wandb_name "Try9-Terrain-GoodMotion-Reward-scratch-4" \
+    --notes "reward bug fix based on Try9-2" \
     --ergo_coeff 0.2 \
-    --unwalkable_obstacles 60 \
+    --unwalkable_obstacles 0 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/TerrainObstacles-GoodMotion-Reward-resume-pretrained-5/Humanoid_19-12-43-50/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
 
 
 ### 3 exp resume from scratch
