@@ -24,12 +24,17 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
 
     # selected motions
+    # candidates = {
+    #     "box_pickUp": cfg["motions"]["box_pickUp"],
+    #     "handle_pickUp": cfg["motions"]["handle_pickUp"],
+    #     "bag_pickUp": cfg["motions"]["bag_pickUp"],
+    #     "timber_pickUp": cfg["motions"]["timber_pickUp"],
+    # }
+    # target_fps = 20
     candidates = {
-        "box_pickUp": cfg["motions"]["box_pickUp"],
-        "handle_pickUp": cfg["motions"]["handle_pickUp"],
-        "bag_pickUp": cfg["motions"]["bag_pickUp"],
-        "timber_pickUp": cfg["motions"]["timber_pickUp"],
+        "dashboard_pickUp": cfg["motions"]["dashboard_pickUp"],
     }
+    target_fps = 30
 
     for skill, data in candidates.items():
         output_dir_skill = os.path.join(output_dir, skill)
@@ -47,6 +52,6 @@ if __name__ == "__main__":
 
             os.makedirs(osp.dirname(output_path), exist_ok=True)
             
-            process_smplest_seq(fname, output_path)
+            process_smplest_seq(fname, output_path, target_fps=target_fps, visualize=False)
 
         print("Processed {} sequences!".format(len(data)))

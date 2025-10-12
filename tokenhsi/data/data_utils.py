@@ -9,7 +9,7 @@ from lpanlib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonState, Ske
 from lpanlib.poselib.visualization.common import plot_skeleton_state, plot_skeleton_motion_interactive
 from lpanlib.poselib.core.rotation3d import quat_mul, quat_from_angle_axis, quat_mul_norm, quat_rotate, quat_identity
 
-def process_smplest_seq(fname, output_path, visualize=False):
+def process_smplest_seq(fname, output_path, visualize=False, target_fps=20):
 
     # load raw params from smplest batch inference
     with open(fname, "rb") as f:
@@ -30,13 +30,12 @@ def process_smplest_seq(fname, output_path, visualize=False):
 
     # downsample from 20hz to 20hz
     source_fps = fps
-    target_fps = 20
+    
     assert source_fps % target_fps == 0, f"source_fps {source_fps} not divisible by target_fps {target_fps}"
     skip = int(source_fps // target_fps)
     poses = poses[::skip]
     trans = trans[::skip]
     J = J[::skip]
-
     # extract 24 SMPL joints from 55 SMPL-X joints
     joints_to_use = np.array(
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 25, 40]
@@ -44,19 +43,34 @@ def process_smplest_seq(fname, output_path, visualize=False):
     joints_to_use = np.arange(0, 156).reshape((-1, 3))[joints_to_use].reshape(-1)
     poses = poses[:, joints_to_use]
     
-    
-    Rx = rot_x(-np.pi / 2.0).astype(np.float32)      # MOD: choose sign per your viewer
+    # Y up to Z-up
+    # Rx = rot_x(-np.pi / 2.0).astype(np.float32)      # MOD: choose sign per your viewer
 
-    root_aa = poses[:, :3]                           # MOD
-    R_root = axis_angle_to_matrix_batch(root_aa)     # MOD
-    R_root_new = Rx[None] @ R_root                   # MOD: left-multiply
-    poses[:, :3] = matrix_to_axis_angle_batch(R_root_new)  # MOD
-    for j in range(24):
+    # root_aa = poses[:, :3]                           # MOD
+    # R_root = axis_angle_to_matrix_batch(root_aa)     # MOD
+    # R_root_new = Rx[None] @ R_root                   # MOD: left-multiply
+    # poses[:, :3] = matrix_to_axis_angle_batch(R_root_new)  # MOD
+
+    # Smooth root, use this axis rotate instead to avoid sudden spin & jerk
+    root_aa_smoothed, jerk_mask, theta = smooth_root_with_jerk_fix(
+        poses[:, :3],
+        fps=target_fps,
+        cutoff_hz=1.0,       # try 0.8–2.0
+        order=2,
+        apply_rx=True,      # keep False if you rotate elsewhere
+        jerk_abs_thresh=0.1, # absolute threshold in rad/frame
+        jerk_mad_k=4.0,      # robust (MAD) multiplier
+        search_radius=2,     # search up to ~2 frames each side for clean neighbors
+        return_format='aa'
+    )
+    poses[:, :3] = root_aa_smoothed
+
+    for j in range(1, 24):
         seg = poses[:, j*3:(j+1)*3]
-        seg = smooth_axis_angle_butter(seg, fps=fps, cutoff_hz=1.0, order=4)
-        seg = smooth_axis_angle_butter(seg, fps=fps, cutoff_hz=1.0, order=4)  # second pass
+        seg = smooth_axis_angle_butter(seg, fps=target_fps, cutoff_hz=1.0, order=4)
+        seg = smooth_axis_angle_butter(seg, fps=target_fps, cutoff_hz=1.0, order=4)  # second pass
         poses[:, j*3:(j+1)*3] = seg
-
+    print(poses[:, :3])
     ##### trans from foot contact: assume walking
     # Y-up → Z-up: (x, y, z) -> (x, z, y)
     J_zup = np.stack([J[..., 0], J[..., 2], -J[..., 1]], axis=-1)  # (T, J, 3)
@@ -91,10 +105,11 @@ def process_smplest_seq(fname, output_path, visualize=False):
     L_ANK, R_ANK = 5, 6
     L_KNEE, R_KNEE = 3, 4
     foot_ids = [19,18,17,16,14,15]
+    foot_ids = [L_ANK, R_ANK]   # 4 joints for foot contact
     smoothed = {}
     for idx in foot_ids:
         traj = J_zup[:, idx, :]                          # (T,3) for one joint
-        # smoothed[idx] = smooth_trans_butter(traj, fps, cutoff_hz=4.0, order=2)
+        # smoothed[idx] = smooth_trans_butter(traj, target_fps, cutoff_hz=4.0, order=2)
         smoothed[idx] = traj
     
     # Stack the smoothed candidate joints into (T, len(foot_ids), 3)
@@ -110,10 +125,13 @@ def process_smplest_seq(fname, output_path, visualize=False):
     
     # Height offsets (meters) per foot_id
     toe_height   = 0.025
+    heel_height  = 0.15
+    
+    add_height = heel_height
     
     # Frame 0: place chosen contact at (0,0,0) after subtracting its height
     idx0 = int(idx_min_per_frame[0])
-    trans[0] = np.array([0.0, 0.0, foot_stack[0, idx0, 2] - toe_height], dtype=np.float32)
+    trans[0] = np.array([0.0, 0.0, foot_stack[0, idx0, 2] - add_height], dtype=np.float32)
     
     # Frames 1..T-1: carry previous frame's contact
     for t in range(1, T):
@@ -122,7 +140,7 @@ def process_smplest_seq(fname, output_path, visualize=False):
         trans[t] = trans[t-1] - foot_movement
 
     # Optional: smooth translation
-    trans = smooth_trans_butter(trans, fps=fps, cutoff_hz=2.0, order=2)
+    trans = smooth_trans_butter(trans, fps=target_fps, cutoff_hz=2.0, order=2)
 
     if visualize:
         J_zup = trans.reshape(-1,1,3)   # visualize
@@ -534,3 +552,183 @@ def smooth_axis_angle_butter(aa, fps, cutoff_hz=4.0, order=2):
     for d in range(3):
         out[:, d] = butter_lowpass_filtfilt(aa[:, d], cutoff_hz, fps, order)
     return out
+
+
+# smooth root axis angle
+
+import numpy as np
+from scipy.signal import butter, filtfilt
+
+# ---------- SO(3) helpers ----------
+def aa_to_R(v):
+    th = np.linalg.norm(v)
+    if th < 1e-12: return np.eye(3)
+    k = v / th
+    K = np.array([[0,-k[2],k[1]],[k[2],0,-k[0]],[-k[1],k[0],0]], float)
+    return np.eye(3) + np.sin(th)*K + (1-np.cos(th))*(K@K)
+
+def R_to_aa(R):
+    c = np.clip((np.trace(R) - 1.0) * 0.5, -1.0, 1.0)
+    th = np.arccos(c)
+    if th < 1e-12: return np.zeros(3)
+    v = np.array([R[2,1]-R[1,2], R[0,2]-R[2,0], R[1,0]-R[0,1]]) / (2.0*np.sin(th))
+    return v * th
+
+def so3_log(R):          # mat -> axis-angle
+    return R_to_aa(R)
+
+def so3_exp(v):          # axis-angle -> mat
+    return aa_to_R(v)
+
+def Rx(angle):
+    c,s = np.cos(angle), np.sin(angle)
+    return np.array([[1,0,0],[0,c,-s],[0,s,c]], float)
+
+# ---------- filtering ----------
+def butter_lowpass_filtfilt_vec(x, cutoff_hz, fps, order=2):
+    nyq = 0.5 * fps
+    b, a = butter(order, cutoff_hz/nyq, btype='low')
+    y = np.empty_like(x)
+    for d in range(x.shape[1]):
+        y[:, d] = filtfilt(b, a, x[:, d], method="gust", padlen=min(31, len(x)-1))
+    return y
+
+# ---------- SLERP for rotations (via squad-lite on edges) ----------
+def slerp_R(R0, R1, u):
+    # SLERP using exp/log: R(u) = R0 * exp( u * log(R0^T R1) )
+    dR = R0.T @ R1
+    v  = so3_log(dR)       # axis-angle
+    return R0 @ so3_exp(u * v)
+
+# ---------- jerk detection (on relative angles) ----------
+def detect_jerks(R, thresh_rad=0.6, mad_k=4.0):
+    """
+    Returns boolean mask of frames that look jerky based on |log(dR)|.
+    thresh_rad: absolute threshold in rad/frame (e.g., 0.5–1.0)
+    mad_k: robust MAD multiplier on top (catches context-dependent spikes)
+    """
+    T = R.shape[0]
+    theta = np.zeros(T)
+    theta[0] = 0.0
+    for t in range(1, T):
+        dR = R[t-1].T @ R[t]
+        theta[t] = np.linalg.norm(so3_log(dR))
+
+    # robust threshold
+    med = np.median(theta)
+    mad = np.median(np.abs(theta - med)) + 1e-9
+    rob_thresh = med + mad_k * 1.4826 * mad
+
+    mask = theta > max(thresh_rad, rob_thresh)
+    # we mark the *current* frame as jerky if its increment is too large
+    return mask, theta
+
+# ---------- repair jerks by inpainting with SLERP ----------
+def repair_rot_jerks(R, jerk_mask, radius=2):
+    """
+    Replace jerky frames by slerp between nearest clean neighbors.
+    radius: how far to search for clean neighbors on each side.
+    """
+    T = R.shape[0]
+    R_fixed = R.copy()
+    idx = np.where(jerk_mask)[0]
+    if len(idx) == 0:
+        return R_fixed
+
+    clean = np.ones(T, dtype=bool)
+    clean[idx] = False
+
+    for t in idx:
+        # find left clean
+        l = t-1
+        while l >= max(0, t-10*radius) and not clean[l]:
+            l -= 1
+        # find right clean
+        r = t+1
+        while r <= min(T-1, t+10*radius) and not clean[r]:
+            r += 1
+        if l < 0 or r >= T or not(clean[l] and clean[r]):
+            # cannot repair cleanly -> leave as is
+            continue
+        # interpolate proportionally in time
+        u = (t - l) / max(1e-6, (r - l))
+        R_fixed[t] = slerp_R(R_fixed[l], R_fixed[r], u)
+
+    return R_fixed
+
+# ---------- main smoother with jerk handling ----------
+def smooth_root_with_jerk_fix(aa_root, fps, cutoff_hz=1.0, order=2,
+                              apply_rx=False, world_pre=True,
+                              jerk_abs_thresh=0.6, jerk_mad_k=4.0,
+                              search_radius=2, return_format='aa'):
+    """
+    1) Build R from AA
+    2) Detect jerks on increments
+    3) Repair jerks by SLERP inpainting
+    4) Low-pass the *increments* and reintegrate
+    5) Optional Rx for Y-up -> Z-up
+    6) Return AA / R / quat
+    """
+    T = aa_root.shape[0]
+    R = np.stack([aa_to_R(aa_root[t]) for t in range(T)], axis=0)  # raw
+
+    # (a) jerk detection
+    mask, theta = detect_jerks(R, thresh_rad=jerk_abs_thresh, mad_k=jerk_mad_k)
+
+    # (b) repair by SLERP between nearest clean neighbors
+    R_rep = repair_rot_jerks(R, mask, radius=search_radius)
+
+    # (c) build relative increments from repaired R
+    omega = np.zeros((T,3))
+    for t in range(1, T):
+        dR = R_rep[t-1].T @ R_rep[t]
+        omega[t] = so3_log(dR)
+
+    # (d) low-pass the increments (zero-phase)
+    omega_f = butter_lowpass_filtfilt_vec(omega, cutoff_hz, fps, order)
+
+    # (e) re-integrate
+    A = np.zeros_like(R_rep)
+    A[0] = R_rep[0]
+    for t in range(1, T):
+        A[t] = A[t-1] @ so3_exp(omega_f[t])
+
+    # (f) optional Y-up -> Z-up
+    if apply_rx:
+        RX = Rx(-np.pi/2)
+        A = (RX[None, ...] @ A) if world_pre else (A @ RX[None, ...])
+
+    if return_format == 'R':
+        return A.astype(np.float32), mask, theta
+    elif return_format == 'quat':
+        out = []
+        for t in range(T):
+            Rt = A[t]
+            tr = np.trace(Rt)
+            if tr > 0:
+                s = np.sqrt(tr + 1.0) * 2
+                w = 0.25 * s
+                x = (Rt[2,1]-Rt[1,2]) / s
+                y = (Rt[0,2]-Rt[2,0]) / s
+                z = (Rt[1,0]-Rt[0,1]) / s
+            else:
+                i = np.argmax([Rt[0,0], Rt[1,1], Rt[2,2]])
+                if i == 0:
+                    s = np.sqrt(1.0 + Rt[0,0] - Rt[1,1] - Rt[2,2]) * 2
+                    w = (Rt[2,1]-Rt[1,2]) / s; x = 0.25*s
+                    y = (Rt[0,1]+Rt[1,0]) / s; z = (Rt[0,2]+Rt[2,0]) / s
+                elif i == 1:
+                    s = np.sqrt(1.0 + Rt[1,1] - Rt[0,0] - Rt[2,2]) * 2
+                    w = (Rt[0,2]-Rt[2,0]) / s; x = (Rt[0,1]+Rt[1,0]) / s
+                    y = 0.25*s;             z = (Rt[1,2]+Rt[2,1]) / s
+                else:
+                    s = np.sqrt(1.0 + Rt[2,2] - Rt[0,0] - Rt[1,1]) * 2
+                    w = (Rt[1,0]-Rt[0,1]) / s; x = (Rt[0,2]+Rt[2,0]) / s
+                    y = (Rt[1,2]+Rt[2,1]) / s; z = 0.25*s
+            q = np.array([w,x,y,z]); q /= (np.linalg.norm(q)+1e-12)
+            out.append(q)
+        return np.stack(out, 0).astype(np.float32), mask, theta
+    else:
+        aa_out = np.stack([R_to_aa(A[t]) for t in range(T)], axis=0)
+        return aa_out.astype(np.float32), mask, theta
+
