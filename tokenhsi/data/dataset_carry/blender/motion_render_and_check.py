@@ -21,6 +21,8 @@ def arr_of(v):
 
 def load_ref_motion(path):
     x = np.load(path, allow_pickle=True)
+    print(x.item().keys())
+    # raise NotImplementedError("This script is deprecated. Please use the updated version in the repository.")
     data = x.item() if hasattr(x, "item") else x  # support dict-like or pure arrays
     # Normalize common fields
     ref = {

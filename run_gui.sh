@@ -157,7 +157,8 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --construction_experiment True \
     --ergo_coeff 0.2 \
     --load_terrain True \
-   --headless \
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
+    --headless \
     --record_headless \
 #     --nums_terrains 0 \
 
@@ -268,7 +269,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/lab_vid" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/dashboard_30fps" --video_name "vid"  --fps 24 --delete_imgs
 
 
 # | Keyboard | Function |

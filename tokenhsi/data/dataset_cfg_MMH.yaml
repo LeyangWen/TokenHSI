@@ -42,3 +42,7 @@ motions:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/timber01.66920758.20250919201355/clip_01.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/timber01.66920758.20250919201355/clip_02.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/timber01.66920758.20250919201355/clip_03.pkl"
+
+  dashboard_pickUp:
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/bad/bad.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/good/good.pkl"

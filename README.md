@@ -788,3 +788,9 @@ Please note that it also relies on external libraries and datasets, each of whic
         ```
       - change `numTerrains: 4 #20 ` instead, no flying off, but same error
       - Seem to started in the right location
+
+
+
+
+- Sometimes sudden z axis spin in visualized html file from imitation motion, the root roation is the cause, but visualizing it in `vis.py` it seems good
+  - ahh, it is the smoothing on root pose that is causing the spin
