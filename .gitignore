@@ -160,6 +160,7 @@ cython_debug/
 /body_models/smpl/
 /output/
 /tokenhsi/data/dataset_carry/motions/
+/tokenhsi/data/dataset_carry/MMH/
 /tokenhsi/data/dataset_amass_loco/motions/
 /tokenhsi/data/dataset_amass_loco/smpl_params/
 /tokenhsi/data/dataset_amass_loco_stairs/motions/
