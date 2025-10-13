@@ -1089,7 +1089,7 @@ class HumanoidCarry(Humanoid):
 
         if (asset_file == "mjcf/amp_humanoid.xml"):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
-        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml" or asset_file == "mjcf/phys_humanoid_v3_box_foot_tall.xml"):
+        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml" or "mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         else:
             print("Unsupported character config file: {s}".format(asset_file))
@@ -1191,7 +1191,7 @@ class HumanoidCarry(Humanoid):
                                     root_vel=root_vel, 
                                     root_ang_vel=root_ang_vel, 
                                     dof_vel=dof_vel)
-                self._humanoid_root_states[env_ids, 2] += 0.1  # example MMH motion have collision with ground
+                self._humanoid_root_states[env_ids, 2] += 0.1  # wen2: example MMH motion have collision with ground
                 self._reset_ref_env_ids[sk_name] = curr_env_ids
                 self._reset_ref_motion_ids[sk_name] = motion_ids
                 self._reset_ref_motion_times[sk_name] = motion_times
@@ -1505,11 +1505,30 @@ def compute_carry_reward(box_pos, prev_box_pos, tar_box_pos, dt, tar_vel, box_si
     if box_vel_penalty:
         min_speed_penalty = box_vel_penalty_thre
         root_vel_norm = torch.norm(root_vel, p=2, dim=-1)
+        # print("box_vel_norm: ", root_vel_norm[0].item())
+        # print("root_vel: ", root_vel[0])
         root_vel_norm = torch.clamp_min(root_vel_norm, min_speed_penalty)
         root_vel_err = min_speed_penalty - root_vel_norm
         root_vel_penalty = -1 * box_vel_pen_coeff * (1 - torch.exp(-2.0 * (root_vel_err * root_vel_err)))
         reward += root_vel_penalty
+        if True:  # wen2: slow down z, 
+            
+            root_vel_z = torch.abs(root_vel[..., 2])
+            root_vel_xy = torch.norm (root_vel[..., :2], p=2, dim=-1)
+            
+            min_speed_penalty = 1.4  # determined from print
+            root_vel_err = min_speed_penalty - torch.clamp_min(root_vel_z, min_speed_penalty)
+            root_vel_penalty = -1 * box_vel_pen_coeff * (1 - torch.exp(-2.0 * (root_vel_err * root_vel_err)))
+            reward += root_vel_penalty
 
+            # also dont turn and lift
+            # raise NotImplementedError
+            # maskroot_vel_z = root_vel_z > 0.8
+            # min_speed_penalty = 1.4  # determined from print
+            # root_vel_err = min_speed_penalty - torch.clamp_min(root_vel_xy, min_speed_penalty)
+            # root_vel_penalty = -1 * box_vel_pen_coeff * (1 - torch.exp(-2.0 * (root_vel_err * root_vel_err)))
+            # reward += root_vel_penalty
+            
     return reward
 
 @torch.jit.script

@@ -40,7 +40,7 @@ env:
 
   box_vel_penalty: True # to avoid stiff grasping
   box_vel_pen_coeff: 1.0
-  box_vel_pen_threshold: 2.5
+  box_vel_pen_threshold: 1.8 #2.5
 
   mode: "train"
 
@@ -49,9 +49,9 @@ env:
       baseSize: [0.4, 0.4, 0.4] # unit: m
       randomSize: True
       randomModeEqualProportion: False
-      scaleRangeX: [0.5, 1.5] # default range if randomModeEqualProportion: True
-      scaleRangeY: [0.5, 1.5]
-      scaleRangeZ: [0.5, 1.5]
+      scaleRangeX: [0.75, 1.5] # default range if randomModeEqualProportion: True
+      scaleRangeY: [0.75, 1.5]
+      scaleRangeZ: [0.75, 1.5]
       scaleSampleInterval: 0.125 # 0.05m
       randomDensity: False # if True, mass will be added into policy obs
       massRange: [2.0, 25.0]  # kg, standard brick --> concrete bag
@@ -103,7 +103,7 @@ env:
   asset:
     assetRoot: "tokenhsi/data/assets"
     # assetFileName: "mjcf/phys_humanoid_v3.xml"  # this is used in CRC
-    assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall.xml"  # this is used in my custom imitation learning
+    assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
 
   plane:
     staticFriction: 1.0

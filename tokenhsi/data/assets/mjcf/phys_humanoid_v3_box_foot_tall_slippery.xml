@@ -60,14 +60,14 @@
           <body name="right_lower_arm" pos="0 0 -0.33">
             <joint name="right_elbow" axis="0 1 0" range="-160 0" stiffness="300" damping="30" armature=".01"/>
             <!-- back to original radius 0.04, length 1.2x -->
-            <geom name="right_lower_arm" fromto="0 0 -0.0525 0 0 -0.27" size="0.04" />
+            <geom name="right_lower_arm" fromto="0 0 -0.0525 0 0 -0.27" size="0.04" density="1056" friction="0.1 0.05 0.05"/>
 
             <body name="right_hand" pos="0 0 -0.32">
               <geom name="right_palm" type="box" pos="0 0 -0.1" 
-                    size="0.035 0.01 0.05" density="1056" />
+                    size="0.035 0.01 0.05" density="1056" friction="0.1 0.05 0.05"/>
               <!-- Fingers: rotated ~120° inward -->
               <geom name="right_fingers" type="box" pos="0 0.015 -0.155"
-                size="0.035 0.01 0.035" density="1056" 
+                size="0.035 0.01 0.035" density="1056" friction="0.1 0.05 0.05"
                 quat="-0.5 0.866 0 0"/>
             </body>
 
@@ -85,13 +85,13 @@
           <body name="left_lower_arm" pos="0 0 -0.33">
             <joint name="left_elbow" axis="0 1 0" range="-160 0" stiffness="300" damping="30" armature=".01"/>
             <!-- back to original radius 0.04, length 1.2x -->
-            <geom name="left_lower_arm" fromto="0 0 -0.0525 0 0 -0.27" size="0.04" density="1056" />
+            <geom name="left_lower_arm" fromto="0 0 -0.0525 0 0 -0.27" size="0.04" density="1056" friction="0.1 0.05 0.05"/>
 
             <body name="left_hand" pos="0 0 -0.32">
               <geom name="left_palm" type="box" pos="0 0 -0.1" 
-                    size="0.035 0.01 0.05" density="1056" />
+                    size="0.035 0.01 0.05" density="1056" friction="0.1 0.05 0.05"/>
               <geom name="left_fingers" type="box" pos="0 -0.015 -0.155"
-                    size="0.035 0.01 0.035" density="1056" 
+                    size="0.035 0.01 0.035" density="1056" friction="0.1 0.05 0.05"
                     quat="0.5 0.866 0 0"/>
             </body>
           </body>
