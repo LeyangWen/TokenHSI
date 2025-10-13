@@ -423,11 +423,6 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self.height_samples = torch.tensor(self.terrain.heightsamples).view(self.terrain.tot_rows, self.terrain.tot_cols).to(self.device)
         return
     
-    def pre_physics_step(self, actions):
-        super().pre_physics_step(actions)
-        self._prev_root_pos[:] = self._humanoid_root_states[..., 0:3]
-        self._prev_box_pos[:] = self._box_states[..., 0:3]
-        return
 
     def _update_marker(self):
         
@@ -978,6 +973,69 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         return
     
+    def render(self, sync_frame_time=False):
+        super().render(sync_frame_time)
+    
+        if self.viewer:
+            self._draw_task()
+        return
+    
+    def save_imgs(self):
+        if self.cfg["args"].record:
+            # render frame if we're saving video
+            if self.save_video and self.viewer is not None:
+                num = str(self.save_img_count)
+                num = '0' * (6 - len(num)) + num
+                new_save_dir = os.path.join(self.save_video_dir, "imgs")
+                os.makedirs(new_save_dir, exist_ok=True)
+                self.gym.write_viewer_image_to_file(self.viewer, f"{new_save_dir}/frame_{num}.png")
+    
+                base_quat = self._humanoid_root_states[:, 3:7]
+                heading_rot = torch_utils.calc_heading_quat(base_quat)
+    
+                points = quat_apply(
+                    heading_rot.repeat(1, self.num_height_points).reshape(-1, 4),
+                    self.height_points) + (self._humanoid_root_states[:, :3]).unsqueeze(1)
+                
+                env_ids = torch.arange(0, self.num_envs, device=self.device, dtype=torch.long)
+                measured_heights = self.get_heights(root_states=self._humanoid_root_states, env_ids=env_ids)
+    
+                sensor_pos = points
+                sensor_pos[..., -1] = measured_heights
+    
+                parameters = {
+                    "hu_rigid_body_pos_rot": self._fetch_humanoid_rigid_body_pos_rot_states().cpu(),
+                    "box_states": self._box_states.clone().cpu(),
+                    "box_sizes": self._box_size.clone().cpu(),
+                    "box_tar_pos": self._tar_pos.clone().cpu(),
+                    "platform_states": self._platform_states.clone().cpu(),
+                    "tar_platform_states": self._tar_platform_states.clone().cpu(),
+                    "platform_size": torch.tensor([0.4, 0.4, 0.02]),
+                    "sensor_pos": sensor_pos.clone().cpu(),
+                    "dt": self.dt,
+                    "progress": self.progress_buf.clone().cpu()
+                }
+    
+                new_save_dir = os.path.join(self.save_video_dir, "parameters")
+                os.makedirs(new_save_dir, exist_ok=True)
+                with open(f"{new_save_dir}/frame_{num}.pkl", 'wb') as f:
+                    pickle.dump(parameters, f)
+    
+                # save terrain
+                mesh_export_dir = os.path.join(self.save_video_dir, "terrain_mesh")
+                os.makedirs(mesh_export_dir, exist_ok=True)
+                output_path = os.path.join(mesh_export_dir, "mesh.obj")
+                if not os.path.exists(output_path):
+                    mesh = trimesh.Trimesh(vertices=self.terrain.vertices, faces=self.terrain.triangles)
+                    mesh.export(os.path.join(mesh_export_dir, "mesh.obj"))
+    
+                self.save_img_count += 1
+    
+        else:
+            super().save_imgs()
+    
+        return
+    
     
     def _draw_task(self):
         self._update_marker()
@@ -1235,68 +1293,165 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         return
     
-    def render(self, sync_frame_time=False):
-        super().render(sync_frame_time)
-
-        if self.viewer:
-            self._draw_task()
+    def _compute_reset(self):
+    
+        env_ids = torch.arange(0, self.num_envs, dtype=torch.long, device=self.device)
+        center_heights = self.get_center_heights(self._humanoid_root_states[..., 0:7], env_ids=env_ids).mean(dim=-1) # 当前人体root 2d pos的高度
+    
+        self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
+                                                   self._contact_forces, self._contact_body_ids,
+                                                   self._rigid_body_pos, self.max_episode_length,
+                                                   self._enable_early_termination, self._termination_heights, center_heights,
+                                                   self._box_states[..., 0:3])
+        return
+    def pre_physics_step(self, actions):
+        super().pre_physics_step(actions)
+        self._prev_root_pos[:] = self._humanoid_root_states[..., 0:3]
+        self._prev_box_pos[:] = self._box_states[..., 0:3]
         return
     
-    def save_imgs(self):
-        if self.cfg["args"].record:
-            # render frame if we're saving video
-            if self.save_video and self.viewer is not None:
-                num = str(self.save_img_count)
-                num = '0' * (6 - len(num)) + num
-                new_save_dir = os.path.join(self.save_video_dir, "imgs")
-                os.makedirs(new_save_dir, exist_ok=True)
-                self.gym.write_viewer_image_to_file(self.viewer, f"{new_save_dir}/frame_{num}.png")
-
-                base_quat = self._humanoid_root_states[:, 3:7]
-                heading_rot = torch_utils.calc_heading_quat(base_quat)
-
-                points = quat_apply(
-                    heading_rot.repeat(1, self.num_height_points).reshape(-1, 4),
-                    self.height_points) + (self._humanoid_root_states[:, :3]).unsqueeze(1)
+    def _reset_boxes(self, env_ids):
+        if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
+            # deterministic slope box start for loadSlopes
+            # Loc from yaml config
+            ids = env_ids.to(dtype=torch.long)
+            if self._box_counter[0] >= 45:
+                raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
+            if self.load_slopes:
+                start_indices = self._box_counter[ids] % (2) 
+                assert ids.max().item() < self.terrain.env_rows * self.terrain.env_cols, "Too many envs for the number of slope tiles"
+                root_pos = self.terrain.box_start[start_indices, ids, :]
+                root_pos[ids, -1] = root_pos[:, -1] + self._box_size[ids, 2] / 2 + self._platform_height / 2
                 
-                env_ids = torch.arange(0, self.num_envs, device=self.device, dtype=torch.long)
-                measured_heights = self.get_heights(root_states=self._humanoid_root_states, env_ids=env_ids)
+            else:
+                start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
+                root_pos = self._fixed_start_positions[start_indices]
+                root_pos = self._process_box_root_pos(root_pos)
+            
+            self._box_states[ids, 0:3] = root_pos
+            axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
+            # if self._reset_random_rot:
+            #     coeff = 1.0
+            # else:
+            coeff = 0.0 # lets just set to 0 for now
+            ang = torch.rand((len(ids),), device=self.device) * 2 * np.pi * coeff
+            root_rot = quat_from_angle_axis(ang, axis)
 
-                sensor_pos = points
-                sensor_pos[..., -1] = measured_heights
+            self._box_states[ids, 3:7] = root_rot
+            self._box_states[ids, 7:10] = 0.0
+            self._box_states[ids, 10:13] = 0.0
 
-                parameters = {
-                    "hu_rigid_body_pos_rot": self._fetch_humanoid_rigid_body_pos_rot_states().cpu(),
-                    "box_states": self._box_states.clone().cpu(),
-                    "box_sizes": self._box_size.clone().cpu(),
-                    "box_tar_pos": self._tar_pos.clone().cpu(),
-                    "platform_states": self._platform_states.clone().cpu(),
-                    "tar_platform_states": self._tar_platform_states.clone().cpu(),
-                    "platform_size": torch.tensor([0.4, 0.4, 0.02]),
-                    "sensor_pos": sensor_pos.clone().cpu(),
-                    "dt": self.dt,
-                    "progress": self.progress_buf.clone().cpu()
-                }
 
-                new_save_dir = os.path.join(self.save_video_dir, "parameters")
-                os.makedirs(new_save_dir, exist_ok=True)
-                with open(f"{new_save_dir}/frame_{num}.pkl", 'wb') as f:
-                    pickle.dump(parameters, f)
+            self._platform_pos[ids, 0:2] = root_pos[:, 0:2] # xy
+            self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
 
-                # save terrain
-                mesh_export_dir = os.path.join(self.save_video_dir, "terrain_mesh")
-                os.makedirs(mesh_export_dir, exist_ok=True)
-                output_path = os.path.join(mesh_export_dir, "mesh.obj")
-                if not os.path.exists(output_path):
-                    mesh = trimesh.Trimesh(vertices=self.terrain.vertices, faces=self.terrain.triangles)
-                    mesh.export(os.path.join(mesh_export_dir, "mesh.obj"))
+            self._box_states[ids, 2] += 0.05 # add 0.05 to enable correct collision detection
 
-                self.save_img_count += 1
+            print(f"[Info]: _box_counter = {self._box_counter[ids]}")
+            print(f"[Info]: _reset_boxes: box_pos = {self._box_states[ids, 0:3]}")
+            print(f"[Info]: box reset {'#'*40}")
+            # Increment the counter here if you want start and target to rotate together.
+            self._box_counter[ids] += 1
+            return
+        # for skill is pickUp, carryWith, putDown, the initial location of the box is from the reference box motion
+        for sk_name in ["pickUp", "carryWith", "putDown"]:
+            if self._reset_ref_env_ids.get(sk_name) is not None:
+                if (len(self._reset_ref_env_ids[sk_name]) > 0):
 
-        else:
-            super().save_imgs()
+                    assert sk_name == "carryWith"
+
+                    curr_env_ids = self._reset_ref_env_ids[sk_name]
+
+                    root_pos, root_rot = self._motion_lib[sk_name].get_obj_motion_state(
+                        motion_ids=self._reset_ref_motion_ids[sk_name], 
+                        motion_times=self._reset_ref_motion_times[sk_name]
+                    )
+
+                    on_ground_mask = (self._box_size[curr_env_ids, 2] / 2 > root_pos[:, 2])
+                    root_pos[on_ground_mask, 2] = self._box_size[curr_env_ids[on_ground_mask], 2] / 2
+
+                    root_pos += self._reset_human_root_pos_offset[sk_name] # 对XYZ均做平移
+
+                    self._box_states[curr_env_ids, 0:3] = root_pos
+                    self._box_states[curr_env_ids, 3:7] = root_rot
+                    self._box_states[curr_env_ids, 7:10] = 0.0
+                    self._box_states[curr_env_ids, 10:13] = 0.0
+
+                    # reset platform, we needn't platforms right now.
+                    if self._reset_random_height:
+                        self._platform_pos[curr_env_ids] = self._platform_default_pos[curr_env_ids]
+
+        # for skill is loco and reset default, we random generate an inital location of the box
+        random_env_ids = []
+        if len(self._reset_default_env_ids) > 0:
+            random_env_ids.append(self._reset_default_env_ids)
+        for sk_name in ["loco", "loco_terrain"]:
+            if self._reset_ref_env_ids.get(sk_name) is not None:
+                random_env_ids.append(self._reset_ref_env_ids[sk_name])
+
+        if len(random_env_ids) > 0:
+            ids = torch.cat(random_env_ids, dim=0)
+
+            root_pos_xy = torch.randn(len(ids), 2, device=self.device)
+            root_pos_xy /= torch.linalg.norm(root_pos_xy, dim=-1, keepdim=True)
+            root_pos_xy *= torch.rand(len(ids), 1, device=self.device) * 9.0 + 1.0 # randomize # 边界是50m，不会走出去整张地图的
+            root_pos_xy += self._humanoid_root_states[ids, :2] # get absolute pos, humanoid_root_state will be updated after set_env_state
+
+            root_pos_z = self._box_size[ids, 2] / 2 # place the box on the ground
+            if self._reset_random_height:
+
+                num_envs = ids.shape[0]
+                probs = to_torch(np.array([self._reset_random_height_prob] * num_envs), device=self.device)
+                mask = torch.bernoulli(probs) == 1.0
+                
+                if mask.sum() > 0:
+                    root_pos_z[mask] += torch.rand(mask.sum(), device=self.device) * 1.0 + self._reset_minBottomSurfaceHeight
+                    root_pos_z[mask] = self._regulate_height(root_pos_z[mask], self._box_size[ids[mask]])
+
+            axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
+            if self._reset_random_rot:
+                coeff = 1.0
+            else:
+                coeff = 0.0
+            ang = torch.rand((len(ids),), device=self.device) * 2 * np.pi * coeff
+            root_rot = quat_from_angle_axis(ang, axis)
+            root_pos = torch.cat([root_pos_xy, root_pos_z.unsqueeze(-1)], dim=-1)
+
+            root_states = torch.cat([root_pos, root_rot], dim=-1)
+            center_height = self.get_center_heights(root_states, env_ids=ids).mean(dim=-1) # 当前人体root 2d pos的高度
+            root_pos[:, 2] += center_height
+
+            self._box_states[ids, 0:3] = root_pos
+            self._box_states[ids, 3:7] = root_rot
+            self._box_states[ids, 7:10] = 0.0
+            self._box_states[ids, 10:13] = 0.0
+
+            # we need to reset this here
+            if self._reset_random_height:
+                self._platform_pos[ids, 0:2] = root_pos[:, 0:2] # xy
+                self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
+
+                self._box_states[ids, 2] += 0.05 # add 0.05 to enable right collision detection
 
         return
+
+    def _reset_env_tensors(self, env_ids):
+        super()._reset_env_tensors(env_ids)
+
+        if self._is_eval:
+            self._success_buf[env_ids] = 0
+            self._precision_buf[env_ids] = float('Inf')
+
+        env_ids_int32 = self._box_actor_ids[env_ids].view(-1)
+        if self._reset_random_height:
+            # env has two platforms
+            env_ids_int32 = torch.cat([env_ids_int32, self._platform_actor_ids, self._tar_platform_actor_ids], dim=0)
+        self.gym.set_actor_root_state_tensor_indexed(self.sim,
+                                                        gymtorch.unwrap_tensor(self._root_states),
+                                                        gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
+
+        return
+    
 
     def post_physics_step(self):
         super().post_physics_step()
@@ -1459,147 +1614,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             
 
     
-    def _reset_boxes(self, env_ids):
-        if self._is_test and self.constructionExp:  # wen: specify box location from yaml instead of random
-            # deterministic slope box start for loadSlopes
-            # Loc from yaml config
-            ids = env_ids.to(dtype=torch.long)
-            if self._box_counter[0] >= 45:
-                raise ValueError(f"Intential: breaking loop for {self._box_counter[ids]} boxes")
-            if self.load_slopes:
-                start_indices = self._box_counter[ids] % (2) 
-                assert ids.max().item() < self.terrain.env_rows * self.terrain.env_cols, "Too many envs for the number of slope tiles"
-                root_pos = self.terrain.box_start[start_indices, ids, :]
-                root_pos[ids, -1] = root_pos[:, -1] + self._box_size[ids, 2] / 2 + self._platform_height / 2
-                
-            else:
-                start_indices = self._box_counter[ids] % self._fixed_start_positions.shape[0]
-                root_pos = self._fixed_start_positions[start_indices]
-                root_pos = self._process_box_root_pos(root_pos)
-            
-            self._box_states[ids, 0:3] = root_pos
-            axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
-            # if self._reset_random_rot:
-            #     coeff = 1.0
-            # else:
-            coeff = 0.0 # lets just set to 0 for now
-            ang = torch.rand((len(ids),), device=self.device) * 2 * np.pi * coeff
-            root_rot = quat_from_angle_axis(ang, axis)
-
-            self._box_states[ids, 3:7] = root_rot
-            self._box_states[ids, 7:10] = 0.0
-            self._box_states[ids, 10:13] = 0.0
-
-
-            self._platform_pos[ids, 0:2] = root_pos[:, 0:2] # xy
-            self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
-
-            self._box_states[ids, 2] += 0.05 # add 0.05 to enable correct collision detection
-
-            print(f"[Info]: _box_counter = {self._box_counter[ids]}")
-            print(f"[Info]: _reset_boxes: box_pos = {self._box_states[ids, 0:3]}")
-            print(f"[Info]: box reset {'#'*40}")
-            # Increment the counter here if you want start and target to rotate together.
-            self._box_counter[ids] += 1
-            return
-        # for skill is pickUp, carryWith, putDown, the initial location of the box is from the reference box motion
-        for sk_name in ["pickUp", "carryWith", "putDown"]:
-            if self._reset_ref_env_ids.get(sk_name) is not None:
-                if (len(self._reset_ref_env_ids[sk_name]) > 0):
-
-                    assert sk_name == "carryWith"
-
-                    curr_env_ids = self._reset_ref_env_ids[sk_name]
-
-                    root_pos, root_rot = self._motion_lib[sk_name].get_obj_motion_state(
-                        motion_ids=self._reset_ref_motion_ids[sk_name], 
-                        motion_times=self._reset_ref_motion_times[sk_name]
-                    )
-
-                    on_ground_mask = (self._box_size[curr_env_ids, 2] / 2 > root_pos[:, 2])
-                    root_pos[on_ground_mask, 2] = self._box_size[curr_env_ids[on_ground_mask], 2] / 2
-
-                    root_pos += self._reset_human_root_pos_offset[sk_name] # 对XYZ均做平移
-
-                    self._box_states[curr_env_ids, 0:3] = root_pos
-                    self._box_states[curr_env_ids, 3:7] = root_rot
-                    self._box_states[curr_env_ids, 7:10] = 0.0
-                    self._box_states[curr_env_ids, 10:13] = 0.0
-
-                    # reset platform, we needn't platforms right now.
-                    if self._reset_random_height:
-                        self._platform_pos[curr_env_ids] = self._platform_default_pos[curr_env_ids]
-
-        # for skill is loco and reset default, we random generate an inital location of the box
-        random_env_ids = []
-        if len(self._reset_default_env_ids) > 0:
-            random_env_ids.append(self._reset_default_env_ids)
-        for sk_name in ["loco", "loco_terrain"]:
-            if self._reset_ref_env_ids.get(sk_name) is not None:
-                random_env_ids.append(self._reset_ref_env_ids[sk_name])
-
-        if len(random_env_ids) > 0:
-            ids = torch.cat(random_env_ids, dim=0)
-
-            root_pos_xy = torch.randn(len(ids), 2, device=self.device)
-            root_pos_xy /= torch.linalg.norm(root_pos_xy, dim=-1, keepdim=True)
-            root_pos_xy *= torch.rand(len(ids), 1, device=self.device) * 9.0 + 1.0 # randomize # 边界是50m，不会走出去整张地图的
-            root_pos_xy += self._humanoid_root_states[ids, :2] # get absolute pos, humanoid_root_state will be updated after set_env_state
-
-            root_pos_z = self._box_size[ids, 2] / 2 # place the box on the ground
-            if self._reset_random_height:
-
-                num_envs = ids.shape[0]
-                probs = to_torch(np.array([self._reset_random_height_prob] * num_envs), device=self.device)
-                mask = torch.bernoulli(probs) == 1.0
-                
-                if mask.sum() > 0:
-                    root_pos_z[mask] += torch.rand(mask.sum(), device=self.device) * 1.0 + self._reset_minBottomSurfaceHeight
-                    root_pos_z[mask] = self._regulate_height(root_pos_z[mask], self._box_size[ids[mask]])
-
-            axis = torch.tensor([[0.0, 0.0, 1.0]], device=self.device).reshape(1, 3).expand([ids.shape[0], -1])
-            if self._reset_random_rot:
-                coeff = 1.0
-            else:
-                coeff = 0.0
-            ang = torch.rand((len(ids),), device=self.device) * 2 * np.pi * coeff
-            root_rot = quat_from_angle_axis(ang, axis)
-            root_pos = torch.cat([root_pos_xy, root_pos_z.unsqueeze(-1)], dim=-1)
-
-            root_states = torch.cat([root_pos, root_rot], dim=-1)
-            center_height = self.get_center_heights(root_states, env_ids=ids).mean(dim=-1) # 当前人体root 2d pos的高度
-            root_pos[:, 2] += center_height
-
-            self._box_states[ids, 0:3] = root_pos
-            self._box_states[ids, 3:7] = root_rot
-            self._box_states[ids, 7:10] = 0.0
-            self._box_states[ids, 10:13] = 0.0
-
-            # we need to reset this here
-            if self._reset_random_height:
-                self._platform_pos[ids, 0:2] = root_pos[:, 0:2] # xy
-                self._platform_pos[ids, -1] = root_pos[:, -1] - self._box_size[ids, 2] / 2 - self._platform_height / 2
-
-                self._box_states[ids, 2] += 0.05 # add 0.05 to enable right collision detection
-
-        return
     
-    def _reset_env_tensors(self, env_ids):
-        super()._reset_env_tensors(env_ids)
-
-        if self._is_eval:
-            self._success_buf[env_ids] = 0
-            self._precision_buf[env_ids] = float('Inf')
-
-        env_ids_int32 = self._box_actor_ids[env_ids].view(-1)
-        if self._reset_random_height:
-            # env has two platforms
-            env_ids_int32 = torch.cat([env_ids_int32, self._platform_actor_ids, self._tar_platform_actor_ids], dim=0)
-        self.gym.set_actor_root_state_tensor_indexed(self.sim,
-                                                     gymtorch.unwrap_tensor(self._root_states),
-                                                     gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
-
-        return
 
     def _reset_actors(self, env_ids):
         if (self._state_init == HumanoidAdaptCarryGround2Terrain.StateInit.Default):
@@ -1808,17 +1823,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                                                                    self._dof_obs_size, self._dof_offsets)
         return
     
-    def _compute_reset(self):
 
-        env_ids = torch.arange(0, self.num_envs, dtype=torch.long, device=self.device)
-        center_heights = self.get_center_heights(self._humanoid_root_states[..., 0:7], env_ids=env_ids).mean(dim=-1) # 当前人体root 2d pos的高度
-
-        self.reset_buf[:], self._terminate_buf[:] = compute_humanoid_reset(self.reset_buf, self.progress_buf,
-                                                   self._contact_forces, self._contact_body_ids,
-                                                   self._rigid_body_pos, self.max_episode_length,
-                                                   self._enable_early_termination, self._termination_heights, center_heights,
-                                                   self._box_states[..., 0:3])
-        return
 
 
 #####################################################################

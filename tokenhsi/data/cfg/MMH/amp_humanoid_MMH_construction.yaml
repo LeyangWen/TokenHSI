@@ -102,7 +102,8 @@ env:
 
   asset:
     assetRoot: "tokenhsi/data/assets"
-    assetFileName: "mjcf/phys_humanoid_v3.xml"
+    # assetFileName: "mjcf/phys_humanoid_v3.xml"  # this is used in CRC
+    assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall.xml"  # this is used in my custom imitation learning
 
   plane:
     staticFriction: 1.0

@@ -102,10 +102,23 @@ class HumanoidCarryMMH(Humanoid):
         self._enable_bbox_obs = box_cfg["obs"]["enableBboxObs"]
         
         self.user_urdf = box_cfg["build"].get("userUrdf", None)
-
+        # manage multi task obs
+        self._num_tasks = 4
+        task_obs_size_carry = 3 + \
+                3 + 6 + 3 + 3 + \
+                3 * 8
+        self._each_subtask_obs_size = [
+            task_obs_size_carry, # carry_1
+            task_obs_size_carry, # carry_1
+            task_obs_size_carry, # carry_1
+            task_obs_size_carry, # carry_1
+        ]
+        self._multiple_task_names = ["MMH_box", "MMH_handle", "MMH_timber", "MMH_bag"]
+        self._enable_task_mask_obs = True
+        self._enable_task_specific_disc = True
         # configs for amp
         state_init = cfg["env"]["stateInit"]
-        self._state_init = HumanoidCarry.StateInit[state_init]
+        self._state_init = HumanoidCarryMMH.StateInit[state_init]
         self._hybrid_init_prob = cfg["env"]["hybridInitProb"]
         self._num_amp_obs_steps = cfg["env"]["numAMPObsSteps"]
         assert(self._num_amp_obs_steps >= 2)
@@ -141,6 +154,10 @@ class HumanoidCarryMMH(Humanoid):
         # tensors for task
         self._prev_root_pos = torch.zeros([self.num_envs, 3], device=self.device, dtype=torch.float)
         self._prev_box_pos = torch.zeros([self.num_envs, 3], device=self.device, dtype=torch.float)
+        # self._task_init_prob = torch.tensor(cfg["env"]["taskInitProb"], device=self.device, dtype=torch.float) # probs for task init
+        self._task_init_prob = torch.tensor([1.0,0,0,0], device=self.device, dtype=torch.float) 
+        self._task_indicator = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
+        self._task_mask = torch.zeros([self.num_envs, self._num_tasks], device=self.device, dtype=torch.bool)
         self._tar_pos = torch.zeros([self.num_envs, 3], device=self.device, dtype=torch.float) # target location of the box, 3d xyz
 
         spacing = cfg["env"]["envSpacing"]
@@ -205,7 +222,29 @@ class HumanoidCarryMMH(Humanoid):
             print(f"[Info]: init done {'#'*40}")
 
 
+    def get_multi_task_info(self):
 
+        num_subtasks = self._num_tasks
+        each_subtask_obs_size = self._each_subtask_obs_size
+
+        each_subtask_obs_mask = torch.zeros(num_subtasks, sum(each_subtask_obs_size), dtype=torch.bool, device=self.device)
+
+        index = torch.cumsum(torch.tensor([0] + each_subtask_obs_size), dim=0).to(self.device)
+        for i in range(num_subtasks):
+            each_subtask_obs_mask[i, index[i]:index[i + 1]] = True
+
+        info = {
+            "onehot_size": num_subtasks,
+            "tota_subtask_obs_size": sum(each_subtask_obs_size),
+            "each_subtask_obs_size": each_subtask_obs_size,
+            "each_subtask_obs_mask": each_subtask_obs_mask,
+            "each_subtask_obs_indx": index,
+            "enable_task_mask_obs": self._enable_task_mask_obs,
+
+            "each_subtask_name": self._multiple_task_names,
+        }
+
+        return info
         return
     
     def _create_envs(self, num_envs, spacing, num_per_row):
@@ -780,7 +819,7 @@ class HumanoidCarryMMH(Humanoid):
         if self._build_random_density:
             obs = torch.cat([obs, box_mass.unsqueeze(-1)], dim=-1)
         if (self._enable_task_mask_obs):
-                    obs = torch.cat([obs, task_mask.float()], dim=-1)
+            obs = torch.cat([obs, task_mask.float()], dim=-1)
         return obs
 
     def _compute_reward(self, actions):
@@ -1058,6 +1097,10 @@ class HumanoidCarryMMH(Humanoid):
         motion_times0 += truncate_time
 
         amp_obs_demo = self.build_amp_obs_demo(motion_ids, motion_times0, curr_motion_lib)
+
+        if self._enable_task_specific_disc:
+            amp_obs_demo = torch.cat([amp_obs_demo, task_onehot], dim=-1)
+
         self._amp_obs_demo_buf[:] = amp_obs_demo.view(self._amp_obs_demo_buf.shape)
         amp_obs_demo_flat = self._amp_obs_demo_buf.view(-1, self.get_num_amp_obs())
 
@@ -1098,6 +1141,9 @@ class HumanoidCarryMMH(Humanoid):
         else:
             print("Unsupported character config file: {s}".format(asset_file))
             assert(False)
+
+        if self._enable_task_specific_disc:
+            self._num_amp_obs_per_step += self._num_tasks
 
         return
 
@@ -1141,12 +1187,12 @@ class HumanoidCarryMMH(Humanoid):
         return
 
     def _reset_actors(self, env_ids):
-        if (self._state_init == HumanoidCarry.StateInit.Default):
+        if (self._state_init == HumanoidCarryMMH.StateInit.Default):
             self._reset_default(env_ids)
-        elif (self._state_init == HumanoidCarry.StateInit.Start
-              or self._state_init == HumanoidCarry.StateInit.Random):
+        elif (self._state_init == HumanoidCarryMMH.StateInit.Start
+              or self._state_init == HumanoidCarryMMH.StateInit.Random):
             self._reset_ref_state_init(env_ids)
-        elif (self._state_init == HumanoidCarry.StateInit.Hybrid):
+        elif (self._state_init == HumanoidCarryMMH.StateInit.Hybrid):
             self._reset_hybrid_state_init(env_ids)
         else:
             assert(False), "Unsupported state initialization strategy: {:s}".format(str(self._state_init))
@@ -1176,10 +1222,10 @@ class HumanoidCarryMMH(Humanoid):
                 num_envs = curr_env_ids.shape[0]
                 motion_ids = curr_motion_lib.sample_motions(num_envs)
 
-                if (self._state_init == HumanoidCarry.StateInit.Random
-                    or self._state_init == HumanoidCarry.StateInit.Hybrid):
+                if (self._state_init == HumanoidCarryMMH.StateInit.Random
+                    or self._state_init == HumanoidCarryMMH.StateInit.Hybrid):
                     motion_times = curr_motion_lib.sample_time_rsi(motion_ids) # avoid times with serious self-penetration
-                elif (self._state_init == HumanoidCarry.StateInit.Start):
+                elif (self._state_init == HumanoidCarryMMH.StateInit.Start):
                     motion_times = torch.zeros(num_envs, device=self.device)
                 else:
                     assert(False), "Unsupported state initialization strategy: {:s}".format(str(self._state_init))
@@ -1257,6 +1303,14 @@ class HumanoidCarryMMH(Humanoid):
                                               dof_pos, dof_vel, key_pos, 
                                               self._local_root_obs, self._root_height_obs, 
                                               self._dof_obs_size, self._dof_offsets)
+        
+
+        if self._enable_task_specific_disc and self._enable_task_mask_obs:
+            motion_labels = self._task_mask[env_ids]
+            motion_labels = torch.broadcast_to(motion_labels.unsqueeze(-2), [motion_labels.shape[0], self._num_amp_obs_steps - 1, motion_labels.shape[1]])
+
+            amp_obs_demo = torch.cat([amp_obs_demo, motion_labels.reshape(-1, motion_labels.shape[-1]).float()], dim=-1)
+
         self._hist_amp_obs_buf[env_ids] = amp_obs_demo.view(self._hist_amp_obs_buf[env_ids].shape)
         return
     
@@ -1282,17 +1336,23 @@ class HumanoidCarryMMH(Humanoid):
     def _compute_amp_observations(self, env_ids=None):
         if (env_ids is None):
             key_body_pos = self._rigid_body_pos[:, self._key_body_ids, :]
-            self._curr_amp_obs_buf[:] = build_amp_observations(self._rigid_body_pos[:, 0, :],
+            amp_obs = build_amp_observations(self._rigid_body_pos[:, 0, :],
                                                                self._rigid_body_rot[:, 0, :],
                                                                self._rigid_body_vel[:, 0, :],
                                                                self._rigid_body_ang_vel[:, 0, :],
                                                                self._dof_pos, self._dof_vel, key_body_pos,
                                                                self._local_root_obs, self._root_height_obs, 
                                                                self._dof_obs_size, self._dof_offsets)
+            
+            if self._enable_task_specific_disc:
+                self._curr_amp_obs_buf[:] = torch.cat([amp_obs, self._task_mask.float()], dim=-1)
+            else:
+                self._curr_amp_obs_buf[:] = amp_obs
+
         else:
             kinematic_rigid_body_pos = self._kinematic_humanoid_rigid_body_states[:, :, 0:3]
             key_body_pos = kinematic_rigid_body_pos[:, self._key_body_ids, :]
-            self._curr_amp_obs_buf[env_ids] = build_amp_observations(self._kinematic_humanoid_rigid_body_states[env_ids, 0, 0:3],
+            amp_obs = build_amp_observations(self._kinematic_humanoid_rigid_body_states[env_ids, 0, 0:3],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 3:7],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 7:10],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 10:13],
@@ -1302,110 +1362,5 @@ class HumanoidCarryMMH(Humanoid):
         return
 
 
-#####################################################################
-###=========================jit functions=========================###
-#####################################################################
 
-@torch.jit.script
-def compute_humanoid_reset(reset_buf, progress_buf, contact_buf, contact_body_ids, rigid_body_pos,
-                           max_episode_length, enable_early_termination, termination_heights):
-    # type: (Tensor, Tensor, Tensor, Tensor, Tensor, float, bool, Tensor) -> Tuple[Tensor, Tensor]
-    terminated = torch.zeros_like(reset_buf)
-
-    if (enable_early_termination):
-
-        body_height = rigid_body_pos[..., 2]
-        fall_height = body_height < termination_heights
-        fall_height[:, contact_body_ids] = False
-        fall_height = torch.any(fall_height, dim=-1)
-
-        has_fallen = torch.logical_and(torch.ones_like(fall_height), fall_height)
-
-        # first timestep can sometimes still have nonzero contact forces
-        # so only check after first couple of steps
-        has_fallen *= (progress_buf > 1)
-        terminated = torch.where(has_fallen, torch.ones_like(reset_buf), terminated)
-    
-    reset = torch.where(progress_buf >= max_episode_length - 1, torch.ones_like(reset_buf), terminated)
-
-    return reset, terminated
-
-
-@torch.jit.script
-def build_amp_observations(root_pos, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos, 
-                           local_root_obs, root_height_obs, dof_obs_size, dof_offsets):
-    # type: (Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, Tensor, bool, bool, int, List[int]) -> Tensor
-    root_h = root_pos[:, 2:3]
-    heading_rot = torch_utils.calc_heading_quat_inv(root_rot)
-
-    if (local_root_obs):
-        root_rot_obs = quat_mul(heading_rot, root_rot)
-    else:
-        root_rot_obs = root_rot
-    root_rot_obs = torch_utils.quat_to_tan_norm(root_rot_obs)
-    
-    if (not root_height_obs):
-        root_h_obs = torch.zeros_like(root_h)
-    else:
-        root_h_obs = root_h
-    
-    local_root_vel = quat_rotate(heading_rot, root_vel)
-    local_root_ang_vel = quat_rotate(heading_rot, root_ang_vel)
-
-    root_pos_expand = root_pos.unsqueeze(-2)
-    local_key_body_pos = key_body_pos - root_pos_expand
-    
-    heading_rot_expand = heading_rot.unsqueeze(-2)
-    heading_rot_expand = heading_rot_expand.repeat((1, local_key_body_pos.shape[1], 1))
-    flat_end_pos = local_key_body_pos.view(local_key_body_pos.shape[0] * local_key_body_pos.shape[1], local_key_body_pos.shape[2])
-    flat_heading_rot = heading_rot_expand.view(heading_rot_expand.shape[0] * heading_rot_expand.shape[1], 
-                                               heading_rot_expand.shape[2])
-    local_end_pos = quat_rotate(flat_heading_rot, flat_end_pos)
-    flat_local_key_pos = local_end_pos.view(local_key_body_pos.shape[0], local_key_body_pos.shape[1] * local_key_body_pos.shape[2])
-    
-    dof_obs = dof_to_obs(dof_pos, dof_obs_size, dof_offsets)
-    obs = torch.cat((root_h_obs, root_rot_obs, local_root_vel, local_root_ang_vel, dof_obs, dof_vel, flat_local_key_pos), dim=-1)
-    return obs
-
-@torch.jit.script
-def compute_location_observations(root_states, box_states, box_bps, tar_pos, enableBboxObs):
-    # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
-    root_pos = root_states[:, 0:3]
-    root_rot = root_states[:, 3:7]
-    heading_rot = torch_utils.calc_heading_quat_inv(root_rot) # (num_envs, 4)
-
-    box_pos = box_states[:, 0:3]
-    box_rot = box_states[:, 3:7]
-    box_vel = box_states[:, 7:10]
-    box_ang_vel = box_states[:, 10:13]
-    
-    local_box_pos = box_pos - root_pos
-    local_box_pos = quat_rotate(heading_rot, local_box_pos)
-
-    local_box_rot = quat_mul(heading_rot, box_rot)
-    local_box_rot_obs = torch_utils.quat_to_tan_norm(local_box_rot)
-
-    local_box_vel = quat_rotate(heading_rot, box_vel)
-    local_box_ang_vel = quat_rotate(heading_rot, box_ang_vel)
-
-    # compute observations for bounding points of the box
-    ## transform from object local space to world space
-    box_pos_exp = torch.broadcast_to(box_pos.unsqueeze(-2), (box_pos.shape[0], box_bps.shape[1], box_pos.shape[1])) # (num_envs, 3) >> (num_envs, 8, 3)
-    box_rot_exp = torch.broadcast_to(box_rot.unsqueeze(-2), (box_rot.shape[0], box_bps.shape[1], box_rot.shape[1])) # (num_envs, 4) >> (num_envs, 8, 4)
-    box_bps_world_space = quat_rotate(box_rot_exp.reshape(-1, 4), box_bps.reshape(-1, 3)) + box_pos_exp.reshape(-1, 3) # (num_envs*8, 3)
-
-    ## transform from world space to humanoid local space
-    heading_rot_exp = torch.broadcast_to(heading_rot.unsqueeze(-2), (heading_rot.shape[0], box_bps.shape[1], heading_rot.shape[1]))
-    root_pos_exp = torch.broadcast_to(root_pos.unsqueeze(-2), (root_pos.shape[0], box_bps.shape[1], root_pos.shape[1]))
-    box_bps_local_space = quat_rotate(heading_rot_exp.reshape(-1, 4), box_bps_world_space - root_pos_exp.reshape(-1, 3)) # (num_envs*8, 3)
-
-    # task obs
-    local_tar_pos = quat_rotate(heading_rot, tar_pos - root_pos) # 3d xyz
-
-    if enableBboxObs:
-        obs = torch.cat([local_box_vel, local_box_ang_vel, local_box_pos, local_box_rot_obs, box_bps_local_space.reshape(root_pos.shape[0], -1), local_tar_pos], dim=-1)
-    else:
-        obs = torch.cat([local_box_vel, local_box_ang_vel, local_box_pos, local_box_rot_obs, local_tar_pos], dim=-1)
-
-    return obs
 

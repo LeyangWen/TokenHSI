@@ -1,14 +1,14 @@
 #!/bin/bash -l
-#SBATCH --job-name=TokenHSI-MMHstage1-train
-#SBATCH --output=output_slurm/train_MMHstage1_log.txt
-#SBATCH --error=output_slurm/train_MMHstage1_error.txt
+#SBATCH --job-name=TokenHSI-MMH-train
+#SBATCH --output=output_slurm/train_MMH_log.txt
+#SBATCH --error=output_slurm/train_MMH_error.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=3:00:00
+#SBATCH --time=80:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -21,10 +21,6 @@ nvidia-smi
 # 80 hr
 
 conda activate tokenhsi # need python 3.8, so you cant load python3.10-anaconda etc, or used the module load pytorch
-
-
-echo "=== NVCC Version ==="
-nvcc --version
 
 echo "=== Python Version ==="
 python --version
@@ -41,10 +37,16 @@ echo ""
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64:$LD_LIBRARY_PATH"
 
+
+echo "=== NVCC Version ==="
+nvcc --version
+
 # export MAX_JOBS=1
+# python -u ./tokenhsi/run.py --task HumanoidCarryMMH \
+    # --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task.yaml \
 
 python -u ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task.yaml \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --num_envs 10240 \
     --headless \
@@ -63,3 +65,4 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --resume 1 \
     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_19-12-53-48/nn/Humanoid.pth \
 
+    # --wandb_mode "disabled" \

@@ -204,7 +204,6 @@ class HumanoidCarry(Humanoid):
 
 
 
-        return
     
     def _create_envs(self, num_envs, spacing, num_per_row):
         if (not self.headless):
@@ -1090,7 +1089,7 @@ class HumanoidCarry(Humanoid):
 
         if (asset_file == "mjcf/amp_humanoid.xml"):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
-        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml"):
+        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml" or asset_file == "mjcf/phys_humanoid_v3_box_foot_tall.xml"):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         else:
             print("Unsupported character config file: {s}".format(asset_file))
@@ -1110,6 +1109,7 @@ class HumanoidCarry(Humanoid):
             self._skill_categories = list(motion_config['motions'].keys()) # all skill names stored in the yaml file
             self._motion_lib = {}
             for skill in self._skill_categories:
+                print(motion_file)
                 self._motion_lib[skill] = MotionLib(motion_file=motion_file,
                                                     skill=skill,
                                                     dof_body_ids=self._dof_body_ids,

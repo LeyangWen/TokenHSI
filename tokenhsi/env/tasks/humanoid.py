@@ -235,7 +235,7 @@ class Humanoid(BaseTask):
             self._num_actions = 28
             self._num_actions_joint = self._num_actions
             self._num_obs = 1 + 15 * (3 + 6 + 3 + 3) - 3
-        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml"):
+        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot_tall.xml"):
             self._dof_body_ids = [1, 2, 3, 4, 6, 7, 9, 10, 11, 12, 13, 14]
             self._dof_offsets = [0, 3, 6, 9, 10, 13, 14, 17, 20, 23, 26, 29, 32]
             self._dof_obs_size = 72
@@ -290,7 +290,7 @@ class Humanoid(BaseTask):
         self.gym.create_asset_force_sensor(humanoid_asset, left_foot_idx, sensor_pose)
 
         self.max_motor_effort = max(motor_efforts)
-        self.motor_efforts = to_torch(motor_efforts, device=self.device)
+        self.   motor_efforts = to_torch(motor_efforts, device=self.device)
 
         self.torso_index = 0
         self.num_bodies = self.gym.get_asset_rigid_body_count(humanoid_asset)
@@ -338,6 +338,9 @@ class Humanoid(BaseTask):
             self._char_h = 0.92 # perfect number
         elif (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml"):
             self._char_h = 0.94
+        elif (asset_file == "mjcf/phys_humanoid_v3_box_foot_tall.xml"):
+            self._char_h = 1.04
+            # TODO: pelvis height, see if this works
         else:
             print("Unsupported character config file: {s}".format(asset_file))
             assert(False)
