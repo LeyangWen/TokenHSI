@@ -339,7 +339,7 @@ class Humanoid(BaseTask):
         elif (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml"):
             self._char_h = 0.94
         elif (asset_file == "mjcf/phys_humanoid_v3_box_foot_tall.xml"):
-            self._char_h = 1.04
+            self._char_h = 1.2
             # TODO: pelvis height, see if this works
         else:
             print("Unsupported character config file: {s}".format(asset_file))

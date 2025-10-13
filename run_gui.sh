@@ -127,7 +127,21 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --box_l 0.4 \
     --box_h 0.4 \
     --random_size False \
+    --random_mode_equal_proportion True \python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --num_envs 4 \
+    --wandb_project "TokenHSI-MMH-Train" \
+    --wandb_mode "online" \
+    --box_w 0.4 \
+    --random_size True \
+    --random_density True \
     --random_mode_equal_proportion True \
+    --construction_experiment False \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --wandb_name "Carry-box-train-1" \
+    --notes "box w. 1 good motion and 0.2 reward" \
+    --ergo_coeff 0.2 \
     --random_density True \
     --density 100.0 \
     --ergo_coeff 0.0 \
@@ -136,6 +150,44 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --skip_img \
     --headless \
     --record_headless \
+
+# MMH Train local visualize
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --num_envs 4 \
+    --wandb_project "TokenHSI-MMH-Train" \
+    --wandb_mode "online" \
+    --box_w 0.4 \
+    --random_size True \
+    --random_density True \
+    --random_mode_equal_proportion True \
+    --construction_experiment False \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --wandb_name "Carry-box-train-1" \
+    --notes "box w. 1 good motion and 0.2 reward" \
+    --ergo_coeff 0.2 \
+    --resume 1 \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #########################################################################################################################

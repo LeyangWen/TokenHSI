@@ -1191,7 +1191,7 @@ class HumanoidCarry(Humanoid):
                                     root_vel=root_vel, 
                                     root_ang_vel=root_ang_vel, 
                                     dof_vel=dof_vel)
-
+                self._humanoid_root_states[env_ids, 2] += 0.1  # example MMH motion have collision with ground
                 self._reset_ref_env_ids[sk_name] = curr_env_ids
                 self._reset_ref_motion_ids[sk_name] = motion_ids
                 self._reset_ref_motion_times[sk_name] = motion_times
