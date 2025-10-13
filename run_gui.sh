@@ -1,5 +1,34 @@
 # conda activate tokenhsi # need python 3.8, so you cant load python3.10-anaconda etc, or used the module load pytorch
 
+# MMH Carry Test
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "Carry_test_1" \
+    --wandb_mode "disabled" \
+    --box_w 0.4 \
+    --random_size False \
+    --random_mode_equal_proportion True \
+    --random_density True \
+    --density 180 \
+    --ergo_coeff 0.2 \
+
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
+    --skip_img \
+    --headless \
+    --record_headless
+
+    # --ergo_sub_weight "20, 40, 40" \
+    # --headless \
+    # --record_headless
+    --density 156.25 \
+    
+
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -36,7 +65,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_28-16-04-15/nn/Humanoid.pth \ # Try4 -9, good lift and lower, sometime bad aim at lower and not stable,  drop box 
     # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_08-15-58-26/nn/Humanoid.pth \ # Try4 -9, continues train, quite stable, werid sidestep when lifting, sometimes pick up multiple times
     # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-9/Humanoid_23-03-39-52/nn/Humanoid.pth \ # Try4 -9, continues train, side step to carry ***
-    # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-11/Humanoid_29-23-04-07/nn/Humanoid.pth \ # Try4 -11, continues train, reward bug fix
+    # output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-11/Humanoid_29-23-04-07/nn/Humanoid.pth \ # Try4 -11, continues train, reward bug fix --> CRC
 
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-resume-ergoReward-train-6/Humanoid_23-09-40-17/nn/Humanoid.pth \ # Try4 -6 # good lift, no lower - stop at target, I think the reward is higher then
     # --checkpoint output/custom_trained/Try4/Carry-GoodMotion-ergoReward-scratch-train-7/Humanoid_23-09-37-42/nn/Humanoid.pth \ # Try4 -7, good lift, no lower - walk pass instead. also walking is slow
@@ -158,6 +187,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --ergo_coeff 0.2 \
     --load_terrain True \
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
+    --skip_img \
     --headless \
     --record_headless \
 #     --nums_terrains 0 \

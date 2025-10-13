@@ -1633,42 +1633,48 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     pelvis_pos = humanoid_rigid_body_pos[:, 0, :]
     mean_body_pos = (torso_pos + pelvis_pos) / 2.0
     mean_body_pos = pelvis_pos
+    r_ankle_pos = humanoid_rigid_body_pos[:, 5, :]
+    l_ankle_pos = humanoid_rigid_body_pos[:, 8, :]
+    r_hand_pos = humanoid_rigid_body_pos[:, 11, :]
+    l_hand_pos = humanoid_rigid_body_pos[:, 14, :]
+    mean_ankle_pos = (r_ankle_pos + l_ankle_pos) / 2.0
+    mean_hand_pos = (r_hand_pos + l_hand_pos) / 2.0
 
     # calculate the xy distance between the box and the humanoid body, if exceed half of box max w, l, h + threshold%, reduce reward
-    box_pos_diff_xy = box_pos[..., :2] - mean_body_pos[..., :2]
+    box_pos_diff_xy = box_pos[..., :2] - mean_ankle_pos[..., :2]
     box_pos_diff_dist = torch.norm(box_pos_diff_xy, p=2, dim=1)
     max_edge = box_size.max(dim=1).values           # (N,)
-    allowed_xy = 0.5 * max_edge * (1.0 + box_dist_threshold_percentage)  # (N,)
+    # allowed_xy = 0.5 * max_edge * (1.0 + box_dist_threshold_percentage)  # (N,)
 
-    box_pos_diff = torch.clamp_min(box_pos_diff_dist - allowed_xy, 0.0)
-    reward = weight*torch.exp(-5.0 * box_pos_diff)
+    # box_pos_diff = torch.clamp_min(box_pos_diff_dist - allowed_xy, 0.0)
+    reward = weight*torch.exp(-5.0 * box_pos_diff_dist)
     
     
-    # only a concern in carrying, so back is relatively straight, make mask
-    back_straight_mask = back_angle < upper_limit_angle
+    # # only a concern in carrying, so back is relatively straight, make mask
+    # back_straight_mask = back_angle < upper_limit_angle
     
     
-    # humanoid_rigid_body_pos = rigid_body_pos
-    if only_height:
-        hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
-    else:
-        hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos) ** 2, dim=-1) # xyz
+    # # humanoid_rigid_body_pos = rigid_body_pos
+    # if only_height:
+    #     hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
+    # else:
+    #     hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos) ** 2, dim=-1) # xyz
     
-    # if box and hands are close enough
-    hands2box_mask = hands2box_pos_err < hand_threshold
+    # # if box and hands are close enough
+    # hands2box_mask = hands2box_pos_err < hand_threshold
     
-    # if box moved, bool mask for each env
-    box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.01 ** 2
+    # # if box moved, bool mask for each env
+    # box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.01 ** 2
     
-    # if box is close enough to target position, give full reward so that reward never drops (which stops it from going to next stage)
+    # # if box is close enough to target position, give full reward so that reward never drops (which stops it from going to next stage)
     box_z_reached_mask = torch.abs((box_pos[:, -1] - tar_pos[:, -1])) <= 0.01  # 0.001
     box_xy_reached_mask = torch.sum((tar_pos[..., :2] - box_pos[..., :2]) ** 2, dim=-1) <= 0.1 ** 2
     box_reached_mask = torch.logical_and(box_z_reached_mask, box_xy_reached_mask)
 
     # reward is 0 unless back is straight and box moved and hands are close enough
-    reward[~box_moved_mask] = 0.0
-    reward[~hands2box_mask] = 0.0
-    reward[~back_straight_mask] = 0.0
+    # reward[~box_moved_mask] = 0.0
+    # reward[~hands2box_mask] = 0.0
+    # reward[~back_straight_mask] = 0.0
     reward[box_reached_mask] = weight # full reward when box is close enough to target position
     
     return reward

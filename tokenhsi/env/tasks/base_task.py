@@ -36,7 +36,7 @@ class BaseTask():
 
         
         # wen parameters
-        self.downsample = 3  # control downsample rate here to speed up, og is 30 fps
+        self.downsample = 1  # control downsample rate here to speed up, og is 30 fps
         self.headless = cfg["headless"]
         self.camera_handles = []
 

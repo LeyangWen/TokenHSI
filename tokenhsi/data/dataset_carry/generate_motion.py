@@ -22,6 +22,59 @@ joints_to_use = {
     "from_smpl_original_to_phys_humanoid_v3": np.array([0, 6, 12, 17, 19, 21, 16, 18, 20, 2, 5, 8, 1, 4, 7]),
 }
 
+
+def export_isaac_csv(new_motion, save_path, n=15, l_hand_idx: int = 5, r_hand_idx: int = 8):
+    """
+    Export to Isaac-compatible CSV.
+    Per joint per frame (13 cols): [x,y,z, qx,qy,qz,qw, vx,vy,vz, wx,wy,wz]
+    - First n joints: pose + velocities taken from new_motion
+    - Then 3 dummy 'box' joints: pose only, vel=0
+        Dummy #1: per-frame box center (avg of two hands)
+        Dummy #2: global min(box center) over time (constant)
+        Dummy #3: last-frame box center (constant)
+    Quaternions are xyzw (Isaac Gym).
+    """
+    # --- real joints (first n) ---
+    pos  = new_motion.global_translation[:, :n, :].detach().cpu().numpy().astype(np.float32)          # (T,n,3)
+    quat = new_motion.local_rotation[:, :n, :].detach().cpu().numpy().astype(np.float32)              # (T,n,4) xyzw
+    linv = new_motion.global_velocity[:, :n, :].detach().cpu().numpy().astype(np.float32)             # (T,n,3)
+    angv = new_motion.global_angular_velocity[:, :n, :].detach().cpu().numpy().astype(np.float32)     # (T,n,3)
+
+    T = pos.shape[0]
+    real = np.concatenate([pos, quat, linv, angv], axis=-1).astype(np.float32)                         # (T,n,13)
+
+    # --- dummy box joints (pose only; vel=0) ---
+    # per-frame hand centers
+    box_center = 0.5 * (pos[:, l_hand_idx, :] + pos[:, r_hand_idx, :])                                 # (T,3)
+
+    # Dummy #1: per-frame center
+    dummy1_pos = box_center                                                                             # (T,3)
+    # Dummy #2: frame with min z
+    dummy2_pos = np.broadcast_to(box_center[np.argmin(box_center[:, 2])], (T, 3))                      # (T,3)
+    # Dummy #3: last-frame position, constant
+    dummy3_pos = np.broadcast_to(box_center[-1], (T, 3))                                               # (T,3)
+
+    # identity quaternion (xyzw) and zero velocities
+    ident_q = np.array([0, 0, 0, 1], dtype=np.float32)[None, :]                                        # (1,4)
+    zeros6 = np.zeros((T, 6), dtype=np.float32)
+
+    def _dummy_block(p3):
+        return np.concatenate([p3, np.broadcast_to(ident_q, (T,4)), zeros6], axis=-1).astype(np.float32)  # (T,13)
+
+    dummy = np.stack([_dummy_block(dummy1_pos),
+                      _dummy_block(dummy2_pos),
+                      _dummy_block(dummy3_pos)], axis=1)                                               # (T,3,13)
+
+    # --- final stack ---
+    all_joints = np.concatenate([real, dummy], axis=1)                                                 # (T, n+3, 13)
+    flat = all_joints.reshape(T, -1)                                                                    # (T, (n+3)*13)
+
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    np.savetxt(save_path, flat, delimiter=',', fmt='%.6f')
+    print(f"✅ Saved Isaac CSV to: {save_path}")
+    print(f"Frames: {T}, joints (incl. dummies): {n+3}, columns/frame: {(n+3)*13}")
+
+    
 if __name__ == '__main__':
 
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/*/smpl_params.npy"))
@@ -199,12 +252,16 @@ if __name__ == '__main__':
             # update new_motion
             new_skeleton_state = SkeletonState.from_rotation_and_root_translation(v["skeleton"], new_motion_params_local_rots, new_motion_params_root_trans, is_local=True)
             new_motion = SkeletonMotion.from_skeleton_state(new_skeleton_state, fps=fps)
+            # print(f"new_skeleton_state")
+            print(f"new_motion stuff shape: {new_motion.global_translation.shape}")
 
             # save retargeted motion
             save_dir = osp.join(osp.dirname(f), k)
             os.makedirs(save_dir, exist_ok=True)
             save_path = osp.join(save_dir, "ref_motion.npy")
             new_motion.to_file(save_path)
+            
+            export_isaac_csv(new_motion, osp.join(save_dir,"isaac_formatted_motion.csv"))
 
             # plot_skeleton_motion_interactive(new_motion)
 
