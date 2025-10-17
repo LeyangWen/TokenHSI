@@ -260,13 +260,14 @@ if __name__ == '__main__':
             # print(f"new_skeleton_state")
             print(f"new_motion stuff shape: {new_motion.global_translation.shape}")
             
+
+            # save retargeted motion
+            save_dir = osp.join(osp.dirname(f), k)
+            os.makedirs(save_dir, exist_ok=True)
+            save_path = osp.join(save_dir, "ref_motion.npy")
             if not render_short_hand:
-                # save retargeted motion
-                save_dir = osp.join(osp.dirname(f), k)
-                os.makedirs(save_dir, exist_ok=True)
-                save_path = osp.join(save_dir, "ref_motion.npy")
+                print(f"Saving retargeted motion to: {save_path}")
                 new_motion.to_file(save_path)
-                
                 export_isaac_csv(new_motion, osp.join(save_dir,"isaac_formatted_motion.csv"))
 
             # plot_skeleton_motion_interactive(new_motion)
