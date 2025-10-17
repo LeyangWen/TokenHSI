@@ -81,6 +81,11 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/S01+__+Activity04_stageii/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/*/smpl_params.npy"))
     all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
+    render_short_hand = True
+    if render_short_hand:
+        humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall_html_render.xml"
+    else:
+        humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall.xml"
 
     # parameters for motion editing
     candidates = {
@@ -111,7 +116,7 @@ if __name__ == '__main__':
     smpl_humanoid_skeleton = SkeletonTree.from_mjcf(smpl_humanoid_xml_path)
 
     # load skeleton of phys_humanoid_v3
-    phys_humanoid_v3_xml_path = osp.join(osp.dirname(__file__), "../assets/mjcf/phys_humanoid_v3_box_foot_tall.xml")
+    phys_humanoid_v3_xml_path = osp.join(osp.dirname(__file__), humanoid_file)
     phys_humanoid_v3_skeleton = SkeletonTree.from_mjcf(phys_humanoid_v3_xml_path)
 
     # load skeleton of smpl_original
@@ -254,14 +259,15 @@ if __name__ == '__main__':
             new_motion = SkeletonMotion.from_skeleton_state(new_skeleton_state, fps=fps)
             # print(f"new_skeleton_state")
             print(f"new_motion stuff shape: {new_motion.global_translation.shape}")
-
-            # save retargeted motion
-            save_dir = osp.join(osp.dirname(f), k)
-            os.makedirs(save_dir, exist_ok=True)
-            save_path = osp.join(save_dir, "ref_motion.npy")
-            new_motion.to_file(save_path)
             
-            export_isaac_csv(new_motion, osp.join(save_dir,"isaac_formatted_motion.csv"))
+            if not render_short_hand:
+                # save retargeted motion
+                save_dir = osp.join(osp.dirname(f), k)
+                os.makedirs(save_dir, exist_ok=True)
+                save_path = osp.join(save_dir, "ref_motion.npy")
+                new_motion.to_file(save_path)
+                
+                export_isaac_csv(new_motion, osp.join(save_dir,"isaac_formatted_motion.csv"))
 
             # plot_skeleton_motion_interactive(new_motion)
 
