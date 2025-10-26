@@ -5,7 +5,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-2/Humanoid_17-14-12-41/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -17,6 +17,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_density True \
     --density 180 \
     --ergo_coeff 0.2 \
+    --construction_experiment False \
 
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
     --skip_img \
@@ -29,6 +30,13 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 156.25 \
     
 
+
+# First try
+# --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+
+# silipper box
+--checkpoint output/custom_trained/MMH-Try1/Carry-box-train-2/Humanoid_17-14-12-41/nn/Humanoid.pth \  # resume from sticky, use edge, but only after adjut
+--checkpoint output/custom_trained/MMH-Try1/Carry-box-train-scratch-3/Humanoid_17-14-11-34/nn/Humanoid.pth \  #  scratch --> do not use edge
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -330,7 +338,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/fixed" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/edge_grab_random" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

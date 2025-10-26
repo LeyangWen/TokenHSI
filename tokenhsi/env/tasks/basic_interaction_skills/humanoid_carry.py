@@ -131,6 +131,7 @@ class HumanoidCarry(Humanoid):
         self._load_motion(motion_file)
 
         self._amp_obs_buf = torch.zeros((self.num_envs, self._num_amp_obs_steps, self._num_amp_obs_per_step), device=self.device, dtype=torch.float)
+        print(f"[Info]: _num_amp_obs_per_step = {self._num_amp_obs_per_step}, _num_amp_obs_steps = {self._num_amp_obs_steps}")
         self._curr_amp_obs_buf = self._amp_obs_buf[:, 0]
         self._hist_amp_obs_buf = self._amp_obs_buf[:, 1:]
         
@@ -1091,8 +1092,11 @@ class HumanoidCarry(Humanoid):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml" or "mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
+            raise NotImplementedError("phys_humanoid_v2 and v3 are not supported anymore.")
+        elif ("mjcf/phys_humanoid_v4" in asset_file):
+            self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         else:
-            print("Unsupported character config file: {s}".format(asset_file))
+            print("Unsupported character config file: {s}".format(asset_file=asset_file))
             assert(False)
 
         return
@@ -1289,6 +1293,16 @@ class HumanoidCarry(Humanoid):
         else:
             kinematic_rigid_body_pos = self._kinematic_humanoid_rigid_body_states[:, :, 0:3]
             key_body_pos = kinematic_rigid_body_pos[:, self._key_body_ids, :]
+            print("Shapes: ")
+            print("Kinematic Rigid Body Positions: ", kinematic_rigid_body_pos.shape)
+            print("Key Body Positions: ", key_body_pos.shape)
+            print("Current AMP Obs Buffer: ", self._curr_amp_obs_buf[env_ids].shape)
+            print("Kinematic Humanoid Rigid Body States: ", self._kinematic_humanoid_rigid_body_states[env_ids].shape)
+            print("Dof Pos: ", self._dof_pos[env_ids].shape)
+            print("Dof Vel: ", self._dof_vel[env_ids].shape)
+            print("Key Body Positions: ", key_body_pos[env_ids].shape)
+            print("Dof Obs Size: ", self._dof_obs_size)
+            print("Dof Offsets: ", self._dof_offsets)
             self._curr_amp_obs_buf[env_ids] = build_amp_observations(self._kinematic_humanoid_rigid_body_states[env_ids, 0, 0:3],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 3:7],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 7:10],
@@ -1587,7 +1601,7 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     ############## hyperparameters ##############
     exp_k = -5.0
     only_height = True
-    hand_threshold = 0.5  # 50 cm
+    hand_threshold = 0.5  # 50 cm cm
     desired_angle = 5.0 / 9.0 * np.pi  # 80 degrees from REBA-elbow, mean(100,60) (100 since it is the other way)
     ##############################################
     
@@ -1613,6 +1627,9 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     # if box moved, bool mask for each env
     box_moved_mask = torch.sum((box_pos - prev_box_pos) ** 2, dim=-1) > 0.001 ** 2
     
+    # start after lift above pelvis height
+    box_high_mask = box_pos[:, 2] > (humanoid_rigid_body_pos[:, 0, 2] + 0.1)  # pelvis height + 0.1m
+    
     # if box is close enough to target position, give full reward so that reward never drops (which stops it from going to next stage)
     box_z_reached_mask = torch.abs((box_pos[:, -1] - tar_pos[:, -1])) <= 0.01  # 0.001
     box_xy_reached_mask = torch.sum((tar_pos[..., :2] - box_pos[..., :2]) ** 2, dim=-1) <= 0.1 ** 2
@@ -1622,6 +1639,7 @@ def compute_elbow_ergo_reward(left_elbow_angle, right_elbow_angle, humanoid_rigi
     # reward is 0 unless box moved and hands are close enough
     reward[~box_moved_mask] = 0.0
     reward[~hands2box_mask] = 0.0
+    reward[~box_high_mask] = 0.0
     reward[box_reached_mask] = weight # full reward when box is close enough to target position
     
     

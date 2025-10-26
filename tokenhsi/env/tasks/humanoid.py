@@ -242,6 +242,13 @@ class Humanoid(BaseTask):
             self._num_actions = 28 + 2 * 2
             self._num_actions_joint = self._num_actions
             self._num_obs = 1 + 15 * (3 + 6 + 3 + 3) - 3
+        elif ("mjcf/phys_humanoid_v4" in asset_file):
+            self._dof_body_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # ['PELVIS', 'torso', 'head', 'right_upper_arm', 'right_lower_arm', 'right_hand', 'left_upper_arm', 'left_lower_arm', 'left_hand', 'right_thigh', 'right_shin', 'right_foot', 'left_thigh', 'left_shin', 'left_foot'
+            self._dof_offsets =  [0, 3, 6, 9, 10, 13, 16, 17, 20, 23, 26, 29, 32, 35, 38]
+            self._dof_obs_size = 72 + 6*2
+            self._num_actions = 28 + 2 * 2 + 2 * 3
+            self._num_actions_joint = self._num_actions
+            self._num_obs = 1 + 15 * (3 + 6 + 3 + 3) - 3  # 15 joints
 
         else:
             print("Unsupported character config file: {s}".format(asset_file))
@@ -276,9 +283,11 @@ class Humanoid(BaseTask):
         asset_options.max_angular_velocity = 100.0
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
         #asset_options.fix_base_link = True
+        print("Loading asset from ", asset_root, asset_file)
         humanoid_asset = self.gym.load_asset(self.sim, asset_root, asset_file, asset_options)
 
         actuator_props = self.gym.get_asset_actuator_properties(humanoid_asset)
+        print("Number of humanoid actuators: ", len(actuator_props))
         motor_efforts = [prop.motor_effort for prop in actuator_props]
         
         # create force sensors at the feet
@@ -290,7 +299,7 @@ class Humanoid(BaseTask):
         self.gym.create_asset_force_sensor(humanoid_asset, left_foot_idx, sensor_pose)
 
         self.max_motor_effort = max(motor_efforts)
-        self.   motor_efforts = to_torch(motor_efforts, device=self.device)
+        self.motor_efforts = to_torch(motor_efforts, device=self.device)
 
         self.torso_index = 0
         self.num_bodies = self.gym.get_asset_rigid_body_count(humanoid_asset)
@@ -339,6 +348,9 @@ class Humanoid(BaseTask):
         elif (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml"):
             self._char_h = 0.94
         elif ("mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
+            self._char_h = 1.04
+            # TODO: pelvis height, see if this works
+        elif ("mjcf/phys_humanoid_v4" in asset_file):
             self._char_h = 1.04
             # TODO: pelvis height, see if this works
         else:
