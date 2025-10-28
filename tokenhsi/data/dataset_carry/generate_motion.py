@@ -80,8 +80,10 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/S01+__+Activity04_stageii/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
-    render_short_hand = True
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
+    print(all_files)
+    render_short_hand = False
     if render_short_hand:
         humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall_html_render.xml"
     else:

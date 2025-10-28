@@ -12,6 +12,14 @@ motions:
       obj_file: motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_03/phys_humanoid_v3/blender/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
+    - file: motions/MMH/box_pickUp/box02.high+__+2/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box02.high+__+2/phys_humanoid_v3/blender/box_motion.npy
+      rsi_skipped_range: []
+      weight: 1.0
+    - file: motions/MMH/box_pickUp/box02.high+__+3/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box02.high+__+3/phys_humanoid_v3/blender/box_motion.npy
+      rsi_skipped_range: []
+      weight: 1.0
 
   putDown:
     - file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/ref_motion.npy

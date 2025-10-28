@@ -5,7 +5,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-2/Humanoid_17-14-12-41/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -17,7 +17,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_density True \
     --density 180 \
     --ergo_coeff 0.2 \
-    --construction_experiment False \
+    --construction_experiment True \
 
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
     --skip_img \
@@ -37,6 +37,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # silipper box
 --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-2/Humanoid_17-14-12-41/nn/Humanoid.pth \  # resume from sticky, use edge, but only after adjut
 --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-scratch-3/Humanoid_17-14-11-34/nn/Humanoid.pth \  #  scratch --> do not use edge
+
+
+# add wrist dof
+output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/Humanoid.pth \  # resume from scratch-3, add wrist dof
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -145,7 +149,6 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --num_envs 750 \
     --wandb_project "TokenHSI-MMH-Train" \
     --wandb_mode "disabled" \
-    --box_w 0.4 \
     --random_size True \
     --random_density True \
     --random_mode_equal_proportion False \
@@ -338,7 +341,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/edge_grab_random" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/edge_grab_wrist" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

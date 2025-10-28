@@ -25,6 +25,8 @@ Pick your dataset **root** (the motion folder) and save it as a shell variable. 
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_01/phys_humanoid_v3"
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.66920734.20250919201305+__+clip_02/phys_humanoid_v3"
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_03/phys_humanoid_v3"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box02.high+__+2/phys_humanoid_v3"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box02.high+__+3/phys_humanoid_v3"
 # MMH handle_pickUp example
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.51470934.20250919200241+__+clip_02/phys_humanoid_v3"
 # MMH timber_pickUp example

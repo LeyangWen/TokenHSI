@@ -9,6 +9,8 @@ motions:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/box01.66920758.20250919201305/clip_01.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/box01.66920758.20250919201305/clip_02.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/box01.66920758.20250919201305/clip_03.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/box02.high/2.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/box02.high/3.pkl"
 
   handle_pickUp:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle01.51470934.20250919200241/clip_01.pkl"
@@ -20,6 +22,8 @@ motions:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle01.66920758.20250919200241/clip_01.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle01.66920758.20250919200241/clip_02.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle01.66920758.20250919200241/clip_03.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle02.high/1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle02.high/4.pkl"
 
   bag_pickUp:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_01.pkl"
