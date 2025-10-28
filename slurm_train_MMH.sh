@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=80:00:00
+#SBATCH --time=60:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -57,9 +57,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-4-wrist/ \
-    --wandb_name "Carry-box-train-4-wrist" \
-    --notes "added movable wrist, 43 kg max mass" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-5-wrist/ \
+    --wandb_name "Carry-box-train-5-wrist" \
+    --notes "added movable wrist, 43 kg max mass, added high motion" \
     --ergo_coeff 0.2 \
     # --resume 1 \
     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
