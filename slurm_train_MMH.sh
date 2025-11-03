@@ -46,27 +46,27 @@ nvcc --version
     # --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task.yaml \
 
 
-# box, v3 for now, update to v4 todo
-python -u ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
-    --num_envs 10240 \
-    --headless \
-    --wandb_project "TokenHSI-MMH-Train" \
-    --wandb_mode "online" \
-    --random_size True \
-    --random_density True \
-    --random_mode_equal_proportion False \
-    --construction_experiment False \
-    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-5-wrist/ \
-    --wandb_name "Carry-box-train-5-wrist" \
-    --notes "added movable wrist, 43 kg max mass, added high motion" \
-    --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+# # box, v3 for now, update to v4 todo
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+#     --num_envs 10240 \
+#     --headless \
+#     --wandb_project "TokenHSI-MMH-Train" \
+#     --wandb_mode "online" \
+#     --random_size True \
+#     --random_density True \
+#     --random_mode_equal_proportion False \
+#     --construction_experiment False \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-5-wrist/ \
+#     --wandb_name "Carry-box-train-5-wrist" \
+#     --notes "added movable wrist, 43 kg max mass, added high motion" \
+#     --ergo_coeff 0.2 \
+#     # --resume 1 \
+#     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
 
-    # --wandb_mode "disabled" \
+#     # --wandb_mode "disabled" \
 
 
 # timber v4
