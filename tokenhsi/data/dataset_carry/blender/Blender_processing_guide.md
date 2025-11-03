@@ -6,9 +6,10 @@ Got it — here’s an updated **README.md** with your requested fixes applied:
 
 This pipeline is meant to be run after you have executed:
 
+```
 python tokenhsi/data/dataset_carry/preprocess_smplest.py
 python tokenhsi/data/dataset_carry/generate_motion.py
-
+```
 
 Those two scripts prepare the initial reference motions (ref_motion.npy) that Blender will take in and let you edit.
 
@@ -30,7 +31,11 @@ ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box02.high+__+3/phys_hu
 # MMH handle_pickUp example
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.51470934.20250919200241+__+clip_02/phys_humanoid_v3"
 # MMH timber_pickUp example
-ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v3"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v4"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_02/phys_humanoid_v4"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_03/phys_humanoid_v4"
+
+
 
 
 # Absolute variant (recommended for Blender scripts)
@@ -38,7 +43,7 @@ ABS_ROOT="/home/leyang/Documents/TokenHSI/${ROOT}"
 echo $ABS_ROOT
 
 # Humanoid XML used for render checks
-HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v3_box_foot_tall.xml"
+HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
 ```
 
 ---
@@ -126,6 +131,7 @@ python tokenhsi/data/dataset_carry/blender/motion_render_and_check.py \
   --root "$ROOT" \
   --humanoid-xml "$HUMANOID_XML" \
   --out-html "box_motion_render.html" \
+  --box-size 0.095 1.8 0.045 
   --box-size 0.34 0.34 0.38
 
     # --box-size 0.095 1.8 0.045 

@@ -18,7 +18,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 180 \
     --ergo_coeff 0.2 \
     --construction_experiment True \
-
+# todo: v4 ref motion mpath
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
     --skip_img \
     --headless \
@@ -151,14 +151,18 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --wandb_mode "disabled" \
     --random_size True \
     --random_density True \
+    --box_l 0.095 \
+    --box_w 1.8 \
+    --box_h 0.045 \
     --random_mode_equal_proportion False \
     --construction_experiment False \
-    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
     --wandb_name "Carry-box-train-1" \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
-    --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+    # --resume 1 \
+    # --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-1/Humanoid_07-01-42-37/nn/Humanoid.pth \
+
 
 
 
@@ -341,7 +345,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/edge_grab_wrist" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/edge_short_arm" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

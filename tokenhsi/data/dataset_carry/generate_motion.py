@@ -79,15 +79,15 @@ if __name__ == '__main__':
 
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/S01+__+Activity04_stageii/smpl_params.npy"))
-    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
     print(all_files)
     render_short_hand = False
     if render_short_hand:
         humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall_html_render.xml"
     else:
-        humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall.xml"
+        humanoid_file = "../assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
 
     # parameters for motion editing
     candidates = {
@@ -202,7 +202,7 @@ if __name__ == '__main__':
         # plot_skeleton_motion_interactive(motion)
 
         configs = {
-            "phys_humanoid_v3": {
+            "phys_humanoid_v4": {
                 "skeleton": phys_humanoid_v3_skeleton,
                 "xml_path": phys_humanoid_v3_xml_path,
                 "tpose": phys_humanoid_v3_tpose,
@@ -275,12 +275,12 @@ if __name__ == '__main__':
             # plot_skeleton_motion_interactive(new_motion)
 
             # scenepic animation
-            vis_motion_use_scenepic_animation(
-                asset_filename=v["xml_path"],
-                rigidbody_global_pos=new_motion.global_translation,
-                rigidbody_global_rot=new_motion.global_rotation,
-                fps=fps,
-                up_axis="z",
-                color=name_to_rgb['AliceBlue'] * 255,
-                output_path=osp.join(save_dir, "ref_motion_render.html"),
-            )
+            # vis_motion_use_scenepic_animation(
+            #     asset_filename=v["xml_path"],
+            #     rigidbody_global_pos=new_motion.global_translation,
+            #     rigidbody_global_rot=new_motion.global_rotation,
+            #     fps=fps,
+            #     up_axis="z",
+            #     color=name_to_rgb['AliceBlue'] * 255,
+            #     output_path=osp.join(save_dir, "ref_motion_render.html"),
+            # )

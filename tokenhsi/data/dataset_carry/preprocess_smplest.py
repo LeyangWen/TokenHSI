@@ -25,9 +25,9 @@ if __name__ == "__main__":
 
     # selected motions
     candidates = {
-        "box_pickUp": cfg["motions"]["box_pickUp"],
-        "handle_pickUp": cfg["motions"]["handle_pickUp"],
-        "bag_pickUp": cfg["motions"]["bag_pickUp"],
+        # "box_pickUp": cfg["motions"]["box_pickUp"],
+        # "handle_pickUp": cfg["motions"]["handle_pickUp"],
+        # "bag_pickUp": cfg["motions"]["bag_pickUp"],
         "timber_pickUp": cfg["motions"]["timber_pickUp"],
     }
     target_fps = 20

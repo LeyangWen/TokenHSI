@@ -115,6 +115,7 @@ def parse_geom_elements_from_xml(xml_path, MESH_SIMPLIFY=True): # only support b
                         from_to = c.getAttribute('fromto')
                         size = c.getAttribute('size')
                         mesh.append(create_capsule(from_to, size, MESH_SIMPLIFY))
+                    # print(name, c.getAttribute('name'), c.getAttribute('type'), "added")
         mesh = trimesh.util.concatenate(mesh)
 
         body_names.append(name)

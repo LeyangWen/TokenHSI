@@ -28,45 +28,42 @@
     <geom name="floor" type="plane" conaffinity="1" size="100 100 .2" material="grid"/>
     <body name="pelvis" pos="0 0 1.1" childclass="body">
       <freejoint name="root"/>
-      <geom name="pelvis" type="sphere" pos="0 0 0.0" size="0.084" density="2226"/>
-      <geom name="upper_waist" type="sphere" pos="0 0 0.15" size="0.065" density="2226"/>      
-      <!-- <geom name="pelvis" fromto="0 0 0.00  0 0 0.16" size="0.09" density="2226"/>
-      <geom name="upper_waist" type="sphere" pos="0 0 0.18" size="0.005" density="2226"/> -->
-
+      <geom name="pelvis" type="sphere" pos="0 0 0.0" size="0.10362" density="2226"/>
+      <geom name="upper_waist" type="sphere" pos="0 0 0.187" size="0.0858" density="2226"/>
       
-  
-      <body name="torso" pos="0 0 0.15">
+
+      <body name="torso" pos="0 0 0.2597661">
         <light name="top" pos="0 0 2.2" mode="trackcom"/>
         <camera name="back" pos="-3.3 0 1.1" xyaxes="0 -1 0 1 0 2.2" mode="trackcom"/>
         <camera name="side" pos="0 -3.3 1.1" xyaxes="1 0 0 0 1 2.2" mode="trackcom"/>
         <joint name="abdomen_x" pos="0 0 0" axis="1 0 0" range="-60 60" stiffness="1000" damping="100" armature=".02"/>
         <joint name="abdomen_y" pos="0 0 0" axis="0 1 0" range="-60 90" stiffness="1000" damping="100" armature=".02"/>
         <joint name="abdomen_z" pos="0 0 0" axis="0 0 1" range="-50 50" stiffness="1000" damping="100" armature=".02"/>
-        <geom name="torso" fromto="0 0 0.165 0 0 0.355" size="0.085" density="1794"/>
+        <geom name="torso" type="sphere" pos="0 0 0.132" size="0.121" density="1794"/>
 
-        <geom name="right_clavicle" fromto="-0.00661375 -0.05035525 0.48667505 -0.0185185 -0.1410 0.4963799" size="0.045" density="1100"/>
-        <geom name="left_clavicle" fromto="-0.00661375 0.05035525 0.48667505 -0.0185185 0.1410 0.4963799" size="0.045" density="1100"/>
+        <geom name="right_clavicle" fromto="-0.00661375 -0.05035525 0.25167505 -0.0185185 -0.1410 0.2613799" size="0.045" density="1100"/>
+        <geom name="left_clavicle" fromto="-0.00661375 0.05035525 0.25167505 -0.0185185 0.1410 0.2613799" size="0.045" density="1100"/>
 
-        <body name="head" pos="0 0 0.455">
+        <body name="head" pos="0 0 0.2462834">
           <joint name="neck_x" axis="1 0 0" range="-50 50" stiffness="100" damping="10" armature=".01"/>
           <joint name="neck_y" axis="0 1 0" range="-40 60" stiffness="100" damping="10" armature=".01"/>
           <joint name="neck_z" axis="0 0 1" range="-45 45" stiffness="100" damping="10" armature=".01"/>
-          <geom name="head" type="sphere" pos="0 0 0.21" size="0.105" density="1081"/>
-          <camera name="egocentric" pos="0.1133 0 0.21" xyaxes="0 -1 0 .11 0 1.1" fovy="80"/>
+          <geom name="head" type="sphere" pos="0 0 0.1925" size="0.095" density="1081"/>
+          <camera name="egocentric" pos="0.1133 0 0.1925" xyaxes="0 -1 0 .11 0 1.1" fovy="80"/>
         </body>
 
-        <body name="right_upper_arm" pos="-0.02405 -0.18311 0.4785">
+        <body name="right_upper_arm" pos="-0.02405 -0.18311 0.24350">
           <joint name="right_shoulder_x" axis="1 0 0" range="-180 45" stiffness="400" damping="40" armature=".02"/>
           <joint name="right_shoulder_y" axis="0 1 0" range="-180 60" stiffness="400" damping="40" armature=".02"/>
           <joint name="right_shoulder_z" axis="0 0 1" range="-90 90" stiffness="400" damping="40" armature=".02"/>
-          <geom name="right_upper_arm" fromto="0 0 -0.05 0 0 -0.25" size="0.045" density="982"/>
+          <geom name="right_upper_arm" fromto="0 0 -0.05 0 0 -0.28" size="0.045" density="982"/>
 
-          <body name="right_lower_arm" pos="0 0 -0.30">
+          <body name="right_lower_arm" pos="0 0 -0.33">
             <joint name="right_elbow" axis="0 1 0" range="-160 0" stiffness="300" damping="30" armature=".01"/>
             <!-- back to original radius 0.04, length 1.2x -->
-            <geom name="right_lower_arm" fromto="0 0 -0.0525 0 0 -0.25" size="0.04" density="1056" friction="0.1 0.05 0.05"/>
+            <geom name="right_lower_arm" fromto="0 0 -0.0525 0 0 -0.27" size="0.04" density="1056" friction="0.1 0.05 0.05"/>
 
-            <body name="right_hand" pos="0 0 -0.29">
+            <body name="right_hand" pos="0 0 -0.32">
               <joint name="right_wrist_x" axis="1 0 0" range="-90 90" stiffness="300" damping="30" armature=".01"/>
               <joint name="right_wrist_y" axis="0 1 0" range="-90 90" stiffness="300" damping="30" armature=".01"/>
               <joint name="right_wrist_z" axis="0 0 1" range="-90 90" stiffness="300" damping="30" armature=".01"/>
@@ -82,19 +79,19 @@
         </body>
 
 
-        <body name="left_upper_arm" pos="-0.026455 0.201421 0.4785">
+        <body name="left_upper_arm" pos="-0.026455 0.201421 0.267850">
           <joint name="left_shoulder_x" axis="1 0 0" range="-45 180" stiffness="400" damping="40" armature=".02"/>
           <joint name="left_shoulder_y" axis="0 1 0" range="-180 60" stiffness="400" damping="40" armature=".02"/>
           <joint name="left_shoulder_z" axis="0 0 1" range="-90 90" stiffness="400" damping="40" armature=".02"/>
           <!-- back to original radius 0.045, length 1.2x -->
-          <geom name="left_upper_arm" fromto="0 0 -0.05 0 0 -0.25" size="0.045" density="982"/>
+          <geom name="left_upper_arm" fromto="0 0 -0.05 0 0 -0.28" size="0.045" density="982"/>
 
-          <body name="left_lower_arm" pos="0 0 -0.30">
+          <body name="left_lower_arm" pos="0 0 -0.33">
             <joint name="left_elbow" axis="0 1 0" range="-160 0" stiffness="300" damping="30" armature=".01"/>
             <!-- back to original radius 0.04, length 1.2x -->
-            <geom name="left_lower_arm" fromto="0 0 -0.0525 0 0 -0.25" size="0.04" density="1056" friction="0.1 0.05 0.05"/>
+            <geom name="left_lower_arm" fromto="0 0 -0.0525 0 0 -0.27" size="0.04" density="1056" friction="0.1 0.05 0.05"/>
 
-            <body name="left_hand" pos="0 0 -0.29">
+            <body name="left_hand" pos="0 0 -0.32">
               <joint name="left_wrist_x" axis="1 0 0" range="-90 90" stiffness="300" damping="30" armature=".01"/>
               <joint name="left_wrist_y" axis="0 1 0" range="-90 90" stiffness="300" damping="30" armature=".01"/>
               <joint name="left_wrist_z" axis="0 0 1" range="-90 90" stiffness="300" damping="30" armature=".01"/>
