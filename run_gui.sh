@@ -1,11 +1,11 @@
 # conda activate tokenhsi # need python 3.8, so you cant load python3.10-anaconda etc, or used the module load pytorch
 
-# MMH Carry Test
+# MMH Box Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -41,6 +41,34 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 
 # add wrist dof
 output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/Humanoid.pth \  # resume from scratch-3, add wrist dof
+# added high example
+output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
+
+
+# MMH Timber Test
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-1/Humanoid_03-04-44-31/nn/Humanoid.pth  \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "Carry_test_1" \
+    --wandb_mode "disabled" \
+    --box_l 0.095 \
+    --box_w 1.8 \
+    --box_h 0.045 \
+    --random_size False \
+    --random_mode_equal_proportion False \
+    --random_density True \
+    --density 180 \
+    --ergo_coeff 0.2 \
+    --construction_experiment True \
+
+
+
+
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -345,7 +373,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/edge_short_arm" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/timber_fail" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |
