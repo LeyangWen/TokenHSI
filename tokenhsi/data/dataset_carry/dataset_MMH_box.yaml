@@ -1,15 +1,23 @@
 motions:
   pickUp:
-    - file: motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v4/blender/ref_motion.npy
-      obj_file: motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v4/blender/box_motion.npy
+    - file: motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_01/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_01/phys_humanoid_v3/blender/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_02/phys_humanoid_v4/blender/ref_motion.npy
-      obj_file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_02/phys_humanoid_v4/blender/box_motion.npy
+    - file: motions/MMH/box_pickUp/box01.66920734.20250919201305+__+clip_02/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box01.66920734.20250919201305+__+clip_02/phys_humanoid_v3/blender/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-    - file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_03/phys_humanoid_v4/blender/ref_motion.npy
-      obj_file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_03/phys_humanoid_v4/blender/box_motion.npy
+    - file: motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_03/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box01.51470934.20250919201305+__+clip_03/phys_humanoid_v3/blender/box_motion.npy
+      rsi_skipped_range: []
+      weight: 1.0
+    - file: motions/MMH/box_pickUp/box02.high+__+2/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box02.high+__+2/phys_humanoid_v3/blender/box_motion.npy
+      rsi_skipped_range: []
+      weight: 1.0
+    - file: motions/MMH/box_pickUp/box02.high+__+3/phys_humanoid_v3/blender/ref_motion.npy
+      obj_file: motions/MMH/box_pickUp/box02.high+__+3/phys_humanoid_v3/blender/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
 

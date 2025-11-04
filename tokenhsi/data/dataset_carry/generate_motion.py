@@ -20,6 +20,7 @@ from lpanlib.others.colors import name_to_rgb
 
 joints_to_use = {
     "from_smpl_original_to_phys_humanoid_v3": np.array([0, 6, 12, 17, 19, 21, 16, 18, 20, 2, 5, 8, 1, 4, 7]),
+    "from_smpl_original_to_phys_humanoid_v4": np.array([0, 3, 12, 17, 19, 21, 16, 18, 20, 2, 5, 8, 1, 4, 7]), # TODO: Not used
 }
 
 
@@ -208,7 +209,7 @@ if __name__ == '__main__':
                 "tpose": phys_humanoid_v3_tpose,
                 "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v3"],
                 "root_height_offset": 0.07,
-            },
+            }, # TODO: seperte v3 and v4, also v4 here should be v5, v4 = v3 + wrist, then modified torso loc
         }
 
         ###### retargeting ######
