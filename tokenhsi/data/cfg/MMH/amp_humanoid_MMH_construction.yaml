@@ -30,8 +30,9 @@ env:
   power_coefficient: 0.0005
 
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.0, 0.4, 0.4, 0.1, 0.1]
-  skillDiscProb: [0.0, 0.2, 0.5, 0.1, 0.1]
+  skillInitProb: [0.0, 0.5, 0.5, 0.0, 0.0]
+  # skillInitProb: [0.0, 0.0, 0.0, 0.0, 1.0]  # for local visualization train testing
+  skillDiscProb: [0.0, 0.3, 0.7, 0.0, 0.0]
 
   # task
   enableTaskObs: True
