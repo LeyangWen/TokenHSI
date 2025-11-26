@@ -52,7 +52,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-2/Humanoid_04-03-51-55/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-3/Humanoid_25-14-35-13/nn/Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -73,6 +73,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-1/Humanoid_03-04-44-31/nn/Humanoid.pth  \
 # corrected, but not working
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-2/Humanoid_04-03-51-55/nn/Humanoid.pth \
+# bug fix, after 1 day
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-3/Humanoid_25-14-35-13/nn/Humanoid.pth \
+
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -177,7 +180,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # MMH Train local visualize
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_small.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --num_envs 8 \
     --wandb_project "TokenHSI-MMH-Train" \
     --wandb_mode "disabled" \
@@ -193,13 +196,20 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-2/Humanoid_04-03-51-55/nn/Humanoid.pth
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-3/Humanoid_25-14-35-13/nn/Humanoid.pth 
 
 
 
+    --box_w 0.095 \
+    --box_l 1.8 \
+    --box_h 0.045 \
 
 
-
+--> thoguhts: w and h is swapped during init, but not in imitation init
+- maybe fingre more friction, done
+- maybe make hook angle bigger
+-- maybe increase min lift height, done
+--> if hand close is calcuated from box center, then it might be a problem for the long box
 
 
 

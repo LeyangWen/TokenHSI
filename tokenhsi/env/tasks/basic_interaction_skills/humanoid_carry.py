@@ -179,7 +179,6 @@ class HumanoidCarry(Humanoid):
             self._skill = cfg["env"]["eval"]["skill"]
             self._skill_init_prob = torch.tensor(cfg["env"]["eval"]["skillInitProb"], device=self.device, dtype=torch.float) # probs for state init
         
-
         ###### Wen: Testing for construction experiments
         print(f"[Info]: constructionExp = {self.constructionExp}")
         print(f"[Info]: _is_eval = {self._is_eval}")
@@ -250,7 +249,8 @@ class HumanoidCarry(Humanoid):
         asset_options.fix_base_link = True
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
         
-        platform_size = 0.4
+        # platform_size = 0.4
+        platform_size = 0.2  # smaller size to avoid tripping
         # if self.constructionExp and self._is_test:
         #     platform_size = max(self._build_base_size)
         self._platform_height = 0.02
@@ -952,7 +952,7 @@ class HumanoidCarry(Humanoid):
             root_pos_xy *= torch.rand(len(ids), 1, device=self.device) * 9.0 + 1.0 # randomize
             root_pos_xy += self._humanoid_root_states[ids, :2] # get absolute pos, humanoid_root_state will be updated after set_env_state
 
-            root_pos_z = self._box_size[ids, 2] / 2 # place the box on the ground
+            root_pos_z = self._box_size[ids, 2] / 2 + 0.08 # place the box on the ground # wen: added 0.08 to avoid sit on the ground
             if self._reset_random_height:
 
                 num_envs = ids.shape[0]
