@@ -72,7 +72,7 @@ nvcc --version
 # timber v4
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --num_envs 10240 \
     --headless \
     --wandb_project "TokenHSI-MMH-Train" \
