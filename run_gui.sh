@@ -50,9 +50,9 @@ output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/H
 # MMH Timber Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-3/Humanoid_25-14-35-13/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-5/Humanoid_26-19-00-14/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -65,16 +65,17 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --random_density True \
     --density 180 \
-    --ergo_coeff 0.2 \
     --construction_experiment True \
-
+    --ergo_coeff 0.2 \
 
 # wrong imitation motion
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-1/Humanoid_03-04-44-31/nn/Humanoid.pth  \
 # corrected, but not working
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-2/Humanoid_04-03-51-55/nn/Humanoid.pth \
-# bug fix, after 1 day
+# bug fix
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-3/Humanoid_25-14-35-13/nn/Humanoid.pth \
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-4/Humanoid_26-19-00-28/nn/Humanoid.pth \
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-5/Humanoid_26-19-00-14/nn/Humanoid.pth \
 
 
 # Basic Carry Test
@@ -196,7 +197,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-3/Humanoid_25-14-35-13/nn/Humanoid.pth 
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-5/Humanoid_26-19-00-14/nn/Humanoid.pth 
 
 
 
