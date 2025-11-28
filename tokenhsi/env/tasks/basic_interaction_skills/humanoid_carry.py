@@ -74,7 +74,7 @@ class HumanoidCarry(Humanoid):
         
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
         self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
-        self._verbose = True
+        self._verbose = False
         self._task_name = cfg.get("taskName", "MMH_box")
         
         if cfg["args"].eval:
@@ -944,10 +944,15 @@ class HumanoidCarry(Humanoid):
                     self._box_states[curr_env_ids, 3:7] = root_rot
                     self._box_states[curr_env_ids, 7:10] = 0.0
                     self._box_states[curr_env_ids, 10:13] = 0.0
+                    
+                    self._box_states[curr_env_ids, 2] += 0.1  # since actor also lifted a bit to avoid ground collision
 
                     # reset platform, we needn't platforms right now.
                     if self._reset_random_height:
                         self._platform_pos[curr_env_ids] = self._platform_default_pos[curr_env_ids]
+                        if self._task_name == "MMH_timber":
+                            self._platform_pos[curr_env_ids, 0:2] = root_pos[:, 0:2] # xy
+                            self._platform_pos[curr_env_ids, -1] = 0.05
 
         # for skill is loco and reset default, we random generate an initial location of the box
         random_env_ids = []
@@ -1503,7 +1508,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     root_pos = humanoid_rigid_body_pos[:, 0, :]
     box2human = torch.sum((box_pos[:, 0:2] - root_pos[:, 0:2]) ** 2, dim=-1)
     reward[box2human > 0.8] = 0.0
-    verbose = True
+    verbose = False
     if verbose:
         print("timber_same_side_reward: ", same_side_reward[0].item())
         print("timber_distance_reward: ", distance_reward[0].item())

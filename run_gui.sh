@@ -182,7 +182,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_small.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
-    --num_envs 8 \
+    --num_envs 24 \
     --wandb_project "TokenHSI-MMH-Train" \
     --wandb_mode "disabled" \
     --random_size True \
