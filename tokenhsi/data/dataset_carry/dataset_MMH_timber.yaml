@@ -13,6 +13,7 @@ motions:
       rsi_skipped_range: []
       weight: 1.0
 
+
   putDown:
     - file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/ref_motion.npy
       obj_file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/box_motion.npy
@@ -95,6 +96,22 @@ motions:
       weight: 1.0
 
   omomo:
-    - file: motions/omomo/OMOMO+__+sub7_largebox_006/phys_humanoid_v3/ref_motion.npy
-      weight: 1.0
+    # - file: motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v4/ref_motion.npy
+    #   weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_02/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_03/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_01/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    # - file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_02/phys_humanoid_v4/ref_motion.npy
+    #   weight: 0.2
+    # - file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_03/phys_humanoid_v4/ref_motion
+    #   weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber01.66920758.20250919201355+__+clip_01/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber01.66920758.20250919201355+__+clip_02/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber01.66920758.20250919201355+__+clip_03/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
   

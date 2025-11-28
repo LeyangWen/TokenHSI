@@ -25,7 +25,10 @@ def vis_motion_use_scenepic_animation(
 
     # add human meshes for the motion sequence
     rigidbody_names, rigidbody_meshes = parse_geom_elements_from_xml(asset_filename)
-    
+    # print(f"rigidbody names: {rigidbody_names}")
+    # print(f"rigidbody_global_rot shape: {rigidbody_global_rot.shape}")
+    # print(rigidbody_global_rot[10, 4:])
+    # raise NotImplementedError("Debug vis_motion_use_scenepic_animation")
     num_frames = rigidbody_global_pos.shape[0]
     for i in range(num_frames):
         human_mesh = build_complete_body(rigidbody_global_pos[i], rigidbody_global_rot[i], rigidbody_meshes)

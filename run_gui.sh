@@ -43,7 +43,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/Humanoid.pth \  # resume from scratch-3, add wrist dof
 # added high example
 output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
-
+# all above uses "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"
 
 
 

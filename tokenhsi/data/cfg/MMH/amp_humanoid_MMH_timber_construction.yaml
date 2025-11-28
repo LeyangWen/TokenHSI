@@ -1,4 +1,5 @@
 # if given, will override the device setting in gym. 
+taskName: MMH_timber
 env: 
   numEnvs: 4096
   envSpacing: 5
@@ -30,10 +31,10 @@ env:
   power_coefficient: 0.0005
 
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.0, 0.5, 0.5, 0.0, 0.0]
+  skillInitProb: [0.2, 0.6, 0.2, 0.0, 0.0]
   # skillInitProb: [0.0, 0.0, 0.0, 0.0, 1.0]  # for local visualization train testing
-  skillDiscProb: [0.0, 0.3, 0.7, 0.0, 0.0]
-  min_height_lift: 0.1
+  skillDiscProb: [0.2, 0.2, 0.6, 0.0, 0.0]
+
 
   # task
   enableTaskObs: True

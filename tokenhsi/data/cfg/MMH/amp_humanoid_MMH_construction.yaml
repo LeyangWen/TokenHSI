@@ -2,7 +2,7 @@
 env: 
   numEnvs: 4096
   envSpacing: 5
-  episodeLength: 300 # 20s
+  episodeLength: 200 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -30,9 +30,8 @@ env:
   power_coefficient: 0.0005
 
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.0, 0.5, 0.5, 0.0, 0.0]
-  # skillInitProb: [0.0, 0.0, 0.0, 0.0, 1.0]  # for local visualization train testing
-  skillDiscProb: [0.0, 0.3, 0.7, 0.0, 0.0]
+  skillInitProb: [0.0, 0.4, 0.4, 0.1, 0.1]
+  skillDiscProb: [0.0, 0.2, 0.5, 0.1, 0.1]
 
   # task
   enableTaskObs: True
@@ -90,9 +89,8 @@ env:
     numExperiments: 4
     constructionExperiment: True
     start_positions:
-      - [2.0, 0.0, 0.045]
       - [2.0, 0.0, 0.2]
-      # - [2.0, 0.0, 0.4]
+      - [2.0, 0.0, 0.4]
       - [2.0, 0.0, 0.6]
       - [2.0, 0.0, 0.8]
     end_positions:
@@ -106,8 +104,9 @@ env:
     assetRoot: "tokenhsi/data/assets"
     # assetFileName: "mjcf/phys_humanoid_v3.xml"  # this is used in CRC
     # assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall.xml"  # this is used in my custom imitation learning
-    assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
-    # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"  # this is used in my custom imitation learning
+    assetFileName:  "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"  # pairs with --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
+    # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
+    # assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall_sticky.xml"  # this is used in my custom imitation learning
 
   plane:
     staticFriction: 1.0

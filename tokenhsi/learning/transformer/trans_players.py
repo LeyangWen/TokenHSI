@@ -115,7 +115,7 @@ class TransPlayerContinuous(common_player.CommonPlayer):
 
             disc_pred = disc_pred.detach().cpu().numpy()[:, 0]
             disc_reward = disc_reward.cpu().numpy()[:, 0]
-            print("env: {} disc_pred: {} disc_reward: {}".format(env, disc_pred, disc_reward))
+            # print("env: {} disc_pred: {} disc_reward: {}".format(env, disc_pred, disc_reward))
 
         return
     

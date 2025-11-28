@@ -80,7 +80,8 @@ if __name__ == '__main__':
 
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/*/S01+__+Activity04_stageii/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/timber_pickUp/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
     print(all_files)
@@ -203,11 +204,18 @@ if __name__ == '__main__':
         # plot_skeleton_motion_interactive(motion)
 
         configs = {
-            "phys_humanoid_v4": {
+            "phys_humanoid_v3": {
                 "skeleton": phys_humanoid_v3_skeleton,
                 "xml_path": phys_humanoid_v3_xml_path,
                 "tpose": phys_humanoid_v3_tpose,
                 "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v3"],
+                "root_height_offset": 0.07,
+            },
+            "phys_humanoid_v4": {
+                "skeleton": phys_humanoid_v3_skeleton,
+                "xml_path": phys_humanoid_v3_xml_path,
+                "tpose": phys_humanoid_v3_tpose,
+                "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v4"],
                 "root_height_offset": 0.07,
             }, # TODO: seperte v3 and v4, also v4 here should be v5, v4 = v3 + wrist, then modified torso loc
         }
@@ -260,7 +268,7 @@ if __name__ == '__main__':
             # update new_motion
             new_skeleton_state = SkeletonState.from_rotation_and_root_translation(v["skeleton"], new_motion_params_local_rots, new_motion_params_root_trans, is_local=True)
             new_motion = SkeletonMotion.from_skeleton_state(new_skeleton_state, fps=fps)
-            # print(f"new_skeleton_state")
+            print(f"new_skeleton_state local_rotation shape: {new_skeleton_state.local_rotation.shape}")
             print(f"new_motion stuff shape: {new_motion.global_translation.shape}")
             
 
@@ -276,12 +284,12 @@ if __name__ == '__main__':
             # plot_skeleton_motion_interactive(new_motion)
 
             # scenepic animation
-            # vis_motion_use_scenepic_animation(
-            #     asset_filename=v["xml_path"],
-            #     rigidbody_global_pos=new_motion.global_translation,
-            #     rigidbody_global_rot=new_motion.global_rotation,
-            #     fps=fps,
-            #     up_axis="z",
-            #     color=name_to_rgb['AliceBlue'] * 255,
-            #     output_path=osp.join(save_dir, "ref_motion_render.html"),
-            # )
+            vis_motion_use_scenepic_animation(
+                asset_filename=v["xml_path"],
+                rigidbody_global_pos=new_motion.global_translation,
+                rigidbody_global_rot=new_motion.global_rotation,
+                fps=fps,
+                up_axis="z",
+                color=name_to_rgb['AliceBlue'] * 255,
+                output_path=osp.join(save_dir, "ref_motion_render.html"),
+            )
