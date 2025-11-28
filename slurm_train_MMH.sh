@@ -85,10 +85,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-4/ \
-    --wandb_name "Carry-timber-train-4" \
-    --notes "timber: imitation motion bug fix" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-7/ \
+    --wandb_name "Carry-timber-train-7" \
+    --notes "new timber reward" \
     --ergo_coeff 0.2 \
-
-
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-5/Humanoid_26-19-00-14/nn/Humanoid.pth
 
