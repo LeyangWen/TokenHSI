@@ -802,10 +802,11 @@ class HumanoidCarry(Humanoid):
             carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
         elif self._task_name =="MMH_timber":
             if self._verbose:
-                print("box_pos =", box_pos[0])
-                print("box_rot =", box_rot[0])
-                print("box_bbox bps =", self._box_bps[0])
-                print("box_size = ", self._box_size[0])
+                # print("box_pos =", box_pos[0])
+                # print("box_rot =", box_rot[0])
+                # print("box_bbox bps =", self._box_bps[0])
+                # print("box_size = ", self._box_size[0])
+                pass
             handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, box_pos, box_rot, self._box_size, hands_ids)
             handheld_r = handheld_timber_r  # override handheld_r for timber task
             carry_box_reward = walk_r + carry_r + handheld_timber_r
@@ -834,7 +835,7 @@ class HumanoidCarry(Humanoid):
                 - elbow_r      = {elbow_r * self._ergo_coeff}
                 - box_r        = {box_r * self._ergo_coeff}
                 """)
-            self.print_angles_degrees(humanoid_angles)
+            # self.print_angles_degrees(humanoid_angles)
             # print(rigid_body_pos[0])
             # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
             # print(f"box_pos = {box_pos[0]}")
@@ -1311,16 +1312,17 @@ class HumanoidCarry(Humanoid):
             kinematic_rigid_body_pos = self._kinematic_humanoid_rigid_body_states[:, :, 0:3]
             key_body_pos = kinematic_rigid_body_pos[:, self._key_body_ids, :]
             if self._verbose:
-                print("Shapes: ")
-                print("Kinematic Rigid Body Positions: ", kinematic_rigid_body_pos.shape)
-                print("Key Body Positions: ", key_body_pos.shape)
-                print("Current AMP Obs Buffer: ", self._curr_amp_obs_buf[env_ids].shape)
-                print("Kinematic Humanoid Rigid Body States: ", self._kinematic_humanoid_rigid_body_states[env_ids].shape)
-                print("Dof Pos: ", self._dof_pos[env_ids].shape)
-                print("Dof Vel: ", self._dof_vel[env_ids].shape)
-                print("Key Body Positions: ", key_body_pos[env_ids].shape)
-                print("Dof Obs Size: ", self._dof_obs_size)
-                print("Dof Offsets: ", self._dof_offsets)
+                # print("Shapes: ")
+                # print("Kinematic Rigid Body Positions: ", kinematic_rigid_body_pos.shape)
+                # print("Key Body Positions: ", key_body_pos.shape)
+                # print("Current AMP Obs Buffer: ", self._curr_amp_obs_buf[env_ids].shape)
+                # print("Kinematic Humanoid Rigid Body States: ", self._kinematic_humanoid_rigid_body_states[env_ids].shape)
+                # print("Dof Pos: ", self._dof_pos[env_ids].shape)
+                # print("Dof Vel: ", self._dof_vel[env_ids].shape)
+                # print("Key Body Positions: ", key_body_pos[env_ids].shape)
+                # print("Dof Obs Size: ", self._dof_obs_size)
+                # print("Dof Offsets: ", self._dof_offsets)
+                pass
             self._curr_amp_obs_buf[env_ids] = build_amp_observations(self._kinematic_humanoid_rigid_body_states[env_ids, 0, 0:3],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 3:7],
                                                                    self._kinematic_humanoid_rigid_body_states[env_ids, 0, 7:10],
@@ -1486,7 +1488,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     hand_proj = torch.sum(rel_hand_pos[..., :2] * axis_xy[:, :2].unsqueeze(1), dim=-1)
     half_len = 0.2  # 20 cm from center on each side
     proj_err = torch.mean(torch.abs(hand_proj.abs() - half_len), dim=-1)
-    distance_reward = torch.exp(-5 * proj_err)
+    hold_loc_reward = torch.exp(-5 * proj_err)
     
     # perpendicular axis makes sure hands straddle the narrow side
     perp_xy = torch.stack([-axis_xy[:, 1], axis_xy[:, 0], axis_xy[:, 2] * 0.0], dim=-1)
@@ -1501,20 +1503,36 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
 
     desired_height = box_pos[:, 2] - 0.05
     height_err = torch.abs(hand_center[:, 2] - desired_height)
-    height_reward = torch.exp(-30.0 * height_err)
+    height_reward = torch.exp(-10.0 * height_err)
 
-    reward = 0.25 * same_side_reward + 0.25 * distance_reward + 0.25 * center_reward + 0.25 * height_reward
+
 
     root_pos = humanoid_rigid_body_pos[:, 0, :]
-    box2human = torch.sum((box_pos[:, 0:2] - root_pos[:, 0:2]) ** 2, dim=-1)
-    reward[box2human > 0.8] = 0.0
+    box2human = torch.sqrt(torch.sum((box_pos[:] - root_pos[:]) ** 2, dim=-1))
+    box2hand = torch.sqrt(torch.sum((box_pos[:] - hand_center[:]) ** 2, dim=-1))
+    distance_reward = torch.exp(-2.0 * box2human)
+    hand_distance_reward = torch.exp(-5.0 * box2hand)
+    
+    
+    same_side_reward[box2hand > 0.4] = 0.0
+    hold_loc_reward[box2hand > 0.4] = 0.0
+    center_reward[box2human > 0.4] = 0.0
+    
+    reward = 0.1 * same_side_reward + 0.1 * hold_loc_reward + 0.1 * center_reward + 0.4 * height_reward + 0.15*distance_reward + 0.15*hand_distance_reward
+    # reward[box2human > 0.8] = 0.0
+    
     verbose = False
     if verbose:
-        print("timber_same_side_reward: ", same_side_reward[0].item())
+        print("box2human: ", box2human[0].item())
+        print("box2hand: ", box2hand[0].item())
         print("timber_distance_reward: ", distance_reward[0].item())
+        print("timber_hand_distance_reward: ", hand_distance_reward[0].item())
+        print("timber_same_side_reward: ", same_side_reward[0].item())
+        print("timber_hold_loc_reward: ", hold_loc_reward[0].item())
         print("timber_center_reward: ", center_reward[0].item())
         print("timber_height_reward: ", height_reward[0].item())
         print("timber_total_reward: ", reward[0].item())
+
         print("0.8*: ", 0.8 * reward[0].item())
     return 0.8 * reward
 
