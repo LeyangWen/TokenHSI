@@ -33,7 +33,7 @@ env:
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
   skillInitProb: [0.1, 0.2, 0.7, 0.0, 0.0]
   # skillInitProb: [0.1, 0.0, 0.0, 0.0, 0.0]  # for local visualization train testing
-  skillDiscProb: [0.2, 0.2, 0.6, 0.0, 0.0]
+  skillDiscProb: [0.0, 0.2, 0.8, 0.0, 0.0]
 
 
   # task
@@ -81,7 +81,7 @@ env:
   debug:
       vel: False
   ergoCoeff: 0.2
-  ergoSubWeight: [50.0, 25.0, 25.0]
+  ergoSubWeight: [45.0, 10.0, 45.0]
 
   eval:
     # override env settings

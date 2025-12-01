@@ -659,8 +659,7 @@ class Humanoid(BaseTask):
         left_knee_angle  = self.angle_3D_from_ids(kp_id['left_foot'],  kp_id['left_shin'],  kp_id['left_thigh'])
         right_knee_angle = self.angle_3D_from_ids(kp_id['right_foot'], kp_id['right_shin'], kp_id['right_thigh'])
 
-        back_angle = self.angle_3D_from_ids(kp_id['torso'], kp_id['pelvis'], "up")
-
+        back_angle = self.angle_3D_from_ids(kp_id['head'], kp_id['torso'], "up")
         left_elbow_angle  = self.angle_3D_from_ids(kp_id['left_hand'],  kp_id['left_lower_arm'],  kp_id['left_upper_arm'])
         right_elbow_angle = self.angle_3D_from_ids(kp_id['right_hand'], kp_id['right_lower_arm'], kp_id['right_upper_arm'])
         

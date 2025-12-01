@@ -52,7 +52,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-7/Humanoid_28-18-13-02/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-8/Humanoid_30-00-11-04/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -78,7 +78,14 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-5/Humanoid_26-19-00-14/nn/Humanoid.pth \
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-6/Humanoid_28-18-12-21/nn/Humanoid.pth \
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-7/Humanoid_28-18-13-02/nn/Humanoid.pth \
-
+# modified handheld reward to prompt reaching to target
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-8/Humanoid_30-00-11-04/nn/Humanoid.pth \
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-9/Humanoid_30-00-13-03/nn/Humanoid.pth \  # 0.25* disc reward
+# throughts: hand now stuck on lower than box location --> rewason: timber_height_reward too much
+# Can reach to target and hold properly, especially for low location. But can not lift --> reason: your reward is stuck after that, no motivation to keep lifting, need increasing new reward
+# sometime do now bend, small issue, might be fixed by twicking weights
+# some kicking behavivor
+# TODO: NIOSH post processing--> V4 back angle calculation change
 
 
 # Basic Carry Test

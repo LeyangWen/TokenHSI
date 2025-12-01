@@ -835,7 +835,7 @@ class HumanoidCarry(Humanoid):
                 - elbow_r      = {elbow_r * self._ergo_coeff}
                 - box_r        = {box_r * self._ergo_coeff}
                 """)
-            # self.print_angles_degrees(humanoid_angles)
+            self.print_angles_degrees(humanoid_angles)
             # print(rigid_body_pos[0])
             # print(f"hand_pos = {rigid_body_pos[0][hands_ids]}")
             # print(f"box_pos = {box_pos[0]}")
@@ -1501,7 +1501,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     center_err = torch.sum(torch.abs(hand_center[:, 0:2] - box_pos[:, 0:2]), dim=-1)
     center_reward = torch.exp(-5.0 * center_err)
 
-    desired_height = box_pos[:, 2] - 0.05
+    desired_height = box_pos[:, 2] - 0.05 + 0.1773393303155899
     height_err = torch.abs(hand_center[:, 2] - desired_height)
     height_reward = torch.exp(-10.0 * height_err)
 
@@ -1510,33 +1510,57 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     root_pos = humanoid_rigid_body_pos[:, 0, :]
     box2human = torch.sqrt(torch.sum((box_pos[:] - root_pos[:]) ** 2, dim=-1))
     box2hand = torch.sqrt(torch.sum((box_pos[:] - hand_center[:]) ** 2, dim=-1))
-    distance_reward = torch.exp(-2.0 * box2human)
-    hand_distance_reward = torch.exp(-5.0 * box2hand)
+    # distance_reward = torch.exp(-2.0 * box2human)  
+    hand_distance_reward = torch.exp(-2.0 * box2hand)
     
     
     same_side_reward[box2hand > 0.4] = 0.0
     hold_loc_reward[box2hand > 0.4] = 0.0
-    center_reward[box2human > 0.4] = 0.0
+    center_reward[box2human > 0.4] = 0.0  # this condition do not activate right now, lets try without this reward
     
-    reward = 0.1 * same_side_reward + 0.1 * hold_loc_reward + 0.1 * center_reward + 0.4 * height_reward + 0.15*distance_reward + 0.15*hand_distance_reward
-    # reward[box2human > 0.8] = 0.0
+    hand_pos_reward = 0.1 * same_side_reward + 0.1 * hold_loc_reward + 0.5 * height_reward + 0.3*hand_distance_reward
+
+    # reward for lifting to natual hand location
+    hand_carry_height = 1.2  # m
+    box_height_reward = torch.exp(-2.0 * torch.clamp_min(hand_carry_height - box_pos[:, 2], 0.0))
+    
+    # reward for not tilting the timber
+    z_axis = torch.tensor([0.0, 0.0, 1.0], device=long_axis_vec_world.device, dtype=long_axis_vec_world.dtype)
+    z_axis = z_axis.expand_as(long_axis_vec_world)
+    print("long_axis_vec_world: ", long_axis_vec_world[0])
+    aligned = torch.sum(long_axis_vec_world * z_axis, dim=-1)
+    tilt_angle = torch.asin(torch.clamp(torch.abs(aligned), -1.0, 1.0))  # 0 when horizontal, pi/2 when vertical
+    timber_notilt_reward = torch.exp(-5.0 * tilt_angle)
+    pickup_reward = 0.5 * box_height_reward + 0.5 * timber_notilt_reward
+    pickup_reward[box2hand > 0.2] = 0.0
+    
+    reward = 0.5*hand_pos_reward + 0.5*pickup_reward
     
     verbose = False
     if verbose:
         print("box2human: ", box2human[0].item())
         print("box2hand: ", box2hand[0].item())
-        print("timber_distance_reward: ", distance_reward[0].item())
+        print("hand_height_err: ", (hand_center[0, 2] - desired_height[0]).item())
+        print("tilt_angle (deg): ", (tilt_angle[0].item() * 180.0 / 3.1415926))
+        
+        print("------------------------------------------------------------------")
+        # print("timber_distance_reward: ", distance_reward[0].item())
         print("timber_hand_distance_reward: ", hand_distance_reward[0].item())
+        print("timber_height_reward: ", height_reward[0].item())
+        print("------------------------------------------------------------------")
+        
         print("timber_same_side_reward: ", same_side_reward[0].item())
         print("timber_hold_loc_reward: ", hold_loc_reward[0].item())
         print("timber_center_reward: ", center_reward[0].item())
-        print("timber_height_reward: ", height_reward[0].item())
+        
+        print("------------------------------------------------------------------")
+        print("box_height_reward: ", box_height_reward[0].item())
+        print("timber_notilt_reward: ", timber_notilt_reward[0].item())
+        print("------------------------------------------------------------------")
         print("timber_total_reward: ", reward[0].item())
-
         print("0.8*: ", 0.8 * reward[0].item())
     return 0.8 * reward
 
-        
         
 @torch.jit.script
 def compute_walk_reward(root_pos, prev_root_pos, box_pos, dt, tar_vel, only_vel_reward, debug_vel):
@@ -1642,7 +1666,7 @@ def compute_carry_reward(box_pos, prev_box_pos, tar_box_pos, dt, tar_vel, box_si
             # root_vel_err = min_speed_penalty - torch.clamp_min(root_vel_xy, min_speed_penalty)
             # root_vel_penalty = -1 * box_vel_pen_coeff * (1 - torch.exp(-2.0 * (root_vel_err * root_vel_err)))
             # reward += root_vel_penalty
-            
+    reward = torch.clamp_min(reward, 0.0)
     return reward
 
 @torch.jit.script
