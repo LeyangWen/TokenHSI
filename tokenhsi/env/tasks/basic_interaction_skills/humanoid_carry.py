@@ -785,6 +785,7 @@ class HumanoidCarry(Humanoid):
         root_pos = self._humanoid_root_states[..., 0:3]
         root_rot = self._humanoid_root_states[..., 3:7]
         rigid_body_pos = self._rigid_body_pos
+        rigid_body_rot = self._rigid_body_rot
         box_pos = self._box_states[..., 0:3]
         box_rot = self._box_states[..., 3:7]
         hands_ids = self._key_body_ids[[0, 1]]
@@ -807,7 +808,7 @@ class HumanoidCarry(Humanoid):
                 # print("box_bbox bps =", self._box_bps[0])
                 # print("box_size = ", self._box_size[0])
                 pass
-            handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, box_pos, box_rot, self._box_size, hands_ids)
+            handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
             handheld_r = handheld_timber_r  # override handheld_r for timber task
             carry_box_reward = walk_r + carry_r + handheld_timber_r
         
@@ -1459,8 +1460,8 @@ def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos
     return 0.2 * hands2box
 
 @torch.jit.script
-def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, box_size, hands_ids):
-    # type: (Tensor, Tensor, Tensor, Tensor, Tensor) -> Tensor
+def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_rot, box_pos, box_rot, box_size, hands_ids):
+    # type: (Tensor,Tensor, Tensor, Tensor, Tensor, Tensor) -> Tensor
     
     # 1 find long edge based on box_size
     # 2 based on box_rot, find the long edge vector
@@ -1469,6 +1470,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     # 5 calculate error 3: see if hand height is slightly lower than box center height, ideally ~ 0.05 lower (from timber size)
     # merge them all together with weight to form the reward, max = 1
     hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]
+    hand_rot = humanoid_rigid_body_rot[:, hands_ids, :]
     hand_center = hand_pos.mean(dim=1)
     rel_hand_pos = hand_pos - box_pos.unsqueeze(1)
 
@@ -1513,12 +1515,29 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     # distance_reward = torch.exp(-2.0 * box2human)  
     hand_distance_reward = torch.exp(-2.0 * box2hand)
     
-    
+    # hands facing each other should be rewarded; use XY projection only
+    eps = 1e-6
+    palm_local = torch.tensor([0.0, 0.0, -1.0], device=hand_rot.device, dtype=hand_rot.dtype).unsqueeze(0)
+    palm_local = palm_local.expand(hand_rot.shape[0] * hand_rot.shape[1], -1)
+
+    hand_dirs = quat_rotate(hand_rot.reshape(-1, 4), palm_local)
+    hand_dirs = hand_dirs.reshape(hand_rot.shape[0], hand_rot.shape[1], 3)
+    left_xy = hand_dirs[:, 0, :2]
+    right_xy = hand_dirs[:, 1, :2]
+
+    left_xy = left_xy / (torch.norm(left_xy, p=2, dim=-1, keepdim=True) + eps)
+    right_xy = right_xy / (torch.norm(right_xy, p=2, dim=-1, keepdim=True) + eps)
+
+    alignment = torch.sum(left_xy * right_xy, dim=-1)
+    alignment = torch.clamp(alignment, -1.0, 1.0)
+    opposite_reward = torch.exp(-5 * (1+ alignment)**2)
+
     same_side_reward[box2hand > 0.4] = 0.0
     hold_loc_reward[box2hand > 0.4] = 0.0
     center_reward[box2human > 0.4] = 0.0  # this condition do not activate right now, lets try without this reward
+    opposite_reward[box2hand > 0.2] = 0.0
     
-    hand_pos_reward = 0.1 * same_side_reward + 0.1 * hold_loc_reward + 0.5 * height_reward + 0.3*hand_distance_reward
+    hand_pos_reward = 0.1 * same_side_reward + 0.1 * hold_loc_reward + 0.4 * height_reward + 0.2*hand_distance_reward + 0.2*opposite_reward
 
     # reward for lifting to natual hand location
     hand_carry_height = 1.2  # m
@@ -1527,11 +1546,11 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
     # reward for not tilting the timber
     z_axis = torch.tensor([0.0, 0.0, 1.0], device=long_axis_vec_world.device, dtype=long_axis_vec_world.dtype)
     z_axis = z_axis.expand_as(long_axis_vec_world)
-    print("long_axis_vec_world: ", long_axis_vec_world[0])
+    # print("long_axis_vec_world: ", long_axis_vec_world[0])
     aligned = torch.sum(long_axis_vec_world * z_axis, dim=-1)
     tilt_angle = torch.asin(torch.clamp(torch.abs(aligned), -1.0, 1.0))  # 0 when horizontal, pi/2 when vertical
     timber_notilt_reward = torch.exp(-5.0 * tilt_angle)
-    pickup_reward = 0.5 * box_height_reward + 0.5 * timber_notilt_reward
+    pickup_reward = 0.8 * box_height_reward + 0.2 * timber_notilt_reward
     pickup_reward[box2hand > 0.2] = 0.0
     
     reward = 0.5*hand_pos_reward + 0.5*pickup_reward
@@ -1542,7 +1561,8 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
         print("box2hand: ", box2hand[0].item())
         print("hand_height_err: ", (hand_center[0, 2] - desired_height[0]).item())
         print("tilt_angle (deg): ", (tilt_angle[0].item() * 180.0 / 3.1415926))
-        
+        print("hand alignment: ", alignment[0].item())  #, hand_dirs[0])
+
         print("------------------------------------------------------------------")
         # print("timber_distance_reward: ", distance_reward[0].item())
         print("timber_hand_distance_reward: ", hand_distance_reward[0].item())
@@ -1552,7 +1572,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, box_pos, box_rot, bo
         print("timber_same_side_reward: ", same_side_reward[0].item())
         print("timber_hold_loc_reward: ", hold_loc_reward[0].item())
         print("timber_center_reward: ", center_reward[0].item())
-        
+        print("hand_facing_opposite_reward: ", opposite_reward[0].item())
         print("------------------------------------------------------------------")
         print("box_height_reward: ", box_height_reward[0].item())
         print("timber_notilt_reward: ", timber_notilt_reward[0].item())

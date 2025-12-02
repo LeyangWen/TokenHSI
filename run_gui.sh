@@ -52,7 +52,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-8/Humanoid_30-00-11-04/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-10/Humanoid_30-23-11-35/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -86,7 +86,12 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # sometime do now bend, small issue, might be fixed by twicking weights
 # some kicking behavivor
 # TODO: NIOSH post processing--> V4 back angle calculation change
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-10/Humanoid_30-23-11-35/nn/Humanoid.pth \  # v3 reward, added pickup reward, no mono
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-11/Humanoid_30-23-15-13/nn/Humanoid.pth
+# Inner hand orientation wrong, lets encofce them to point towards the axis, also no bad imitaion motion
+# hand location right, but is not lifting at all, just holding, maybe increase lift reward weight
 
+# TODO: No kicking
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -399,7 +404,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/timber_drop" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/timber_hold_2" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |
