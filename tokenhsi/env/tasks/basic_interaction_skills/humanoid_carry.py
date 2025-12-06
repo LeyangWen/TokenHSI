@@ -1553,7 +1553,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     pickup_reward = 0.8 * box_height_reward + 0.2 * timber_notilt_reward
     pickup_reward[box2hand > 0.2] = 0.0
     
-    reward = 0.5*hand_pos_reward + 0.5*pickup_reward
+    reward = 0.25*hand_pos_reward + 0.75*pickup_reward
     
     verbose = False
     if verbose:
