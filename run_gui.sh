@@ -96,7 +96,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # maybe the finger angle is not suitable for this task  --> horizontal finger xml
 # maybe shouldn't hold too far apart, see example motion hand loc
 # TODO: No kicking
-# hand facing reward is not working correctly
+# hand facing reward is not working correctly --> fixed
 
 ######################################## --> hand face bad, but liftin gposture, no lift
 [Info] Frame 833
