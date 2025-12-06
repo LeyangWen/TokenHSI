@@ -1517,7 +1517,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     
     # hands facing each other should be rewarded; use XY projection only
     eps = 1e-6
-    palm_local = torch.tensor([0.0, 0.0, -1.0], device=hand_rot.device, dtype=hand_rot.dtype).unsqueeze(0)
+    palm_local = torch.tensor([1.0, 0.0, 0.0], device=hand_rot.device, dtype=hand_rot.dtype).unsqueeze(0)
     palm_local = palm_local.expand(hand_rot.shape[0] * hand_rot.shape[1], -1)
 
     hand_dirs = quat_rotate(hand_rot.reshape(-1, 4), palm_local)
@@ -1530,7 +1530,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
 
     alignment = torch.sum(left_xy * right_xy, dim=-1)
     alignment = torch.clamp(alignment, -1.0, 1.0)
-    opposite_reward = torch.exp(-5 * (1+ alignment)**2)
+    opposite_reward = torch.exp(-5 * (1 - alignment)**2)
 
     same_side_reward[box2hand > 0.4] = 0.0
     hold_loc_reward[box2hand > 0.4] = 0.0
@@ -1561,7 +1561,8 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
         print("box2hand: ", box2hand[0].item())
         print("hand_height_err: ", (hand_center[0, 2] - desired_height[0]).item())
         print("tilt_angle (deg): ", (tilt_angle[0].item() * 180.0 / 3.1415926))
-        print("hand alignment: ", alignment[0].item())  #, hand_dirs[0])
+        print("hand alignment: ", alignment[0].item())
+        print("hand dirs: ", hand_dirs[0])
 
         print("------------------------------------------------------------------")
         # print("timber_distance_reward: ", distance_reward[0].item())

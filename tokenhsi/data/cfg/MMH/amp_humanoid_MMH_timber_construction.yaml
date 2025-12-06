@@ -109,7 +109,7 @@ env:
     # assetFileName: "mjcf/phys_humanoid_v3.xml"  # this is used in CRC
     # assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall.xml"  # this is used in my custom imitation learning
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
-    assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_sticky.xml"  
+    assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_sticky_horizontal.xml"  
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"  
 
   plane:
