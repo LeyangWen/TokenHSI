@@ -85,10 +85,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-15/ \
-    --wandb_name "Carry-timber-train-15" \
-    --notes "scratch horz-hand" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-16/ \
+    --wandb_name "Carry-timber-train-16" \
+    --notes "resume horz-hand; omomo 0.2" \
     --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-13/Humanoid_01-20-32-30/nn/Humanoid.pth
+    --resume 1 \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth
 

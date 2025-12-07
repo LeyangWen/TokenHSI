@@ -74,7 +74,7 @@ class HumanoidCarry(Humanoid):
         
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
         self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
-        self._verbose = False
+        self._verbose = True
         self._task_name = cfg.get("taskName", "MMH_box")
         
         if cfg["args"].eval:
@@ -1503,7 +1503,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     center_err = torch.sum(torch.abs(hand_center[:, 0:2] - box_pos[:, 0:2]), dim=-1)
     center_reward = torch.exp(-5.0 * center_err)
 
-    desired_height = box_pos[:, 2] - 0.05 + 0.1773393303155899
+    desired_height = box_pos[:, 2] - 0.06 + 0.1773393303155899
     height_err = torch.abs(hand_center[:, 2] - desired_height)
     height_reward = torch.exp(-10.0 * height_err)
 
@@ -1555,7 +1555,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     
     reward = 0.25*hand_pos_reward + 0.75*pickup_reward
     
-    verbose = False
+    verbose = True
     if verbose:
         print("box2human: ", box2human[0].item())
         print("box2hand: ", box2hand[0].item())

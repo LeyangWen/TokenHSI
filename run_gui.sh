@@ -52,7 +52,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-13/Humanoid_01-20-32-30/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -97,46 +97,12 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # maybe shouldn't hold too far apart, see example motion hand loc
 # TODO: No kicking
 # hand facing reward is not working correctly --> fixed
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-15/Humanoid_06-04-56-00/nn/Humanoid.pth
 
+--> more imitation, include carry motion
 ######################################## --> hand face bad, but liftin gposture, no lift
-[Info] Frame 833
-                Ergo coeff = 0.2
-                Carry_box_reward = tensor([0.5256], device='cuda:0')
-                - walk_r       = tensor([0.1600], device='cuda:0')
-                - carry_r      = tensor([0.], device='cuda:0')
-                - handheld_r   = tensor([0.3656], device='cuda:0')
-                - putdown_r    = tensor([0.], device='cuda:0')
-                Ergo_reward  = tensor([0.1624], device='cuda:0')
-                - back_r       = tensor([0.0900], device='cuda:0')
-                - elbow_r      = tensor([0.], device='cuda:0')
-                - box_r        = tensor([0.0724], device='cuda:0')
-                
-left_knee: tensor([65.7592], device='cuda:0') degrees
-right_knee: tensor([44.9091], device='cuda:0') degrees
-back: tensor([62.2393], device='cuda:0') degrees
-left_elbow: tensor([156.0180], device='cuda:0') degrees
-right_elbow: tensor([166.2754], device='cuda:0') degrees
-env: 0 disc_pred: [-1.03] disc_reward: [0.61]
-box2human:  0.48895332217216492
-box2hand:  0.11756408214569092
-hand_height_err:  -0.018097519874572754
-tilt_angle (deg):  1.0146555678082287
-hand alignment:  -0.99848723411560059
-------------------------------------------------------------------
-timber_hand_distance_reward:  0.79046952724456787
-timber_height_reward:  0.83445602655410767
-------------------------------------------------------------------
-timber_same_side_reward:  1.
-timber_hold_loc_reward:  0.64525246620178223
-timber_center_reward:  0.
-hand_facing_opposite_reward:  0.99998855590820312
-------------------------------------------------------------------
-box_height_reward:  0.13576708734035492
-timber_notilt_reward:  0.91526156663894653
-------------------------------------------------------------------
-timber_total_reward:  0.57403266429901123
-0.8*:  0.45922613143920898
-########################################
+
 
 
 # Basic Carry Test
@@ -258,7 +224,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-6/Humanoid_28-18-12-21/nn/Humanoid.pth 
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth 
 
 
 
