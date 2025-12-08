@@ -9,7 +9,7 @@ from lpanlib.poselib.skeleton.skeleton3d import SkeletonTree, SkeletonState, Ske
 from lpanlib.poselib.visualization.common import plot_skeleton_state, plot_skeleton_motion_interactive
 from lpanlib.poselib.core.rotation3d import quat_mul, quat_from_angle_axis, quat_mul_norm, quat_rotate, quat_identity
 
-def process_smplest_seq(fname, output_path, visualize=False, target_fps=20):
+def process_smplest_seq(fname, output_path, visualize=False, target_fps=20, flip_hand=False):
 
     # load raw params from smplest batch inference
     with open(fname, "rb") as f:
@@ -156,7 +156,34 @@ def process_smplest_seq(fname, output_path, visualize=False, target_fps=20):
         plt.title('Joint Trajectories')
         plt.legend()
         plt.show()
-        
+    
+    if flip_hand:
+        correction_aa = np.array([-2/3*np.pi, 0, 0])  # 180 around Y
+        correction_rotM = axis_angle_to_matrix_batch(correction_aa[None, :])  # (1,3,3)
+        wrist_ids = []
+        if "Left" in flip_hand:  # rotate left hand only
+            wrist_ids.append(20)
+            wrist_ids.append(22)
+        elif "Right" in flip_hand:  # rotate right hand only
+            wrist_ids.append(21)
+            wrist_ids.append(23)
+            raise NotImplementedError("Right hand flip not tested yet, visualize in blender to see if correction_aa should be the same")
+        for wid in wrist_ids:
+            wrist_aa = poses[:, wid*3:(wid+1)*3]                           # (T,3) MOD
+            wrist_rotM = axis_angle_to_matrix_batch(wrist_aa)     # MOD
+            wrist_new_rotM = correction_rotM[None] @ wrist_rotM                   # MOD: left-multiply
+            
+            # print(poses[:, wid*3:(wid+1)*3])
+            # print("shape:", poses[:, wid*3:(wid+1)*3].shape)
+            # print("wrist_new_rotM shape:", wrist_new_rotM.shape)
+            # print("matrix_to_axis_angle_batch(wrist_new_rotM) shape:", matrix_to_axis_angle_batch(wrist_new_rotM).shape)
+            poses[:, wid*3:(wid+1)*3] = matrix_to_axis_angle_batch(wrist_new_rotM[0])  # MOD
+            # print("*")
+            # # print(poses[:, wid*3:(wid+1)*3])
+            # print("####")
+            
+            
+
     required_params = {}
     required_params["poses"] = poses
     required_params["trans"] = trans

@@ -99,9 +99,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # hand facing reward is not working correctly --> fixed
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-15/Humanoid_06-04-56-00/nn/Humanoid.pth
-
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-16/Humanoid_07-01-29-43/nn/Humanoid.pth
 --> more imitation, include carry motion
 ######################################## --> hand face bad, but liftin gposture, no lift
+# thought: check if init use the lifting phrase
 
 
 

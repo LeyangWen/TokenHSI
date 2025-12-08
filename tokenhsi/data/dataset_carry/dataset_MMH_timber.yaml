@@ -12,19 +12,26 @@ motions:
       obj_file: motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_03/phys_humanoid_v4/blender/box_motion.npy
       rsi_skipped_range: []
       weight: 1.0
-
+    
 
   putDown:
-    - file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity04_stageii+__+555-1008_putDown/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
-      weight: 1.0
+    - file: motions/MMH/timber_putDown/_lower_1/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_putDown/_lower_2/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_putDown/_lower_3/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+
     
   carryWith:
-    - file: motions/carry/ACCAD+__+Female1Walking_c3d+__+B20_-_walk_with_box_stageii/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/ACCAD+__+Female1Walking_c3d+__+B20_-_walk_with_box_stageii/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
-      weight: 1.0
+    - file: motions/MMH/timber_carry/_carry_1/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_carry/_carry_3/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_carry/_carry_4/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_carry/_carry_5/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
   
 
   loco:
@@ -114,4 +121,27 @@ motions:
       weight: 0.2
     - file: motions/MMH/timber_pickUp/timber01.66920758.20250919201355+__+clip_03/phys_humanoid_v4/ref_motion.npy
       weight: 0.2
-  
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_1/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_2/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_3/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_4/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_5/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_6/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_7/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_8/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_9/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_10/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_12/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2
+    - file: motions/MMH/timber_pickUp/timber+__+timber_lift_13/phys_humanoid_v4/ref_motion.npy
+      weight: 0.2

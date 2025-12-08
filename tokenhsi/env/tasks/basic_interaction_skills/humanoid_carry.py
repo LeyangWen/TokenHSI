@@ -74,7 +74,7 @@ class HumanoidCarry(Humanoid):
         
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
         self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
-        self._verbose = True
+        self._verbose = False
         self._task_name = cfg.get("taskName", "MMH_box")
         
         if cfg["args"].eval:
@@ -1555,7 +1555,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     
     reward = 0.25*hand_pos_reward + 0.75*pickup_reward
     
-    verbose = True
+    verbose = False
     if verbose:
         print("box2human: ", box2human[0].item())
         print("box2hand: ", box2hand[0].item())
