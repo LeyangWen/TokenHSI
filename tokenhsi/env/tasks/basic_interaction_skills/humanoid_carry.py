@@ -1540,7 +1540,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     hand_pos_reward = 0.1 * same_side_reward + 0.1 * hold_loc_reward + 0.4 * height_reward + 0.2*hand_distance_reward + 0.2*opposite_reward
 
     # reward for lifting to natual hand location
-    hand_carry_height = 1.2  # m
+    hand_carry_height = 1.05  # m
     box_height_reward = torch.exp(-2.0 * torch.clamp_min(hand_carry_height - box_pos[:, 2], 0.0))
     
     # reward for not tilting the timber
@@ -1559,7 +1559,9 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     if verbose:
         print("box2human: ", box2human[0].item())
         print("box2hand: ", box2hand[0].item())
-        print("hand_height_err: ", (hand_center[0, 2] - desired_height[0]).item())
+        print("hand_height: ", hand_center[0, 2].item())
+        print("hand-lift_height_err: ", (hand_carry_height - hand_center[0, 2]).item())
+        print("hand-box_height_err: ", (hand_center[0, 2] - desired_height[0]).item())
         print("tilt_angle (deg): ", (tilt_angle[0].item() * 180.0 / 3.1415926))
         print("hand alignment: ", alignment[0].item())
         print("hand dirs: ", hand_dirs[0])

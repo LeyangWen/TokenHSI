@@ -52,7 +52,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-19/Humanoid_08-16-13-40/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -99,11 +99,23 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # hand facing reward is not working correctly --> fixed
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth
 --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-15/Humanoid_06-04-56-00/nn/Humanoid.pth
---checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-16/Humanoid_07-01-29-43/nn/Humanoid.pth
---> more imitation, include carry motion
-######################################## --> hand face bad, but liftin gposture, no lift
-# thought: check if init use the lifting phrase
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-16/Humanoid_07-01-29-43/nn/Humanoid.pth # stop at lowest location, do not lift
+# --> more imitation, include carry motion
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-17/Humanoid_08-06-30-32/nn/Humanoid.pth  # just not lifting at lowest, lift at higher loc
+# --> hand face bad, but liftin gposture, no lift
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-18/Humanoid_08-06-30-49/nn/Humanoid.pth  # kind of lifts (scratch horz-hand; more omomo type motions)
+--checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-19/Humanoid_08-16-13-40/nn/Humanoid.pth  # best so far--> lifts, but hand location is werid at end (resume horz-hand; more omomo type motions, 60s) 60 hrs
+# thought: check if init use the lifting phrase --> seem so, just printed out to check, did not do in depth analysis
+# thought: maybe we need carry example init to finish lifting  --> added as mono type motion only
+# AMP check if wrist is used. 
+# maybe it is about the weight of the reward, try a bunch. 
+# wrist gap too big,--> made v4_hoz_hand forearm longer
+# tought: try v4 on box and see if it works
 
+# Issue: hand location too far forward after lift, pitch under arm, too high box final height
+# thought: maybe skill des prob should be all lift at test
+# reset time should definitely be long, maybe even > 60 s
+# throught: maybe og reward it self would just work, train again with og reward, long time, and more imitation
 
 
 # Basic Carry Test
