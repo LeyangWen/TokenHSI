@@ -1,5 +1,5 @@
 # if given, will override the device setting in gym. 
-taskName: MMH_timber
+taskName: MMH_handle
 env: 
   numEnvs: 4096
   envSpacing: 5
@@ -32,8 +32,8 @@ env:
 
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
   skillInitProb: [0.1, 0.3, 0.6, 0.0, 0.0]
-  # skillInitProb: [0.1, 0.0, 0.0, 0.0, 0.0]  # for local visualization train testing
-  skillDiscProb: [0.4, 0.2, 0.4, 0.1, 0.1]
+  # skillInitProb: [0.0, 0.0, 1.0, 0.0, 0.0]  # for local visualization train testing
+  skillDiscProb: [0.1, 0.2, 0.4, 0.0, 0.10]
 
 
   # task
@@ -49,12 +49,13 @@ env:
 
   box:
     build:
-      baseSize: [0.4, 0.4, 0.4] # unit: m
-      randomSize: True
+      userUrdf: "tokenhsi/data/assets/carry_box/indented_box_lab.urdf"
+      baseSize: [0.34, 0.34, 0.36] # unit: m
+      randomSize: False
       randomModeEqualProportion: False
-      scaleRangeX: [0.75, 1.5] # default range if randomModeEqualProportion: True
-      scaleRangeY: [0.75, 1.5]
-      scaleRangeZ: [0.75, 1.5]
+      scaleRangeX: [1.0, 1.0] # default range if randomModeEqualProportion: True
+      scaleRangeY: [1.0, 1.0]
+      scaleRangeZ: [1.0, 1.0]
       scaleSampleInterval: 0.125 # 0.05m
       randomDensity: False # if True, mass will be added into policy obs
       massRange: [2.0, 43.0]  # kg, standard brick --> concrete bag

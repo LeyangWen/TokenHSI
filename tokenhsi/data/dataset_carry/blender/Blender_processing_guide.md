@@ -29,7 +29,11 @@ ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box01.51470934.20250919
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box02.high+__+2/phys_humanoid_v3"
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/box_pickUp/box02.high+__+3/phys_humanoid_v3"
 # MMH handle_pickUp example
-ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.51470934.20250919200241+__+clip_02/phys_humanoid_v3"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.66920734.20250919200241+__+clip_01/phys_humanoid_v4"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.51470934.20250919200241+__+clip_02/phys_humanoid_v4"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle01.66920734.20250919200241+__+clip_03/phys_humanoid_v4"
+# ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle02.high+__+1/phys_humanoid_v4"
+# ROOT="tokenhsi/data/dataset_carry/motions/MMH/handle_pickUp/handle02.high+__+4/phys_humanoid_v4"
 # MMH timber_pickUp example
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v4"
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_02/phys_humanoid_v4"
@@ -44,6 +48,7 @@ echo $ABS_ROOT
 
 # Humanoid XML used for render checks
 HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
+HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_sticky_horizontal.xml"
 ```
 
 ---
@@ -70,7 +75,7 @@ Open Blender, then run this script from the Python console inside Blender (or pa
 * Add the box object you’ll animate alongside the humanoid.
 * **Keyframing hotkeys:**
 
-  * `I` → choose **Location & Rotation** to insert a keyframe.
+  * `I` `O` → choose **Location & Rotation** to insert a keyframe.
   * `X` → delete keyframes in the Dope Sheet / Timeline.
 * Save your `.blend`.
 
@@ -131,7 +136,6 @@ python tokenhsi/data/dataset_carry/blender/motion_render_and_check.py \
   --root "$ROOT" \
   --humanoid-xml "$HUMANOID_XML" \
   --out-html "box_motion_render.html" \
-  --box-size 0.095 1.8 0.045 
   --box-size 0.34 0.34 0.38
 
     # --box-size 0.095 1.8 0.045 

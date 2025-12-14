@@ -70,7 +70,7 @@ def process_smplest_seq(fname, output_path, visualize=False, target_fps=20, flip
         seg = smooth_axis_angle_butter(seg, fps=target_fps, cutoff_hz=1.0, order=4)
         seg = smooth_axis_angle_butter(seg, fps=target_fps, cutoff_hz=1.0, order=4)  # second pass
         poses[:, j*3:(j+1)*3] = seg
-    print(poses[:, :3])
+    # print(poses[:, :3])
     ##### trans from foot contact: assume walking
     # Y-up → Z-up: (x, y, z) -> (x, z, y)
     J_zup = np.stack([J[..., 0], J[..., 2], -J[..., 1]], axis=-1)  # (T, J, 3)

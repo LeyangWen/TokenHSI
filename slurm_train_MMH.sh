@@ -70,25 +70,44 @@ nvcc --version
 
 
 # timber v4
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
+#     --num_envs 10240 \
+#     --headless \
+#     --wandb_project "TokenHSI-MMH-Train" \
+#     --wandb_mode "online" \
+#     --random_size False \
+#     --random_density True \
+#     --box_w 0.095 \
+#     --box_l 1.8 \
+#     --box_h 0.045 \
+#     --random_mode_equal_proportion False \
+#     --construction_experiment False \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-17/ \
+#     --wandb_name "Carry-timber-train-17" \
+#     --notes "resume horz-hand; more omomo type motions" \
+#     --ergo_coeff 0.2 \
+#     --resume 1 \
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth
+
+# box w. handle v1
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
     --num_envs 10240 \
     --headless \
     --wandb_project "TokenHSI-MMH-Train" \
     --wandb_mode "online" \
-    --random_size False \
-    --random_density True \
-    --box_w 0.095 \
-    --box_l 1.8 \
-    --box_h 0.045 \
     --random_mode_equal_proportion False \
     --construction_experiment False \
-    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-17/ \
-    --wandb_name "Carry-timber-train-17" \
-    --notes "resume horz-hand; more omomo type motions" \
+    --random_density True \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-1/ \
+    --wandb_name "Try3-Carry-handle-train-1" \
+    --notes "indented box try" \
     --ergo_coeff 0.2 \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-timber-train-14/Humanoid_06-05-02-09/nn/Humanoid.pth
+
+
 

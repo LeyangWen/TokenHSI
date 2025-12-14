@@ -116,7 +116,17 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # thought: maybe skill des prob should be all lift at test
 # reset time should definitely be long, maybe even > 60 s
 # throught: maybe og reward it self would just work, train again with og reward, long time, and more imitation
+# --> Learn from this, then start traiing box handle
 
+
+
+
+
+# Handle Carry Test 
+# 1. imitation motion w/ box annotation, done
+# 2. new yaml file, done
+# 3. carry box urdf with handle, done
+# 4. collison check in amp, include box? have handel? --> seems no collision check, just rsi frame ranges
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -254,7 +264,22 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 
 
 
-
+# MMH Train local visualize - handle
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_small.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
+    --num_envs 24 \
+    --wandb_project "TokenHSI-MMH-Train" \
+    --wandb_mode "disabled" \
+    --random_mode_equal_proportion False \
+    --construction_experiment False \
+    --random_density True \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
+    --wandb_name "Carry-box-train-1" \
+    --notes "box w. 1 good motion and 0.2 reward" \
+    --ergo_coeff 0.2 \
+    --resume 1 \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth
 
 
 

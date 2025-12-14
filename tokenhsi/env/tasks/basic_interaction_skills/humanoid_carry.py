@@ -250,8 +250,10 @@ class HumanoidCarry(Humanoid):
         asset_options.fix_base_link = True
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
         
-        # platform_size = 0.4
-        platform_size = 0.2  # smaller size to avoid tripping
+        if self._task_name =="MMH_box" or self._task_name =="MMH_handle":
+            platform_size = 0.4
+        elif self._task_name =="MMH_timber":
+            platform_size = 0.2  # smaller size to avoid tripping
         # if self.constructionExp and self._is_test:
         #     platform_size = max(self._build_base_size)
         self._platform_height = 0.02
@@ -356,9 +358,12 @@ class HumanoidCarry(Humanoid):
             asset_options.density = self._box_density[i]
             asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
             if self.user_urdf is not None:
-                # todo: load root from userURDF
-                asset_root = "tokenhsi/data/assets/carry_box"
-                self._box_assets.append(self.gym.load_asset(self.sim, asset_root, f"indented_box.urdf", asset_options))
+                # "tokenhsi/data/assets/carry_box/indented_box.urdf"
+                asset_root, asset_file = os.path.split(self.user_urdf)
+                print(f"[Info]: Loading user urdf for box: {self.user_urdf}")
+                print(f"[Info]: asset_root = {asset_root}, asset_file = {asset_file}")
+                # asset_root = "tokenhsi/data/assets/carry_box"
+                self._box_assets.append(self.gym.load_asset(self.sim, asset_root, asset_file, asset_options))
                 # TODO: mass & size are taken from urdf file, not asset_options
             else: 
                 self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
@@ -799,7 +804,7 @@ class HumanoidCarry(Humanoid):
         handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
         putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
         
-        if self._task_name =="MMH_box":
+        if self._task_name =="MMH_box" or self._task_name =="MMH_handle":
             carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
         elif self._task_name =="MMH_timber":
             if self._verbose:
@@ -811,7 +816,6 @@ class HumanoidCarry(Humanoid):
             handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
             handheld_r = handheld_timber_r  # override handheld_r for timber task
             carry_box_reward = walk_r + carry_r + handheld_timber_r
-        
         
         humanoid_angles = self.humanoid_angles()
         ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
