@@ -8,11 +8,10 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=60:00:00
+#SBATCH --time=100:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
-##### Run in MotionBert dir
 
 my_job_header
 
@@ -108,7 +107,27 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --wandb_name "Try3-Carry-handle-train-1" \
     --notes "indented box try" \
     --ergo_coeff 0.2 \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-1/Humanoid_16-20-14-21/nn/Humanoid.pth
+
+
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-2/ \
+    # --wandb_name Try3-Carry-handle-train-2 \
+    # --notes resume-box-MMH-carry \
+    # --ergo_coeff 0.2 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-2/Humanoid_16-20-54-29/nn/Humanoid.pth
 
 
 
 
+
+# python -u ./tokenhsi/run.py --task HumanoidCarry --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction_exp4-noReward.yaml --num_envs 10240 --headless --wandb_project TokenHSI-MMH-Train --wandb_mode online --random_size False --random_density True --box_w 0.095 --box_l 1.8 --box_h 0.045 --random_mode_equal_proportion False --construction_experiment False --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-4/ --wandb_name Try2-Carry-timber-train-4 --notes "220hr when finish - scratch, 60s, timber reward, small imitation motion, longer forearm" --ergo_coeff 0.2 \
+#     --resume 1 \
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-4/Humanoid_15-16-13-28/nn/Humanoid.pth \
+
+# python ./tokenhsi/run.py --task HumanoidCarry --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction_exp3-smallMotion.yaml --num_envs 10240 --headless --wandb_project TokenHSI-MMH-Train --wandb_mode online --random_size False --random_density True --box_w 0.095 --box_l 1.8 --box_h 0.045 --random_mode_equal_proportion False --construction_experiment False --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-3/ --wandb_name Try2-Carry-timber-train-3 --notes "220hr when finish - scratch, 60s, box reward, longer forearm" --ergo_coeff 0.2 \
+#     --resume 1 \
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-3/Humanoid_15-16-18-48/nn/Humanoid.pth \
