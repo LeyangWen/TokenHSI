@@ -250,8 +250,10 @@ class HumanoidCarry(Humanoid):
         asset_options.fix_base_link = True
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
         
-        if self._task_name =="MMH_box" or self._task_name =="MMH_handle":
+        if self._task_name =="MMH_box":
             platform_size = 0.4
+        if self._task_name =="MMH_handle":
+            platform_size = 0.36
         elif self._task_name =="MMH_timber":
             platform_size = 0.2  # smaller size to avoid tripping
         # if self.constructionExp and self._is_test:
