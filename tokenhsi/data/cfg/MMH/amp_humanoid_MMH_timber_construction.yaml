@@ -89,15 +89,16 @@ env:
     skill: ["loco"]
     skillInitProb: [1.0]
     # wen custom input for weight, start and end location
-    numExperiments: 4
+    numExperiments: 5
     constructionExperiment: True
     start_positions:
       - [2.0, 0.0, 0.045]
       - [2.0, 0.0, 0.2]
-      # - [2.0, 0.0, 0.4]
+      - [2.0, 0.0, 0.4]
       - [2.0, 0.0, 0.6]
       - [2.0, 0.0, 0.8]
     end_positions:
+      - [-2.0, 0.0, 0.045]
       - [-2.0, 0.0, 0.2]
       - [-2.0, 0.0, 0.4]
       - [-2.0, 0.0, 0.6]

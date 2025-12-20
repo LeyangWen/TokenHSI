@@ -52,7 +52,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-timber-train-19/Humanoid_08-16-13-40/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-4/Humanoid_15-16-13-28/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -118,7 +118,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # throught: maybe og reward it self would just work, train again with og reward, long time, and more imitation
 # --> Learn from this, then start traiing box handle
 
-
+--checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_12-23-37-56/nn/Humanoid.pth  # resume try1-19 good results, 60s, timber reward, longer forearm
+--checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-2/Humanoid_12-23-38-56/nn/Humanoid.pth  # resume try1-19 good results, 60s, timber reward, longer forearm --> best so far
+# for both of these: can lift from lower height perfectly, but cant from higher height.
+--checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-3/Humanoid_15-16-18-48/nn/Humanoid.pth  # scratch, 60s, timber reward, small imitation motion, longer forearm  --> can form posture, but not lift
+--checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-4/Humanoid_15-16-13-28/nn/Humanoid.pth  # scratch, 60s, box reward, longer forearm --> kind of form posture, but no lift, and wrong hand pos, do lift for higher loc
 
 
 
@@ -127,6 +131,27 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # 2. new yaml file, done
 # 3. carry box urdf with handle, done
 # 4. collison check in amp, include box? have handel? --> seems no collision check, just rsi frame ranges
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-2/Humanoid_16-20-54-29/nn/Humanoid.pth  \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "Carry_test_1" \
+    --wandb_mode "disabled" \
+    --random_size False \
+    --random_mode_equal_proportion True \
+    --random_density True \
+    --density 180 \
+    --ergo_coeff 0.2 \
+    --construction_experiment True \
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box_lab.urdf"  \
+
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_16-20-14-21/nn/Humanoid.pth  # scratch
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-2/Humanoid_16-20-54-29/nn/Humanoid.pth  # resume from box
+
 
 # Basic Carry Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -279,7 +304,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-2/Humanoid_16-20-54-29/nn/Humanoid.pth
 
 
 
@@ -454,7 +479,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/timber_hold_2" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/timber_imitation" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

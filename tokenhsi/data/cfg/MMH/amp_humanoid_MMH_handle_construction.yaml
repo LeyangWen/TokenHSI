@@ -93,8 +93,8 @@ env:
     numExperiments: 4
     constructionExperiment: True
     start_positions:
-      - [2.0, 0.0, 0.045]
       - [2.0, 0.0, 0.2]
+      - [2.0, 0.0, 0.4]
       # - [2.0, 0.0, 0.4]
       - [2.0, 0.0, 0.6]
       - [2.0, 0.0, 0.8]

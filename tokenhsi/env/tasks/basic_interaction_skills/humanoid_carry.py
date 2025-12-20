@@ -804,8 +804,11 @@ class HumanoidCarry(Humanoid):
         handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
         putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
         
-        if self._task_name =="MMH_box" or self._task_name =="MMH_handle":
+        if self._task_name =="MMH_box":
             carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
+        elif self._task_name =="MMH_handle":
+            handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
+            carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
         elif self._task_name =="MMH_timber":
             if self._verbose:
                 # print("box_pos =", box_pos[0])
@@ -1461,6 +1464,28 @@ def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos
     box2human = torch.sum((box_pos[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1) # 2d
     hands2box[box2human > 0.7 ** 2] = 0 # disable this reward when the box is not close to the humanoid
 
+    return 0.2 * hands2box
+
+@torch.jit.script
+def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height):
+    # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
+    hand_length = 0.08
+    box_pos_adjusted = box_pos.clone()
+    box_pos_adjusted[:, 2] += hand_length + (0.34/2)*0.6  # lift by handle
+    if only_height:
+        hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos_adjusted[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
+    else:
+        hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted) ** 2, dim=-1) # xyz
+    hands2box = torch.exp(-5.0 * hands2box_pos_err)
+
+    # box2tar = torch.sum((box_pos_adjusted[..., 0:2] - tar_pos[..., 0:2]) ** 2, dim=-1) # 2d
+    # hands2box[box2tar < 0.7 ** 2] = 1.0 # assume this reward is max when the box is close enough to its target location
+
+    root_pos = humanoid_rigid_body_pos[:, 0, :]
+    box2human = torch.sum((box_pos_adjusted[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1) # 2d
+    hands2box[box2human > 0.7 ** 2] = 0 # disable this reward when the box is not close to the humanoid
+
+    # TODO: maybe add opposite side on box.
     return 0.2 * hands2box
 
 @torch.jit.script
