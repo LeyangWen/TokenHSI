@@ -119,7 +119,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 # --> Learn from this, then start traiing box handle
 
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth  # resume try1-19 good results, 60s, timber reward, longer forearm --> best so far, after long traing, very good posture, faster converge? need to check
---checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-2/Humanoid_12-23-38-56/nn/Humanoid.pth  # resume try1-19 good results, 60s, timber reward, longer forearm --> didn't long train, also good
+--checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-2/Humanoid_12-23-38-56/nn/Humanoid.pth  # resume try1-19 good results, 120s, timber reward, longer forearm --> didn't long train, also good
 # for both of these: can lift from lower height perfectly, but cant from higher height.
 --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction_exp4-noReward.yaml
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-3/Humanoid_06-16-56-31/nn/Humanoid.pth  # 320hr scratch, 60s, timber reward, small imitation motion, longer forearm  --> after long trainng, can lift, shaky at the end
