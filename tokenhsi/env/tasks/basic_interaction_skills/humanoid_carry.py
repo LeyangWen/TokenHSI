@@ -811,6 +811,7 @@ class HumanoidCarry(Humanoid):
         elif self._task_name =="MMH_handle":
             handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
             carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
+            handheld_r = handheld_handle_r  # override handheld_r for handle task
         elif self._task_name =="MMH_timber":
             if self._verbose:
                 # print("box_pos =", box_pos[0])
@@ -1121,7 +1122,7 @@ class HumanoidCarry(Humanoid):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml" or "mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
-        elif ("mjcf/phys_humanoid_v4" in asset_file):
+        elif ("mjcf/phys_humanoid_v4" in asset_file or "mjcf/phys_humanoid_v5" in asset_file):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         else:
             print("Unsupported character config file: {s}".format(asset_file=asset_file))
@@ -1473,7 +1474,7 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
     hand_length = 0.08
     box_pos_adjusted = box_pos.clone()
-    box_pos_adjusted[:, 2] += hand_length + (0.34/2)*0.6  # lift by handle
+    box_pos_adjusted[:, 2] += hand_length + (0.34/2)*0.6  # lift by handle --> need to make sure not lifting by wrist
     if only_height:
         hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos_adjusted[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
     else:

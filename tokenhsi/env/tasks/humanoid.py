@@ -242,7 +242,7 @@ class Humanoid(BaseTask):
             self._num_actions = 28 + 2 * 2
             self._num_actions_joint = self._num_actions
             self._num_obs = 1 + 15 * (3 + 6 + 3 + 3) - 3
-        elif ("mjcf/phys_humanoid_v4" in asset_file):
+        elif ("mjcf/phys_humanoid_v4" in asset_file or "mjcf/phys_humanoid_v5" in asset_file):
             self._dof_body_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]  # ['PELVIS', 'torso', 'head', 'right_upper_arm', 'right_lower_arm', 'right_hand', 'left_upper_arm', 'left_lower_arm', 'left_hand', 'right_thigh', 'right_shin', 'right_foot', 'left_thigh', 'left_shin', 'left_foot'
             self._dof_offsets =  [0, 3, 6, 9, 10, 13, 16, 17, 20, 23, 26, 29, 32, 35, 38]
             self._dof_obs_size = 72 + 6*2
@@ -350,7 +350,7 @@ class Humanoid(BaseTask):
         elif ("mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
             self._char_h = 1.04
             # TODO: pelvis height, see if this works
-        elif ("mjcf/phys_humanoid_v4" in asset_file):
+        elif ("mjcf/phys_humanoid_v4" in asset_file or "mjcf/phys_humanoid_v5" in asset_file):
             self._char_h = 1.04
             # TODO: pelvis height, see if this works
         else:
