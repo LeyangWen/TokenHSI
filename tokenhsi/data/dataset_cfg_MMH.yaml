@@ -76,3 +76,11 @@ motions:
   dashboard_pickUp:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/bad/bad.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/good/good.pkl"
+
+  bad_pickUp:
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/bad/clips/bag_bad_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/bad/clips/box_bad_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/bad/clips/box_okay_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/bad/clips/handle_bad_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/bad/clips/handle_okay_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/bad/clips/timber_bad_1.pkl"

@@ -21,6 +21,7 @@ from lpanlib.others.colors import name_to_rgb
 joints_to_use = {
     "from_smpl_original_to_phys_humanoid_v3": np.array([0, 6, 12, 17, 19, 21, 16, 18, 20, 2, 5, 8, 1, 4, 7]),
     "from_smpl_original_to_phys_humanoid_v4": np.array([0, 3, 12, 17, 19, 21, 16, 18, 20, 2, 5, 8, 1, 4, 7]), # TODO: Not used
+    "from_smpl_original_to_phys_humanoid_v5": np.array([0, 3, 12, 17, 19, 21, 16, 18, 20, 2, 5, 8, 1, 4, 7]), # TODO: Not used
 }
 
 
@@ -84,13 +85,16 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/timber_*/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bad_pickUp/*/smpl_params.npy"))
     print(all_files)
-    render_short_hand = False
+    render_short_hand = False  # TODO: temp flag to switch humanoid model
     if render_short_hand:
         humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall_html_render.xml"
     else:
         humanoid_file = "../assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
+        
+        # humanoid_file = "../assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # TODO: set v5 median height model
 
     # parameters for motion editing
     candidates = {
@@ -217,8 +221,9 @@ if __name__ == '__main__':
                 "xml_path": phys_humanoid_v3_xml_path,
                 "tpose": phys_humanoid_v3_tpose,
                 "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v4"],
-                "root_height_offset": 0.07,
+                "root_height_offset": 0.18, # 0.07,
             }, # TODO: seperte v3 and v4, also v4 here should be v5, v4 = v3 + wrist, then modified torso loc
+            # TODO: V5
         }
 
         ###### retargeting ######
