@@ -18,6 +18,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 180 \
     --ergo_coeff 0.2 \
     --construction_experiment True \
+
+
+    --user_urdf "tokenhsi/data/assets/carry_box/indented_box_lab.urdf"  \
+
+
     --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
     
     # todo: v4 ref motion mpath
@@ -317,7 +322,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-2/Humanoid_16-20-54-29/nn/Humanoid.pth
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth
 
 
 

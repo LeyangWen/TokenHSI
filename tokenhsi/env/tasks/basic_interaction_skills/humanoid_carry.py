@@ -366,7 +366,7 @@ class HumanoidCarry(Humanoid):
                 print(f"[Info]: asset_root = {asset_root}, asset_file = {asset_file}")
                 # asset_root = "tokenhsi/data/assets/carry_box"
                 self._box_assets.append(self.gym.load_asset(self.sim, asset_root, asset_file, asset_options))
-                # TODO: mass & size are taken from urdf file, not asset_options
+                # TODO: mass & size are taken from urdf file, not asset_options, also need to happen before _build_box_tensors if dynamic, also change mass
             else: 
                 self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
 
@@ -809,7 +809,7 @@ class HumanoidCarry(Humanoid):
         if self._task_name =="MMH_box":
             carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
         elif self._task_name =="MMH_handle":
-            handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
+            handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size)
             carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
             handheld_r = handheld_handle_r  # override handheld_r for handle task
         elif self._task_name =="MMH_timber":
@@ -1470,25 +1470,53 @@ def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos
     return 0.2 * hands2box
 
 @torch.jit.script
-def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height):
-    # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
+def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height, box_size):
+    # type: (Tensor, Tensor, Tensor, Tensor, bool, Tensor) -> Tensor
     hand_length = 0.08
+    box_to_hand_dist_threshold = 0.75
+    
+    box_size_max = torch.max(box_size, dim=1).values
     box_pos_adjusted = box_pos.clone()
-    box_pos_adjusted[:, 2] += hand_length + (0.34/2)*0.6  # lift by handle --> need to make sure not lifting by wrist
-    if only_height:
-        hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos_adjusted[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
-    else:
-        hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted) ** 2, dim=-1) # xyz
-    hands2box = torch.exp(-5.0 * hands2box_pos_err)
+    box_pos_adjusted[:, 2] += hand_length + (box_size_max/2)*0.7  # lift by handle --> need to make sure not lifting by wrist
+    hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted)**2, dim=-1) # xyz
+    hands2box_pos_err_z = torch.sum(torch.abs(humanoid_rigid_body_pos[:, hands_ids, 2].mean(dim=1) - box_pos_adjusted[:, 2].unsqueeze(-1)), dim=-1) # height
+    hands2box_xyz =torch.exp(-5.0 * hands2box_pos_err)
+    hands2box_z = torch.exp(-5.0 * hands2box_pos_err_z)
+    hands2box = 0.5 * hands2box_xyz + 0.5 * hands2box_z
 
+
+    hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]
+    rel_xyz = hand_pos - box_pos_adjusted[:, None, :]
+    left_xyz = rel_xyz[:, 0]  # vec from box to left hand
+    right_xyz = rel_xyz[:, 1]
+    dot_xyz = torch.sum(left_xyz * right_xyz, dim=-1)
+    denom = torch.norm(left_xyz, p=2, dim=-1) * torch.norm(right_xyz, p=2, dim=-1) + 1e-6
+    cos_xyz = torch.clamp(dot_xyz / denom, -1.0, 1.0)
+    
+    opposite_reward = torch.exp(-5.0 * (1.0 + cos_xyz))
+    
+    box_to_hand_dist_threshold = 0.75
+    if False:
+        print("------------------------------------------------------------------")
+        print("box_pos_adjusted:", box_pos_adjusted[0])
+        print("hand_pos:", hand_pos[0])
+        angle_xyz = torch.acos(cos_xyz)
+        print("Angle between hands (deg):", angle_xyz[0].item() * 180.0 / 3.1415926)
+        print("Opposite Reward:", opposite_reward[0].item())
+        print("Hands2Box xyz:", hands2box_xyz[0].item(), "val: ", hands2box_pos_err[0].item())
+        print("Hands2Box z:", hands2box_z[0].item(), "val: ", hands2box_pos_err_z[0].item())
+        print("Hands2Box before:", hands2box[0].item())
+        print("Total Reward:", (hands2box * opposite_reward)[0].item())
+
+    hands2box = hands2box * opposite_reward
+    
     # box2tar = torch.sum((box_pos_adjusted[..., 0:2] - tar_pos[..., 0:2]) ** 2, dim=-1) # 2d
     # hands2box[box2tar < 0.7 ** 2] = 1.0 # assume this reward is max when the box is close enough to its target location
-
+    
     root_pos = humanoid_rigid_body_pos[:, 0, :]
     box2human = torch.sum((box_pos_adjusted[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1) # 2d
     hands2box[box2human > 0.7 ** 2] = 0 # disable this reward when the box is not close to the humanoid
-
-    # TODO: maybe add opposite side on box.
+    
     return 0.2 * hands2box
 
 @torch.jit.script
@@ -1894,4 +1922,3 @@ def compute_box_ergo_reward(back_angle, box_size, box_pos, prev_box_pos, humanoi
     reward[box_reached_mask] = weight # full reward when box is close enough to target position
     
     return reward
-
