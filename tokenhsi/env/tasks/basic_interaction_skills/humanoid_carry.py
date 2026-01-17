@@ -1484,19 +1484,23 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     hands2box_z = torch.exp(-5.0 * hands2box_pos_err_z)
     hands2box = 0.5 * hands2box_xyz + 0.5 * hands2box_z
 
-
+    # hold by opposite sides of the box
     hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]
-    rel_xyz = hand_pos - box_pos_adjusted[:, None, :]
+    if False: # xyz
+        rel_xyz = hand_pos - box_pos_adjusted[:, None, :]
+    else: # xy only
+        rel_xyz = hand_pos[..., 0:2] - box_pos_adjusted[:, None, 0:2]
     left_xyz = rel_xyz[:, 0]  # vec from box to left hand
     right_xyz = rel_xyz[:, 1]
     dot_xyz = torch.sum(left_xyz * right_xyz, dim=-1)
     denom = torch.norm(left_xyz, p=2, dim=-1) * torch.norm(right_xyz, p=2, dim=-1) + 1e-6
     cos_xyz = torch.clamp(dot_xyz / denom, -1.0, 1.0)
+
     
     opposite_reward = torch.exp(-5.0 * (1.0 + cos_xyz))
     
     box_to_hand_dist_threshold = 0.75
-    if False:
+    if True:
         print("------------------------------------------------------------------")
         print("box_pos_adjusted:", box_pos_adjusted[0])
         print("hand_pos:", hand_pos[0])
