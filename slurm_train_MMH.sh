@@ -147,3 +147,5 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 #     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-3/ --wandb_name Try2-Carry-timber-train-3 --notes "320hr when finish - scratch, 60s, box reward, longer forearm" --ergo_coeff 0.2 \
 #     --resume 1 \
 #     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-3/Humanoid_15-16-18-48/nn/Humanoid.pth \
+
+# todo: note is backwards

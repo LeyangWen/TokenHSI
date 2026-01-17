@@ -3,7 +3,7 @@ taskName: MMH_timber
 env: 
   numEnvs: 4096
   envSpacing: 5
-  episodeLength: 600 # 60s
+  episodeLength: 300 # 60s
   isFlagrun: False
   enableDebugVis: False
   
@@ -92,17 +92,17 @@ env:
     numExperiments: 5
     constructionExperiment: True
     start_positions:
-      - [2.0, 0.0, 0.045]
-      - [2.0, 0.0, 0.2]
-      - [2.0, 0.0, 0.4]
-      - [2.0, 0.0, 0.6]
-      - [2.0, 0.0, 0.8]
+      - [2.0, 0.0, 0.0] #0.045]
+      - [2.0, 0.0, 0.0]
+      - [2.0, 0.0, 0.0]
+      - [2.0, 0.0, 0.0]
+      - [2.0, 0.0, 0.0]
     end_positions:
-      - [-2.0, 0.0, 0.045]
-      - [-2.0, 0.0, 0.2]
-      - [-2.0, 0.0, 0.4]
-      - [-2.0, 0.0, 0.6]
-      - [-2.0, 0.0, 0.8]
+      - [-6.0, 0.0, 0.0]
+      - [-6.0, 0.0, 0.0]
+      - [-6.0, 0.0, 0.0]
+      - [-6.0, 0.0, 0.0]
+      - [-6.0, 0.0, 0.0]
     density: 100.0  # kg/m^3
 
   asset:

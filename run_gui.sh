@@ -5,7 +5,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -18,7 +18,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 180 \
     --ergo_coeff 0.2 \
     --construction_experiment True \
-# todo: v4 ref motion mpath
+    --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
+    
+    # todo: v4 ref motion mpath
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box.urdf"  \
     --skip_img \
     --headless \
@@ -45,6 +47,7 @@ output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/H
 output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
 # all above uses "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"
 
+output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  # from good ones, adapt to v5 mediumn heights
 
 
 # MMH Timber Test
@@ -52,7 +55,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth   \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -122,11 +125,14 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-2/Humanoid_12-23-38-56/nn/Humanoid.pth  # resume try1-19 good results, 120s, timber reward, longer forearm --> didn't long train, also good
 # for both of these: can lift from lower height perfectly, but cant from higher height.
 --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction_exp4-noReward.yaml
+--cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_timber_construction_exp3-smallMotion.yaml
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-3/Humanoid_06-16-56-31/nn/Humanoid.pth  # 320hr scratch, 60s, timber reward, small imitation motion, longer forearm  --> after long trainng, can lift, shaky at the end
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-4/Humanoid_06-16-56-31/nn/Humanoid.pth  # 320 hr scratch, 60s, box reward, longer forearm --> after long training, still have trouble lifting properly , someitme manage, but bad posture
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-3/Humanoid_20-13-26-51/nn/Humanoid.pth  # 220 hr converge, working
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-4/Humanoid_20-13-25-30/nn/Humanoid.pth  # 220 hr not workinig
 
+
+output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights
 
 # Handle Carry Test 
 # 1. imitation motion w/ box annotation, done
@@ -153,6 +159,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth  # scratch --> working, but wrist lift, no finger on handle, stuck on higher hights some times, lift from adasent edge
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-2/Humanoid_06-16-56-31/nn/Humanoid.pth  # resume from box --> working, same wrist lift, rotate box some times, lift for higher hights, but rotate, lift from bottom, still stuck on higher hights
+
+output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights
+
+
+
 
 
 # Basic Carry Test
@@ -481,7 +492,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/timber_noReward_fail" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_fail_diag" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

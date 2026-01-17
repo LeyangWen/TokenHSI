@@ -2,7 +2,7 @@
 env: 
   numEnvs: 4096
   envSpacing: 5
-  episodeLength: 600 # 20s
+  episodeLength: 300 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -90,14 +90,14 @@ env:
     constructionExperiment: True
     start_positions:
       - [2.0, 0.0, 0.2]
-      - [2.0, 0.0, 0.4]
-      - [2.0, 0.0, 0.6]
-      - [2.0, 0.0, 0.8]
+      - [2.0, 0.0, 0.2]
+      - [2.0, 0.0, 0.2]
+      - [2.0, 0.0, 0.2]
     end_positions:
       - [-2.0, 0.0, 0.2]
-      - [-2.0, 0.0, 0.4]
-      - [-2.0, 0.0, 0.6]
-      - [-2.0, 0.0, 0.8]
+      - [-2.0, 0.0, 0.2]
+      - [-2.0, 0.0, 0.2]
+      - [-2.0, 0.0, 0.2]
     density: 100.0  # kg/m^3
 
   asset:
