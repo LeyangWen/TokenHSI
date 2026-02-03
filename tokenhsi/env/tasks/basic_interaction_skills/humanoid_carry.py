@@ -1477,7 +1477,7 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     
     box_size_max = torch.max(box_size, dim=1).values
     box_pos_adjusted = box_pos.clone()
-    box_pos_adjusted[:, 2] += hand_length + (box_size_max/2)*0.7  # lift by handle --> need to make sure not lifting by wrist
+    box_pos_adjusted[:, 2] += hand_length + (box_size_max/2)*0.65  # lift by handle --> need to make sure not lifting by wrist
     hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted)**2, dim=-1) # xyz
     hands2box_pos_err_z = torch.sum(torch.abs(humanoid_rigid_body_pos[:, hands_ids, 2].mean(dim=1) - box_pos_adjusted[:, 2].unsqueeze(-1)), dim=-1) # height
     hands2box_xyz =torch.exp(-5.0 * hands2box_pos_err)
@@ -1500,7 +1500,8 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     opposite_reward = torch.exp(-5.0 * (1.0 + cos_xyz))
     
     box_to_hand_dist_threshold = 0.75
-    if True:
+    verbose = False
+    if verbose:
         print("------------------------------------------------------------------")
         print("box_pos_adjusted:", box_pos_adjusted[0])
         print("hand_pos:", hand_pos[0])

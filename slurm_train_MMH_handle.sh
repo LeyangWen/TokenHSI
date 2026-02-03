@@ -148,12 +148,12 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment False \
     --random_density True \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/ \
-    --wandb_name Try3-Carry-handle-train-6 \
-    --notes "From scratch again" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-7/ \
+    --wandb_name Try3-Carry-handle-train-7 \
+    --notes "more imitation motion" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_28-11-11-31/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
 
 
 
