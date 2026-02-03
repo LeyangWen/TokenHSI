@@ -24,6 +24,25 @@ motions:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle01.66920758.20250919200241/clip_03.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle02.high/1.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle02.high/4.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_2.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_3.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_4.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_5.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_6.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_7.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_8.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_9.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/handle_2/handle_lift_10.pkl"
+
+  handle_carry:
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_2.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_3.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_4.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_5.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_6.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_7.pkl"
 
   bag_pickUp:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_01.pkl"

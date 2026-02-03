@@ -60,37 +60,19 @@ motions:
       weight: 1.0
 
   carryWith:
-    - file: motions/carry/ACCAD+__+Female1Walking_c3d+__+B20_-_walk_with_box_stageii/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/ACCAD+__+Female1Walking_c3d+__+B20_-_walk_with_box_stageii/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_1/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S01+__+Activity05_stageii+__+10695-10851_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S01+__+Activity05_stageii+__+10695-10851_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_2/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+4851-5001_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+4851-5001_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_3/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+5664-5853_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+5664-5853_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_4/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S02+__+Activity03_stageii+__+8899-9137_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity03_stageii+__+8899-9137_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_5/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S02+__+Activity04_stageii+__+12780-12926_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity04_stageii+__+12780-12926_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_6/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-    - file: motions/carry/S02+__+Activity05_stageii+__+13505-13676_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S02+__+Activity05_stageii+__+13505-13676_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
-      weight: 1.0
-    - file: motions/carry/S03+__+Activity03_stageii+__+8483-8675_carryWith/phys_humanoid_v3/ref_motion.npy
-      obj_file: motions/carry/S03+__+Activity03_stageii+__+8483-8675_carryWith/phys_humanoid_v3/box_motion.npy
-      rsi_skipped_range: []
+    - file: motions/MMH/handle_carry/+__+home+__+leyang+__+Documents+__+SMPLest-X+__+demo+__+result_imitation_motions+__+Carry+__+handle+__+handle_carry_7/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
 
   loco:
@@ -178,4 +160,25 @@ motions:
       weight: 1.0
     - file: motions/MMH/handle_pickUp/handle02.high+__+4/phys_humanoid_v4/ref_motion.npy
       weight: 1.0
-  
+    - file: motions/MMH/handle_pickUp/handle02.high+__+1/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle02.high+__+4/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_1/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_3/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_4/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_5/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_6/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_7/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_8/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_9/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0
+    - file: motions/MMH/handle_pickUp/handle_2+__+handle_lift_10/phys_humanoid_v4/ref_motion.npy
+      weight: 1.0

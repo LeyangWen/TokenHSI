@@ -85,14 +85,20 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/timber_*/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
-    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bad_pickUp/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/handle_2*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle_carry/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bad_pickUp/*/smpl_params.npy"))
+    
+    
+    
     print(all_files)
     render_short_hand = False  # TODO: temp flag to switch humanoid model
     if render_short_hand:
         humanoid_file = "../assets/mjcf/phys_humanoid_v3_box_foot_tall_html_render.xml"
     else:
-        humanoid_file = "../assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
+        humanoid_file = "../assets/mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
+        
+        # humanoid_file = "../assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
         
         # humanoid_file = "../assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # TODO: set v5 median height model
 

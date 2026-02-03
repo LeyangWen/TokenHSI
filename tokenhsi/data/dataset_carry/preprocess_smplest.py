@@ -28,20 +28,21 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
 
     # TODO:selected motions here
-    # candidates = {
-    #     # "box_pickUp": cfg["motions"]["box_pickUp"],
-    #     "handle_pickUp": cfg["motions"]["handle_pickUp"],
-    #     # "bag_pickUp": cfg["motions"]["bag_pickUp"],
-    #     # "timber_pickUp": cfg["motions"]["timber_pickUp"],
-    #     # "timber_carry": cfg["motions"]["timber_carry"],
-    #     # "timber_putDown": cfg["motions"]["timber_putDown"],
-    # }
-    # target_fps = 20
     candidates = {
-        "dashboard_pickUp": cfg["motions"]["dashboard_pickUp"],
-        "bad_pickUp": cfg["motions"]["bad_pickUp"],
+        # "box_pickUp": cfg["motions"]["box_pickUp"],
+        "handle_pickUp": cfg["motions"]["handle_pickUp"],
+        "handle_carry": cfg["motions"]["handle_carry"],
+        # "bag_pickUp": cfg["motions"]["bag_pickUp"],
+        # "timber_pickUp": cfg["motions"]["timber_pickUp"],
+        # "timber_carry": cfg["motions"]["timber_carry"],
+        # "timber_putDown": cfg["motions"]["timber_putDown"],
     }
-    target_fps = 30
+    target_fps = 20
+    # candidates = {
+    #     "dashboard_pickUp": cfg["motions"]["dashboard_pickUp"],
+    #     "bad_pickUp": cfg["motions"]["bad_pickUp"],
+    # }
+    # target_fps = 30
 
     for skill, data in candidates.items():
         output_dir_skill = os.path.join(output_dir, skill)

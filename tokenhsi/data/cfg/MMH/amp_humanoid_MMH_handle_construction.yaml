@@ -3,7 +3,7 @@ taskName: MMH_handle
 env: 
   numEnvs: 4096
   envSpacing: 5
-  episodeLength: 300 # 20s
+  episodeLength: 900 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -33,7 +33,7 @@ env:
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
   skillInitProb: [0.1, 0.3, 0.6, 0.0, 0.0]
   # skillInitProb: [0.0, 0.0, 1.0, 0.0, 0.0]  # for local visualization train testing
-  skillDiscProb: [0.1, 0.2, 0.4, 0.0, 0.10]
+  skillDiscProb: [0.4, 0.2, 0.4, 0.1, 0.1]
 
 
   # task
@@ -111,7 +111,8 @@ env:
     # assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall.xml"  # this is used in my custom imitation learning
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_sticky_horizontal.xml"  
-    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal.xml"  
+    # assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal.xml"  
+    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 
   plane:
     staticFriction: 1.0
