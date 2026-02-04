@@ -3,7 +3,7 @@ taskName: MMH_handle
 env: 
   numEnvs: 4096
   envSpacing: 3
-  episodeLength: 900 # 20s
+  episodeLength: 1200 # 20s
   isFlagrun: False
   enableDebugVis: False
   

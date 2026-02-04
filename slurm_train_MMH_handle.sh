@@ -109,7 +109,34 @@ nvcc --version
 #     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth  \
 
 
-box w. handle v1
+# box w. handle v1
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
+#     --num_envs 10240 \
+#     --headless \
+#     --wandb_project "TokenHSI-MMH-Train" \
+#     --wandb_mode "online" \
+#     --random_mode_equal_proportion False \
+#     --construction_experiment False \
+#     --random_density True \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-5/ \
+#     --wandb_name Try3-Carry-handle-train-5-2 \
+#     --notes "opposit reward, smooth wrist, median H, from Try3-2, resume from box" \
+#     --ergo_coeff 0.2 \
+#     --resume 1 \
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-5/Humanoid_17-00-15-35/nn/Humanoid.pth
+
+
+    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-4/ \
+    # --wandb_name "Try3-Carry-handle-train-4" \
+    # --notes "opposit reward, smooth wrist, median H, from Try3-1-->3-3" \
+    # --ergo_coeff 0.2 \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth
+
+
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
@@ -121,19 +148,12 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment False \
     --random_density True \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-1/ \
-    --wandb_name "Try3-Carry-handle-train-1" \
-    --notes "indented box try, smooth wrist, median H" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-8/ \
+    --wandb_name Try3-Carry-handle-train-8 \
+    --notes "more imitation motion, 120s" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth
-
-    # --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-2/ \
-    # --wandb_name Try3-Carry-handle-train-2 \
-    # --notes resume-box-MMH-carry \
-    # --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-2/Humanoid_20-13-28-16/nn/Humanoid.pth
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
 
 
 

@@ -3,7 +3,7 @@ taskName: MMH_timber
 env: 
   numEnvs: 4096
   envSpacing: 3
-  episodeLength: 300 # 60s
+  episodeLength: 900 # 60s
   isFlagrun: False
   enableDebugVis: False
   
