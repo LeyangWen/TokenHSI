@@ -1,9 +1,9 @@
 # if given, will override the device setting in gym. 
-taskName: MMH_handle
+taskName: MMH_bag
 env: 
   numEnvs: 4096
   envSpacing: 3
-  episodeLength: 900 # 20s
+  episodeLength: 200 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -31,7 +31,8 @@ env:
   power_coefficient: 0.0005
 
   skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.1, 0.3, 0.6, 0.0, 0.0]
+  skillInitProb: [0.1, 0.3, 0.1, 0.0, 0.0]
+    # skillInitProb: [0.1, 0.3, 0.6, 0.0, 0.0]
   # skillInitProb: [0.0, 0.0, 1.0, 0.0, 0.0]  # for local visualization train testing
   skillDiscProb: [0.4, 0.2, 0.4, 0.1, 0.1]
 
@@ -49,8 +50,8 @@ env:
 
   box:
     build:
-      userUrdf: "tokenhsi/data/assets/carry_box/indented_box_lab.urdf"
-      baseSize: [0.34, 0.34, 0.36] # unit: m
+      userUrdf: "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"
+      baseSize: [0.35, 0.51, 0.15] # unit: m  [width(X), length(Y), thickness(Z)]
       randomSize: False
       randomModeEqualProportion: False
       scaleRangeX: [1.0, 1.0] # default range if randomModeEqualProportion: True

@@ -92,6 +92,9 @@ motions:
     # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_4.pkl"
     # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_12.pkl"
 
+  bag_pickUp:
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_1.pkl"
+
   dashboard_pickUp:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/bad/bad.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/good/good.pkl"

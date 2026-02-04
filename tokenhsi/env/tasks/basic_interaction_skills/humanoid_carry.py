@@ -252,10 +252,12 @@ class HumanoidCarry(Humanoid):
         
         if self._task_name =="MMH_box":
             platform_size = 0.4
-        if self._task_name =="MMH_handle":
+        elif self._task_name =="MMH_handle":
             platform_size = 0.36
         elif self._task_name =="MMH_timber":
             platform_size = 0.2  # smaller size to avoid tripping
+        elif self._task_name =="MMH_bag":
+            platform_size = 0.4
         # if self.constructionExp and self._is_test:
         #     platform_size = max(self._build_base_size)
         self._platform_height = 0.02
@@ -819,7 +821,7 @@ class HumanoidCarry(Humanoid):
             handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size)
             carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
             handheld_r = handheld_handle_r  # override handheld_r for handle task
-        elif self._task_name =="MMH_timber":
+        elif self._task_name =="MMH_timber" or self._task_name =="MMH_bag":
             if self._verbose:
                 # print("box_pos =", box_pos[0])
                 # print("box_rot =", box_rot[0])

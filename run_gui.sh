@@ -18,7 +18,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --density 180 \
     --ergo_coeff 0.2 \
     --construction_experiment True \
-
+    
 
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box_lab.urdf"  \
 
@@ -148,7 +148,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth   \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_28-11-11-31/nn/Humanoid.pth    \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -162,10 +162,44 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment True \
     --user_urdf "tokenhsi/data/assets/carry_box/indented_box_lab.urdf"  \
 
+    
+
+    
+    
+
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth  # scratch --> working, but wrist lift, no finger on handle, stuck on higher hights some times, lift from adasent edge
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-2/Humanoid_06-16-56-31/nn/Humanoid.pth  # resume from box --> working, same wrist lift, rotate box some times, lift for higher hights, but rotate, lift from bottom, still stuck on higher hights
 
-output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights
+
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-4/Humanoid_17-00-12-00/nn/Humanoid.pth  # opposite reward, lift from proxy edges, can lift
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-5/Humanoid_17-00-15-35/nn/Humanoid.pth  # opposite reward, resume from box
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-5/Humanoid_28-11-06-29/nn/Humanoid.pth  # more training, still rotate, does not lift high loc
+# try training from scratch, keep training, angle in the xy plane promote turning of the box
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_28-11-11-31/nn/Humanoid.pth  # from scratch, getting there
+
+
+# MMH bag carry test TODO:dataset_MMH_timber file change
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-5/Humanoid_17-00-15-35/nn/Humanoid.pth    \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "Carry_test_1" \
+    --wandb_mode "disabled" \
+    --random_size False \
+    --random_density True \
+    --density 180 \
+    --ergo_coeff 0.2 \
+    --construction_experiment True \
+
+
+
+
+
 
 
 
@@ -322,10 +356,26 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "box w. 1 good motion and 0.2 reward" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth \
 
 
-
+# MMH Train local visualize - bag, TODO:dataset_MMH_timber file change
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_small.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
+    --num_envs 24 \
+    --wandb_project "TokenHSI-MMH-Train" \
+    --wandb_mode "disabled" \
+    --random_mode_equal_proportion False \
+    --construction_experiment False \
+    --random_density True \
+    --wandb_name "Carry-box-train-1" \
+    --notes "box w. 1 good motion and 0.2 reward" \
+    --ergo_coeff 0.2 \
+    --resume 1 \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-1/Humanoid_13-22-34-51/nn/Humanoid.pth \
+    # --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
 
 
 
@@ -497,7 +547,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_fail_diag" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/bag_2" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

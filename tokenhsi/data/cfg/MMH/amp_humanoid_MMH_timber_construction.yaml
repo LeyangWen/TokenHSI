@@ -2,7 +2,7 @@
 taskName: MMH_timber
 env: 
   numEnvs: 4096
-  envSpacing: 5
+  envSpacing: 3
   episodeLength: 300 # 60s
   isFlagrun: False
   enableDebugVis: False
@@ -112,7 +112,8 @@ env:
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_sticky_horizontal.xml"  
     # assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_sticky_horizontal.xml"
-    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal.xml"  
+    # assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal.xml"  
+    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 
   plane:
     staticFriction: 1.0
