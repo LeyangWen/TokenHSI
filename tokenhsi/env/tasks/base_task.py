@@ -581,8 +581,8 @@ class BaseTask():
 
     def _physics_step(self):
         for i in range(self.control_freq_inv):
-            self.render()
             self.gym.simulate(self.sim)
+            self.render()  # reverse sequence to avoid reset bug
         return
 
     def post_physics_step(self):

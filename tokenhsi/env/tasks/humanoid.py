@@ -101,7 +101,7 @@ class Humanoid(BaseTask):
         self.vec_sensor_tensor = gymtorch.wrap_tensor(sensor_tensor).view(self.num_envs, sensors_per_env * 6)
 
         dof_force_tensor = self.gym.acquire_dof_force_tensor(self.sim)
-        self.dof_force_tensor = gymtorch.wrap_tensor(dof_force_tensor).view(self.num_envs, self.num_dof)
+        self.dof_force_tensor = gymtorch.wrap_tensor(dof_force_tensor).view(self.num_envs, -1)[ :, :self.num_dof]
         
         self.gym.refresh_dof_state_tensor(self.sim)
         self.gym.refresh_actor_root_state_tensor(self.sim)
@@ -120,8 +120,10 @@ class Humanoid(BaseTask):
         # create some wrapper tensors for different slices
         self._dof_state = gymtorch.wrap_tensor(dof_state_tensor)
         dofs_per_env = self._dof_state.shape[0] // self.num_envs
+        self._dofs_per_env = dofs_per_env
         self._dof_pos = self._dof_state.view(self.num_envs, dofs_per_env, 2)[..., :self.num_dof, 0]
         self._dof_vel = self._dof_state.view(self.num_envs, dofs_per_env, 2)[..., :self.num_dof, 1]
+        self._pd_target_full = torch.zeros((self.num_envs, dofs_per_env), device=self.device, dtype=torch.float)
         
         self._initial_dof_pos = torch.zeros_like(self._dof_pos, device=self.device, dtype=torch.float)
         self._initial_dof_vel = torch.zeros_like(self._dof_vel, device=self.device, dtype=torch.float)
@@ -206,7 +208,7 @@ class Humanoid(BaseTask):
         self.gym.set_actor_root_state_tensor_indexed(self.sim,
                                                      gymtorch.unwrap_tensor(self._root_states),
                                                      gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
-        self.gym.set_dof_state_tensor_indexed(self.sim,
+        self.gym.set_dof_state_tensor_indexed(self.sim,  # (42, 2) for bag, (38, 2) for boxes; for bag, you should not set root and dof here, it will get overwritten afterwards in child classes
                                               gymtorch.unwrap_tensor(self._dof_state),
                                               gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
         
@@ -368,7 +370,7 @@ class Humanoid(BaseTask):
 
         if (self._pd_control):
             dof_prop = self.gym.get_asset_dof_properties(humanoid_asset)
-            dof_prop["driveMode"] = gymapi.DOF_MODE_POS
+            dof_prop["driveMode"] = gymapi.DOF_MODE_POS  # list of (38,), all int 1
             self.gym.set_actor_dof_properties(env_ptr, humanoid_handle, dof_prop)
 
         self.humanoid_handles.append(humanoid_handle)
@@ -542,7 +544,15 @@ class Humanoid(BaseTask):
             if self.cfg["env"]["enableTrackInitState"]:
                 pd_tar = self._every_env_init_dof_pos.clone()
 
-            pd_tar_tensor = gymtorch.unwrap_tensor(pd_tar)
+            # fix shape when box have joints
+            # pd_tar_tensor = gymtorch.unwrap_tensor(pd_tar)  # --> original code
+            
+            # fix to allow passive joints in box, or else no joints will move
+            self._pd_target_full.zero_()
+            self._pd_target_full[:, :self.num_dof] = pd_tar
+            pd_tar_tensor = gymtorch.unwrap_tensor(self._pd_target_full)
+            # fix end
+            
             self.gym.set_dof_position_target_tensor(self.sim, pd_tar_tensor)
         else:
             forces = self.actions * self.motor_efforts.unsqueeze(0) * self.power_scale

@@ -2,15 +2,15 @@
 <robot name="concrete_bag_box_chain">
 
   <!-- Link geometry -->
-  <!-- One concrete bag (80lb) modeled as 5 segments for flexibility with tapered ends:
-       Total bag dimensions: ~0.51m (20") long × 0.41m (16") wide × 0.10m (4") thick
+  <!-- One concrete bag (80lb) modeled as 5 segments for flexibility with tapered ends: (if stone, 22.1 kg)
+       Total bag dimensions: ~0.51m (20") long × 0.41m (16") wide × 0.15m (6") thick
        
        Segment dimensions (length × width × thickness):
-       seg_0 (end):    0.102m × 0.328m × 0.08m  (80% width/thickness)
-       seg_1:          0.102m × 0.369m × 0.09m  (90% width/thickness)
-       seg_2 (center): 0.102m × 0.41m  × 0.10m  (100% - full size)
-       seg_3:          0.102m × 0.369m × 0.09m  (90% width/thickness)
-       seg_4 (end):    0.102m × 0.328m × 0.08m  (80% width/thickness)
+       seg_0 (end):    0.102m × 0.35m × 0.12m
+       seg_1:          0.102m × 0.35m × 0.135m
+       seg_2 (center): 0.102m × 0.35m × 0.15m
+       seg_3:          0.102m × 0.35m × 0.135m
+       seg_4 (end):    0.102m × 0.35m × 0.12m
        
        Gap between segments: 2cm for visible spacing and flexing
   -->
@@ -18,96 +18,71 @@
   <link name="seg_0">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.328 0.08"/></geometry>  <!-- 80% width and thickness -->
+      <geometry><box size="0.102 0.35 0.12"/></geometry>
       <material name="gray">
         <color rgba="0.5 0.5 0.5 1.0"/>
       </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.328 0.08"/></geometry>
+      <geometry><box size="0.102 0.35 0.12"/></geometry>
     </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="8.0"/>  <!-- 80% of 10 kg -->
-      <inertia ixx="0.092" iyy="0.007" izz="0.093" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
   </link>
 
   <link name="seg_1">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.369 0.09"/></geometry>  <!-- 90% width and thickness -->
+      <geometry><box size="0.102 0.35 0.135"/></geometry>
       <material name="gray">
         <color rgba="0.5 0.5 0.5 1.0"/>
       </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.369 0.09"/></geometry>
+      <geometry><box size="0.102 0.35 0.135"/></geometry>
     </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="9.0"/>  <!-- 90% of 10 kg -->
-      <inertia ixx="0.117" iyy="0.008" izz="0.118" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
   </link>
 
   <link name="seg_2">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.41 0.10"/></geometry>
+      <geometry><box size="0.102 0.35 0.15"/></geometry>
       <material name="gray">
         <color rgba="0.5 0.5 0.5 1.0"/>
       </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.41 0.10"/></geometry>
+      <geometry><box size="0.102 0.35 0.15"/></geometry>
     </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="10.0"/>
-      <inertia ixx="0.144" iyy="0.009" izz="0.145" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
   </link>
 
   <link name="seg_3">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.369 0.09"/></geometry>  <!-- 90% width and thickness -->
+      <geometry><box size="0.102 0.35 0.135"/></geometry>
       <material name="gray">
         <color rgba="0.5 0.5 0.5 1.0"/>
       </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.369 0.09"/></geometry>
+      <geometry><box size="0.102 0.35 0.135"/></geometry>
     </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="9.0"/>  <!-- 90% of 10 kg -->
-      <inertia ixx="0.117" iyy="0.008" izz="0.118" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
   </link>
 
   <link name="seg_4">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.328 0.08"/></geometry>  <!-- 80% width and thickness -->
+      <geometry><box size="0.102 0.35 0.12"/></geometry>
       <material name="gray">
         <color rgba="0.5 0.5 0.5 1.0"/>
       </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.102 0.328 0.08"/></geometry>
+      <geometry><box size="0.102 0.35 0.12"/></geometry>
     </collision>
-    <inertial>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <mass value="8.0"/>  <!-- 80% of 10 kg -->
-      <inertia ixx="0.092" iyy="0.007" izz="0.093" ixy="0" ixz="0" iyz="0"/>
-    </inertial>
   </link>
 
   <!-- Chain joints: bend around Y-axis (hinge), so it flexes in X-Z plane -->
@@ -115,40 +90,40 @@
        x = half of segment length (0.051) + spacing (0.01) = 0.061 m
        This creates a 2cm gap between adjacent segments -->
 
-  <joint name="j_0_1" type="fixed">
+  <joint name="j_0_1" type="revolute">
     <parent link="seg_0"/>
     <child link="seg_1"/>
-    <origin xyz="0.061 0 0" rpy="0 0 0"/>
+    <origin xyz="0.122 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
     <!-- Joint limits: ±45 degrees (±0.785 rad) allows realistic flexing -->
-    <limit lower="-0.785" upper="0.785" effort="500" velocity="2.0"/>
+    <limit lower="-0.133" upper="0.133" effort="500" velocity="2.0"/>
     <dynamics damping="5.0" friction="1.0"/>
   </joint>
 
-  <joint name="j_1_2" type="fixed">
+  <joint name="j_1_2" type="revolute">
     <parent link="seg_1"/>
     <child link="seg_2"/>
-    <origin xyz="0.061 0 0" rpy="0 0 0"/>
+    <origin xyz="0.122 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-0.785" upper="0.785" effort="500" velocity="2.0"/>
+    <limit lower="-0.133" upper="0.133" effort="500" velocity="2.0"/>
     <dynamics damping="5.0" friction="1.0"/>
   </joint>
 
-  <joint name="j_2_3" type="fixed">
+  <joint name="j_2_3" type="revolute">
     <parent link="seg_2"/>
     <child link="seg_3"/>
-    <origin xyz="0.061 0 0" rpy="0 0 0"/>
+    <origin xyz="0.122 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-0.785" upper="0.785" effort="500" velocity="2.0"/>
+    <limit lower="-0.133" upper="0.133" effort="500" velocity="2.0"/>
     <dynamics damping="5.0" friction="1.0"/>
   </joint>
 
-  <joint name="j_3_4" type="fixed">
+  <joint name="j_3_4" type="revolute">
     <parent link="seg_3"/>
     <child link="seg_4"/>
-    <origin xyz="0.061 0 0" rpy="0 0 0"/>
+    <origin xyz="0.122 0 0" rpy="0 0 0"/>
     <axis xyz="0 1 0"/>
-    <limit lower="-0.785" upper="0.785" effort="500" velocity="2.0"/>
+    <limit lower="-0.133" upper="0.133" effort="500" velocity="2.0"/>
     <dynamics damping="5.0" friction="1.0"/>
   </joint>
 

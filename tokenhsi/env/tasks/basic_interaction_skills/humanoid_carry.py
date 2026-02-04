@@ -399,6 +399,13 @@ class HumanoidCarry(Humanoid):
     
         box_handle = self.gym.create_actor(env_ptr, self._box_assets[env_id], default_pose, "box", col_group, col_filter, segmentation_id)
         self._box_handles.append(box_handle)
+        if env_id == 0:  # count box joints
+            self._box_dof_count = self.gym.get_actor_dof_count(env_ptr, box_handle)
+
+        if self.gym.get_actor_dof_count(env_ptr, box_handle) > 0:  # for box with joints
+            dof_prop = self.gym.get_actor_dof_properties(env_ptr, box_handle)
+            dof_prop["driveMode"].fill(gymapi.DOF_MODE_NONE)
+            self.gym.set_actor_dof_properties(env_ptr, box_handle, dof_prop)
         
         print(self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0])
         mass = self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0].mass
@@ -897,6 +904,13 @@ class HumanoidCarry(Humanoid):
 
     def pre_physics_step(self, actions):
         super().pre_physics_step(actions)
+        reset_mask = self.progress_buf == 0
+        if torch.any(reset_mask):
+            # Hold the reset pose for the first step to avoid snapping back to stale targets.
+            self._pd_target_full[reset_mask, :self.num_dof] = self._dof_pos[reset_mask]
+            pd_tar_tensor = gymtorch.unwrap_tensor(self._pd_target_full)
+            self.gym.set_dof_position_target_tensor(self.sim, pd_tar_tensor)
+
         self._update_task()
         self._prev_root_pos[:] = self._humanoid_root_states[..., 0:3]
         self._prev_box_pos[:] = self._box_states[..., 0:3]
@@ -1023,10 +1037,24 @@ class HumanoidCarry(Humanoid):
             self._success_buf[env_ids] = 0
             self._precision_buf[env_ids] = float('Inf')
 
-        env_ids_int32 = self._box_actor_ids[env_ids].view(-1)
+        env_ids_int32 = self._box_actor_ids[env_ids].view(-1)  # actor indices  tensor([1], device='cuda:0', dtype=torch.int32) box
         if self._reset_random_height:
             # env has two platforms
-            env_ids_int32 = torch.cat([env_ids_int32, self._platform_actor_ids, self._tar_platform_actor_ids], dim=0)
+            env_ids_int32 = torch.cat([env_ids_int32, self._platform_actor_ids, self._tar_platform_actor_ids], dim=0)  # tensor([1, 2, 3], device='cuda:0', dtype=torch.int32)
+        
+        
+        if getattr(self, "_box_dof_count", 0) > 0:  # need to reset humanoid and box at the same time, or else the reset in super() will overwritten
+            humanoid_env_ids_int32 = self._humanoid_actor_ids[env_ids]
+            box_env_ids_int32 = self._box_actor_ids[env_ids]
+            dof_env_ids_int32 = torch.cat([humanoid_env_ids_int32, box_env_ids_int32], dim=0)  # 0, 1
+           
+            dof_state = self._dof_state.view(self.num_envs, self._dofs_per_env, 2)
+            dof_state[env_ids, self.num_dof:self.num_dof + self._box_dof_count, :] = 0.0
+            self.gym.set_dof_state_tensor_indexed(self.sim,  # (42, 2) for bag, (38, 2) for boxes
+                                                              gymtorch.unwrap_tensor(self._dof_state),
+                                                              gymtorch.unwrap_tensor(dof_env_ids_int32), len(dof_env_ids_int32))
+            env_ids_int32 = torch.cat([humanoid_env_ids_int32, env_ids_int32], dim=0)  # 0, 1, 2, 3
+        
         self.gym.set_actor_root_state_tensor_indexed(self.sim,
                                                      gymtorch.unwrap_tensor(self._root_states),
                                                      gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
@@ -1500,7 +1528,8 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     opposite_reward = torch.exp(-5.0 * (1.0 + cos_xyz))
     
     box_to_hand_dist_threshold = 0.75
-    if True:
+    verbose = False
+    if verbose:
         print("------------------------------------------------------------------")
         print("box_pos_adjusted:", box_pos_adjusted[0])
         print("hand_pos:", hand_pos[0])
