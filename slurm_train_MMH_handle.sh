@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=TokenHSI-MMH-train
-#SBATCH --output=output_slurm/train_MMH_log.txt
-#SBATCH --error=output_slurm/train_MMH_error.txt
+#SBATCH --output=output_slurm/train_MMH_log_2.txt
+#SBATCH --error=output_slurm/train_MMH_error_2.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -9,7 +9,7 @@
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
 #SBATCH --time=100:00:00
-#SBATCH --account=shdpm0
+#SBATCH --account=shdpm98
 #SBATCH --partition=spgpu
 ##### END preamble
 
@@ -148,12 +148,12 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment False \
     --random_density True \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-8/ \
-    --wandb_name Try3-Carry-handle-train-8 \
-    --notes "more imitation motion, 120s" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-10/ \
+    --wandb_name Try3-Carry-handle-train-10 \
+    --notes "opposite edge orient reward, scratch" \
     --ergo_coeff 0.2 \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
 
 
 
