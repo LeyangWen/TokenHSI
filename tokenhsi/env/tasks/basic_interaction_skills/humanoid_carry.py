@@ -818,7 +818,7 @@ class HumanoidCarry(Humanoid):
         if self._task_name =="MMH_box":
             carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
         elif self._task_name =="MMH_handle":
-            handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size)
+            handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size, box_rot)
             carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
             handheld_r = handheld_handle_r  # override handheld_r for handle task
         elif self._task_name =="MMH_timber" or self._task_name =="MMH_bag":
@@ -1500,58 +1500,134 @@ def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos
     return 0.2 * hands2box
 
 @torch.jit.script
-def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height, box_size):
-    # type: (Tensor, Tensor, Tensor, Tensor, bool, Tensor) -> Tensor
+def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height, box_size, box_rot):
+    # type: (Tensor, Tensor, Tensor, Tensor, bool, Tensor, Tensor) -> Tensor
+    """
+    Rewards the humanoid for lifting a box by its handles on opposite sides of the same edge.
+
+    Key change vs prior version:
+        - `opposite_reward` now also checks that both hands lie along the *same*
+          local box axis (i.e. the axis whose half-extent is smallest, so they
+          grab the long/wide sides rather than corners or adjacent edges).
+        - We decompose each hand's relative position into the box's local frame
+          (via the quaternion), pick the dominant axis per hand, and reward
+          configurations where both hands share that axis but have opposite signs.
+    """
     hand_length = 0.08
     box_to_hand_dist_threshold = 0.75
-    
+
+    # ------------------------------------------------------------------ #
+    # 1. Target hand position: above box centre, at handle height          #
+    # ------------------------------------------------------------------ #
     box_size_max = torch.max(box_size, dim=1).values
     box_pos_adjusted = box_pos.clone()
-    box_pos_adjusted[:, 2] += hand_length + (box_size_max/2)*0.65  # lift by handle --> need to make sure not lifting by wrist
-    hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted)**2, dim=-1) # xyz
-    hands2box_pos_err_z = torch.sum(torch.abs(humanoid_rigid_body_pos[:, hands_ids, 2].mean(dim=1) - box_pos_adjusted[:, 2].unsqueeze(-1)), dim=-1) # height
-    hands2box_xyz =torch.exp(-5.0 * hands2box_pos_err)
-    hands2box_z = torch.exp(-5.0 * hands2box_pos_err_z)
-    hands2box = 0.5 * hands2box_xyz + 0.5 * hands2box_z
+    box_pos_adjusted[:, 2] += hand_length + (box_size_max / 2) * 0.65
 
-    # hold by opposite sides of the box
-    hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]
-    if False: # xyz
-        rel_xyz = hand_pos - box_pos_adjusted[:, None, :]
-    else: # xy only
-        rel_xyz = hand_pos[..., 0:2] - box_pos_adjusted[:, None, 0:2]
-    left_xyz = rel_xyz[:, 0]  # vec from box to left hand
-    right_xyz = rel_xyz[:, 1]
-    dot_xyz = torch.sum(left_xyz * right_xyz, dim=-1)
-    denom = torch.norm(left_xyz, p=2, dim=-1) * torch.norm(right_xyz, p=2, dim=-1) + 1e-6
-    cos_xyz = torch.clamp(dot_xyz / denom, -1.0, 1.0)
+    # ------------------------------------------------------------------ #
+    # 2. Proximity reward (unchanged)                                      #
+    # ------------------------------------------------------------------ #
+    hands2box_pos_err = torch.sum(
+        (humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted) ** 2, dim=-1
+    )
+    hands2box_pos_err_z = torch.sum(
+        torch.abs(
+            humanoid_rigid_body_pos[:, hands_ids, 2].mean(dim=1)
+            - box_pos_adjusted[:, 2].unsqueeze(-1)
+        ),
+        dim=-1,
+    )
+    hands2box_xyz = torch.exp(-5.0 * hands2box_pos_err)
+    hands2box_z   = torch.exp(-5.0 * hands2box_pos_err_z)
+    hands2box     = 0.5 * hands2box_xyz + 0.5 * hands2box_z
 
-    
-    opposite_reward = torch.exp(-5.0 * (1.0 + cos_xyz))
-    
-    box_to_hand_dist_threshold = 0.75
+    # ------------------------------------------------------------------ #
+    # 3. Opposite-side-of-the-SAME-edge reward                            #
+    # ------------------------------------------------------------------ #
+    hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]          # (N, 2, 3)
+    # XY only – we care about which face they're gripping, not height
+    rel_xy = hand_pos[..., 0:2] - box_pos_adjusted[:, None, 0:2]  # (N, 2, 2)
+    left_xy  = rel_xy[:, 0]   # (N, 2)
+    right_xy = rel_xy[:, 1]   # (N, 2)
+
+    # --- 3a. Original "hands are 180° apart" term (keep as a component) ---
+    dot_xy  = torch.sum(left_xy * right_xy, dim=-1)
+    denom   = torch.norm(left_xy, p=2, dim=-1) * torch.norm(right_xy, p=2, dim=-1) + 1e-6
+    cos_xy  = torch.clamp(dot_xy / denom, -1.0, 1.0)
+    opposite_reward = torch.exp(-5.0 * (1.0 + cos_xy))   # peaks at cos = -1
+
+    # --- 3b. NEW: both hands must lie along the SAME box-local axis -------
+    # Convert box quaternion (w, x, y, z) to a 2×2 rotation matrix (XY plane only).
+    # box_rot is (N, 4) in (x, y, z, w) or (w, x, y, z) – adjust index below if needed.
+    # Assuming Isaac Gym convention: (x, y, z, w)
+    qx = box_rot[:, 0]
+    qy = box_rot[:, 1]
+    qz = box_rot[:, 2]
+    qw = box_rot[:, 3]
+
+    # Yaw-only rotation matrix columns (world X and Y projected into box local frame)
+    #   R = [[cos_yaw, -sin_yaw],
+    #        [sin_yaw,  cos_yaw]]
+    # We extract the two columns so we can project rel_xy onto box local axes.
+    cos_yaw =  1.0 - 2.0 * (qy * qy + qz * qz)   # R[0,0]
+    sin_yaw =        2.0 * (qw * qz + qx * qy)    # R[1,0]  (world→local: transpose)
+
+    # Box local X-axis unit vector (in world XY)
+    box_local_x = torch.stack([ cos_yaw, sin_yaw], dim=-1)   # (N, 2)
+    # Box local Y-axis unit vector (in world XY)
+    box_local_y = torch.stack([-sin_yaw, cos_yaw], dim=-1)   # (N, 2)
+
+    # Project each hand's relative position onto local axes
+    left_lx  = torch.sum(left_xy  * box_local_x, dim=-1)   # scalar projections
+    left_ly  = torch.sum(left_xy  * box_local_y, dim=-1)
+    right_lx = torch.sum(right_xy * box_local_x, dim=-1)
+    right_ly = torch.sum(right_xy * box_local_y, dim=-1)
+
+    # "Same-axis" score: hands should dominate along the *same* local axis.
+    # Compute how much each hand's projection is along X vs Y:
+    #   axis_alignment  =  |proj_x|² - |proj_y|²  (positive → X dominant)
+    # Both hands should have the same sign → reward = product (positive when same axis).
+    left_axis_score  = left_lx  ** 2 - left_ly  ** 2   # (N,)
+    right_axis_score = right_lx ** 2 - right_ly ** 2   # (N,)
+
+    # Normalise to [-1, 1] so the magnitude of the projection doesn't dominate.
+    left_axis_norm  = left_axis_score  / (left_lx  ** 2 + left_ly  ** 2 + 1e-6)
+    right_axis_norm = right_axis_score / (right_lx ** 2 + right_ly ** 2 + 1e-6)
+
+    # Product is +1 when both are on same axis, -1 when on different axes.
+    same_axis_cos = left_axis_norm * right_axis_norm           # (N,) in [-1, 1]
+    same_axis_reward = torch.exp(-5.0 * (1.0 - same_axis_cos))  # peaks at +1
+
+    # --- 3c. Combine the two orientation terms ---
+    # Both must be satisfied: hands 180° apart AND along the same box axis.
+    orientation_reward = opposite_reward * same_axis_reward
+    hands2box = hands2box * orientation_reward
+
+    # ------------------------------------------------------------------ #
+    # 4. Disable reward when box is far from the humanoid (unchanged)     #
+    # ------------------------------------------------------------------ #
+    root_pos  = humanoid_rigid_body_pos[:, 0, :]
+    box2human = torch.sum(
+        (box_pos_adjusted[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1
+    )
+    hands2box[box2human > 0.7 ** 2] = 0
+
+    # ------------------------------------------------------------------ #
+    # 5. Verbose debug (optional)                                          #
+    # ------------------------------------------------------------------ #
     verbose = False
     if verbose:
         print("------------------------------------------------------------------")
         print("box_pos_adjusted:", box_pos_adjusted[0])
         print("hand_pos:", hand_pos[0])
-        angle_xyz = torch.acos(cos_xyz)
-        print("Angle between hands (deg):", angle_xyz[0].item() * 180.0 / 3.1415926)
-        print("Opposite Reward:", opposite_reward[0].item())
-        print("Hands2Box xyz:", hands2box_xyz[0].item(), "val: ", hands2box_pos_err[0].item())
-        print("Hands2Box z:", hands2box_z[0].item(), "val: ", hands2box_pos_err_z[0].item())
-        print("Hands2Box before:", hands2box[0].item())
-        print("Total Reward:", (hands2box * opposite_reward)[0].item())
+        angle_xy = torch.acos(cos_xy)
+        print("Angle between hands (deg):", angle_xy[0].item() * 180.0 / 3.1415926)
+        print("Opposite reward:", opposite_reward[0].item())
+        print("Same-axis reward:", same_axis_reward[0].item())
+        print("Orientation reward:", orientation_reward[0].item())
+        print("Hands2Box xyz:", hands2box_xyz[0].item())
+        print("Hands2Box z:",   hands2box_z[0].item())
+        print("Total reward:", hands2box[0].item())
 
-    hands2box = hands2box * opposite_reward
-    
-    # box2tar = torch.sum((box_pos_adjusted[..., 0:2] - tar_pos[..., 0:2]) ** 2, dim=-1) # 2d
-    # hands2box[box2tar < 0.7 ** 2] = 1.0 # assume this reward is max when the box is close enough to its target location
-    
-    root_pos = humanoid_rigid_body_pos[:, 0, :]
-    box2human = torch.sum((box_pos_adjusted[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1) # 2d
-    hands2box[box2human > 0.7 ** 2] = 0 # disable this reward when the box is not close to the humanoid
-    
     return 0.2 * hands2box
 
 @torch.jit.script

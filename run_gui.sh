@@ -148,7 +148,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_28-11-11-31/nn/Humanoid.pth    \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -177,6 +177,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-5/Humanoid_28-11-06-29/nn/Humanoid.pth  # more training, still rotate, does not lift high loc
 # try training from scratch, keep training, angle in the xy plane promote turning of the box
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_28-11-11-31/nn/Humanoid.pth  # from scratch, getting there
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth  # continue, best so far
+
+# More imitation motion
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-7/Humanoid_03-02-18-37/nn/Humanoid.pth  # more imitation motion, 90s,
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-8/Humanoid_03-02-22-13/nn/Humanoid.pth  # more imitation motion, 120s, good hand pos, but still diagnal
 
 
 # MMH bag carry test TODO:dataset_MMH_timber file change
@@ -184,7 +189,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-5/Humanoid_17-00-15-35/nn/Humanoid.pth    \
+    --checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth     \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -196,7 +201,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --ergo_coeff 0.2 \
     --construction_experiment True \
 
-
+--checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth  # scratch
 
 
 
@@ -547,7 +552,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/bag_2" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/bag_lift_fail" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |
