@@ -5,11 +5,11 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=3
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=100:00:00
-#SBATCH --account=shdpm0
+#SBATCH --time=40:00:00
+#SBATCH --account=shdpm98
 #SBATCH --partition=spgpu
 ##### END preamble
 
@@ -102,11 +102,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-3/ \
-    --wandb_name Try2-Carry-timber-train-3 \
-    --notes "resume Try2-1, from 320hr, 60s, median height adjust" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-1-v5_armfix/ \
+    --wandb_name Try2-Carry-timber-train-1-v5_armfix/ \
+    --notes "v5 arm fix adjust" \
     --ergo_coeff 0.2 --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-1/Humanoid_06-16-56-31/nn/Humanoid.pth  \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth  \
 
 
 

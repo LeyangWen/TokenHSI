@@ -107,7 +107,8 @@ env:
     # assetFileName:  "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"  # pairs with --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
     # assetFileName: "mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"  # this is used in my custom imitation learning
     # assetFileName: "mjcf/phys_humanoid_v3_box_foot_tall_sticky.xml"  # this is used in my custom imitation learning
-    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal.xml"  
+    # assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal.xml"  
+    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 
   plane:
     staticFriction: 1.0
