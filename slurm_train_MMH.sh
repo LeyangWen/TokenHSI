@@ -5,11 +5,11 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=3
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=100:00:00
-#SBATCH --account=shdpm0
+#SBATCH --time=60:00:00
+#SBATCH --account=shdpm98
 #SBATCH --partition=spgpu
 ##### END preamble
 
@@ -58,11 +58,11 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-6-wrist/ \
-    --wandb_name "Carry-box-train-6-wrist" \
-    --notes "median height adjust from Try1-5" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-6-v5_armfix/ \
+    --wandb_name "Carry-box-train-6-v5_armfix" \
+    --notes "v5_armfix" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth
 
 #     # --wandb_mode "disabled" \
