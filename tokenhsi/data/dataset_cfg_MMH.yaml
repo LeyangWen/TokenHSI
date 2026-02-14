@@ -45,15 +45,33 @@ motions:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/handle/handle_carry_7.pkl"
 
   bag_pickUp:
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_01.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_02.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_03.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920734.20250919201429/clip_01.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920734.20250919201429/clip_02.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920734.20250919201429/clip_03.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920758.20250919201429/clip_01.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920758.20250919201429/clip_02.pkl"
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920758.20250919201429/clip_03.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_01.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_02.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.51470934.20250919201429/clip_03.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920734.20250919201429/clip_01.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920734.20250919201429/clip_02.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920734.20250919201429/clip_03.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920758.20250919201429/clip_01.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920758.20250919201429/clip_02.pkl"
+    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag01.66920758.20250919201429/clip_03.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_2.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_3.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_4.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_5.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_6.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_7.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_8.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_9.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_10.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/bag/bag_lift_11.pkl"
+
+  bag_carry:
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/bag/bag_carry_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/bag/bag_carry_2.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/bag/bag_carry_3.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Carry/bag/bag_carry_4.pkl"
+
 
   timber_pickUp:  # left hand rotate
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lift/good/clips/timber01.51470934.20250919201355/clip_01.pkl"
@@ -89,11 +107,8 @@ motions:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_1.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_2.pkl"
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_3.pkl"
-    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_4.pkl"
-    # - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_12.pkl"
-
-  bag_pickUp:
-    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_1.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_4.pkl"
+    - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Lower/timber/timber_lower_12.pkl"
 
   dashboard_pickUp:
     - "/home/leyang/Documents/SMPLest-X/demo/result_imitation_motions/Terrain_lift/dashboard/bad/bad.pkl"

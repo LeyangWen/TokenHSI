@@ -5,11 +5,11 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=3
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
 #SBATCH --time=100:00:00
-#SBATCH --account=shdpm0
+#SBATCH --account=shdpm98
 #SBATCH --partition=spgpu
 ##### END preamble
 
@@ -42,7 +42,7 @@ nvcc --version
 
 # export MAX_JOBS=1
 
-box w. bag
+# box w. bag
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
@@ -54,7 +54,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment False \
     --random_density True \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-1/ \
-    --wandb_name "Try4-Carry-bag-train-1" \
-    --notes "bag train try" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-2/ \
+    --wandb_name "Try4-Carry-bag-train-2" \
+    --notes "resume from Try4-1, imitation motion and reward" \
     --ergo_coeff 0.2 \
+    --resume \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth

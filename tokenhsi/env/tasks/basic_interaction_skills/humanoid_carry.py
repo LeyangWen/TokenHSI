@@ -821,17 +821,15 @@ class HumanoidCarry(Humanoid):
             handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size, box_rot)
             carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
             handheld_r = handheld_handle_r  # override handheld_r for handle task
-        elif self._task_name =="MMH_timber" or self._task_name =="MMH_bag":
-            if self._verbose:
-                # print("box_pos =", box_pos[0])
-                # print("box_rot =", box_rot[0])
-                # print("box_bbox bps =", self._box_bps[0])
-                # print("box_size = ", self._box_size[0])
-                pass
+        elif self._task_name =="MMH_timber":
             handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
             handheld_r = handheld_timber_r  # override handheld_r for timber task
             carry_box_reward = walk_r + carry_r + handheld_timber_r
-        
+        elif self._task_name =="MMH_bag":
+            handheld_bag_r = compute_handheld_bag_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
+            handheld_r = handheld_bag_r  # override handheld_r for bag task
+            carry_box_reward = walk_r + carry_r + handheld_bag_r
+            
         humanoid_angles = self.humanoid_angles()
         ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
         ergo_sub_weight /= ergo_sub_weight.sum()
@@ -1586,6 +1584,7 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     # Compute how much each hand's projection is along X vs Y:
     #   axis_alignment  =  |proj_x|² - |proj_y|²  (positive → X dominant)
     # Both hands should have the same sign → reward = product (positive when same axis).
+
     left_axis_score  = left_lx  ** 2 - left_ly  ** 2   # (N,)
     right_axis_score = right_lx ** 2 - right_ly ** 2   # (N,)
 
@@ -1621,6 +1620,10 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
         print("hand_pos:", hand_pos[0])
         angle_xy = torch.acos(cos_xy)
         print("Angle between hands (deg):", angle_xy[0].item() * 180.0 / 3.1415926)
+        print("left_lx:", left_lx[0].item())
+        print("left_ly:", left_ly[0].item())
+        print("right_lx:", right_lx[0].item())
+        print("right_ly:", right_ly[0].item())
         print("Opposite reward:", opposite_reward[0].item())
         print("Same-axis reward:", same_axis_reward[0].item())
         print("Orientation reward:", orientation_reward[0].item())
@@ -1629,6 +1632,198 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
         print("Total reward:", hands2box[0].item())
 
     return 0.2 * hands2box
+
+@torch.jit.script
+def compute_handheld_bag_reward(humanoid_rigid_body_pos, humanoid_rigid_body_rot, box_pos, box_rot, box_size, hands_ids):
+    # type: (Tensor,Tensor, Tensor, Tensor, Tensor, Tensor) -> Tensor
+    
+    # Concrete bag carrying technique:
+    # Phase 1 (STAND-UP): Prop the bag up on its short edge (0.35m side) so it stands
+    #          tall near the humanoid's feet. The 0.51m dimension becomes vertical.
+    # Phase 2 (LIFT):     One hand underneath, one hand stabilizing on top, lift upward.
+    #
+    # bag_size expected: 0.35 (x) x 0.51 (y) x 0.15 (z) when flat on ground.
+    # When propped up on the 0.35 edge, the 0.51 side should be roughly vertical.
+    #
+    # Key design: lifting reward is GATED behind the bag being upright first,
+    # so the policy cannot skip the stand-up phase.
+
+    hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]   # (B, 2, 3)
+    hand_rot = humanoid_rigid_body_rot[:, hands_ids, :]   # (B, 2, 4)
+    hand_center = hand_pos.mean(dim=1)                     # (B, 3)
+    root_pos = humanoid_rigid_body_pos[:, 0, :]            # (B, 3)
+
+    # ---------------------------------------------------------------
+    # Bag orientation analysis
+    # ---------------------------------------------------------------
+    # Determine which local axis corresponds to each dimension.
+    # box_size is (0.35, 0.51, 0.15). We need the MEDIUM axis (0.51) to
+    # point upward when the bag is propped up.
+    axis_basis = torch.tensor([[1.0, 0.0, 0.0],
+                               [0.0, 1.0, 0.0],
+                               [0.0, 0.0, 1.0]], device=box_pos.device, dtype=box_pos.dtype)
+
+    # Identify axes by size: long=0.51, short=0.35, thin=0.15
+    # We want the LONGEST local axis (0.51) to align with world up when standing
+    long_axis_idx = torch.argmax(box_size, dim=1)          # the 0.51 axis
+    thin_axis_idx = torch.argmin(box_size, dim=1)          # the 0.15 axis
+    # short axis (0.35) is the remaining one
+    all_sum = 0 + 1 + 2  # = 3
+    short_axis_idx = all_sum - long_axis_idx - thin_axis_idx  # the 0.35 axis
+
+    long_axis_local = axis_basis.index_select(0, long_axis_idx)    # (B, 3)
+    thin_axis_local = axis_basis.index_select(0, thin_axis_idx)    # (B, 3)
+    short_axis_local = axis_basis.index_select(0, short_axis_idx)  # (B, 3)
+
+    # Transform to world frame
+    long_axis_world = quat_rotate(box_rot, long_axis_local)
+    long_axis_world = torch.nn.functional.normalize(long_axis_world, dim=-1)
+    thin_axis_world = quat_rotate(box_rot, thin_axis_local)
+    thin_axis_world = torch.nn.functional.normalize(thin_axis_world, dim=-1)
+    short_axis_world = quat_rotate(box_rot, short_axis_local)
+    short_axis_world = torch.nn.functional.normalize(short_axis_world, dim=-1)
+
+    # ---------------------------------------------------------------
+    # PHASE 1: STAND-UP REWARD
+    # ---------------------------------------------------------------
+    # Goal: the 0.51 (long) axis should be roughly vertical (aligned with world Z).
+    # When perfectly upright on the 0.35 edge, long_axis_world ≈ ±[0,0,1].
+    z_up = torch.tensor([0.0, 0.0, 1.0], device=box_pos.device, dtype=box_pos.dtype)
+    z_up = z_up.unsqueeze(0).expand_as(long_axis_world)
+
+    upright_alignment = torch.abs(torch.sum(long_axis_world * z_up, dim=-1))  # 1.0 = vertical
+    # Smooth reward: 1.0 when perfectly upright, decays when tilted
+    upright_reward = torch.exp(-8.0 * (1.0 - upright_alignment))
+
+    # The bag should be near the humanoid's feet (close in XY, on the ground)
+    bag_to_root_xy = torch.sqrt(torch.sum((box_pos[:, 0:2] - root_pos[:, 0:2]) ** 2, dim=-1))
+    proximity_reward = torch.exp(-3.0 * bag_to_root_xy)
+
+    # Bag should be low (on the ground or just being propped) during stand-up
+    # When propped on 0.35 edge, center height ≈ 0.51/2 = 0.255m
+    bag_standing_height = 0.255  # approximate center height when propped up
+    bag_height_err_standup = torch.abs(box_pos[:, 2] - bag_standing_height)
+    standup_height_reward = torch.exp(-8.0 * bag_height_err_standup)
+
+    # Hands should be near the bag during stand-up (approach reward)
+    box2hand = torch.sqrt(torch.sum((box_pos - hand_center) ** 2, dim=-1))
+    approach_reward = torch.exp(-3.0 * box2hand)
+
+    # Combined stand-up reward
+    standup_phase_reward = (0.35 * upright_reward +
+                            0.25 * proximity_reward +
+                            0.15 * standup_height_reward +
+                            0.25 * approach_reward)
+
+    # ---------------------------------------------------------------
+    # Upright gate: only allow lift rewards when bag is sufficiently upright
+    # This is the KEY mechanism to prevent skipping the stand-up phase.
+    # ---------------------------------------------------------------
+    upright_threshold = 0.75  # cos(~41°) — bag must be fairly upright
+    bag_is_upright = (upright_alignment > upright_threshold).float()
+
+    # ---------------------------------------------------------------
+    # PHASE 2: LIFT REWARD (gated behind upright)
+    # ---------------------------------------------------------------
+    # Asymmetric hand placement: one hand below bag, one hand on top/side
+    # When bag is upright on 0.35 edge:
+    #   - bottom hand should be near the bottom of the bag
+    #   - top hand should be near the top/upper portion to stabilize
+
+    rel_hand_pos = hand_pos - box_pos.unsqueeze(1)  # (B, 2, 3)
+
+    # Project hand positions onto the bag's long (vertical) axis
+    hand_along_long = torch.sum(rel_hand_pos * long_axis_world.unsqueeze(1), dim=-1)  # (B, 2)
+
+    # One hand should be near the bottom (-0.51/2 ≈ -0.255), one near top (+0.51/2 ≈ +0.255)
+    # We don't know which hand is which, so check both assignments
+    half_long = 0.22  # slightly inside from the edge
+
+    # Assignment A: hand0=bottom, hand1=top
+    bot_err_a = torch.abs(hand_along_long[:, 0] - (-half_long))
+    top_err_a = torch.abs(hand_along_long[:, 1] - half_long)
+    asym_err_a = bot_err_a + top_err_a
+
+    # Assignment B: hand0=top, hand1=bottom
+    bot_err_b = torch.abs(hand_along_long[:, 1] - (-half_long))
+    top_err_b = torch.abs(hand_along_long[:, 0] - half_long)
+    asym_err_b = bot_err_b + top_err_b
+
+    asym_err = torch.minimum(asym_err_a, asym_err_b)
+    hand_placement_reward = torch.exp(-5.0 * asym_err)
+
+    # Hands should be close to the bag surface (not floating)
+    hand_dist_to_bag = torch.sqrt(torch.sum(rel_hand_pos ** 2, dim=-1))  # (B, 2)
+    # Approximate: hands should be within ~half of short/thin dimension from center
+    hand_contact_err = torch.clamp_min(hand_dist_to_bag.mean(dim=1) - 0.15, 0.0)
+    hand_contact_reward = torch.exp(-8.0 * hand_contact_err)
+
+    # Reward for lifting the bag to a comfortable carry height
+    carry_height = 0.95  # m — slightly lower than timber, bag is heavier
+    lift_height_reward = torch.exp(-3.0 * torch.clamp_min(carry_height - box_pos[:, 2], 0.0))
+
+    # Keep bag upright during lift (don't let it flop over)
+    lift_upright_reward = torch.exp(-5.0 * (1.0 - upright_alignment))
+
+    # Bag should stay close to the body during lift (hugged in)
+    bag_to_body_xy = torch.sqrt(torch.sum((box_pos[:, 0:2] - root_pos[:, 0:2]) ** 2, dim=-1))
+    close_to_body_reward = torch.exp(-5.0 * bag_to_body_xy)
+
+    # Combined lift reward
+    lift_phase_reward = (0.25 * hand_placement_reward +
+                         0.15 * hand_contact_reward +
+                         0.30 * lift_height_reward +
+                         0.15 * lift_upright_reward +
+                         0.15 * close_to_body_reward)
+
+    # Gate lift reward behind uprightness
+    lift_phase_reward = lift_phase_reward * bag_is_upright
+
+    # ---------------------------------------------------------------
+    # PHASE BLENDING
+    # ---------------------------------------------------------------
+    # When bag is not upright: mostly standup reward drives learning
+    # When bag is upright: lift reward kicks in, standup reward provides baseline
+    # The gate ensures the policy MUST learn to stand up the bag first.
+
+    # Additional bonus for transitioning: if bag is upright AND being lifted
+    is_lifting = (box_pos[:, 2] > bag_standing_height + 0.1).float()
+    transition_bonus = 0.1 * bag_is_upright * is_lifting * upright_alignment
+
+    reward = (0.35 * standup_phase_reward +
+              0.55 * lift_phase_reward +
+              0.10 * transition_bonus)
+
+    verbose = False
+    if verbose:
+        print("==================================================================")
+        print("BAG CARRY REWARD DEBUG")
+        print("==================================================================")
+        print("box_pos height: ", box_pos[0, 2].item())
+        print("upright_alignment: ", upright_alignment[0].item())
+        print("bag_is_upright (gate): ", bag_is_upright[0].item())
+        print("bag_to_root_xy: ", bag_to_root_xy[0].item())
+        print("box2hand: ", box2hand[0].item())
+        print("------------------------------------------------------------------")
+        print("STAND-UP PHASE:")
+        print("  upright_reward: ", upright_reward[0].item())
+        print("  proximity_reward: ", proximity_reward[0].item())
+        print("  standup_height_reward: ", standup_height_reward[0].item())
+        print("  approach_reward: ", approach_reward[0].item())
+        print("  standup_phase_reward: ", standup_phase_reward[0].item())
+        print("------------------------------------------------------------------")
+        print("LIFT PHASE:")
+        print("  hand_placement_reward: ", hand_placement_reward[0].item())
+        print("  hand_contact_reward: ", hand_contact_reward[0].item())
+        print("  lift_height_reward: ", lift_height_reward[0].item())
+        print("  lift_upright_reward: ", lift_upright_reward[0].item())
+        print("  close_to_body_reward: ", close_to_body_reward[0].item())
+        print("  lift_phase_reward (gated): ", lift_phase_reward[0].item())
+        print("------------------------------------------------------------------")
+        print("transition_bonus: ", transition_bonus[0].item())
+        print("TOTAL reward: ", reward[0].item())
+        print("0.8 * reward: ", 0.8 * reward[0].item())
+    return 0.8 * reward
 
 @torch.jit.script
 def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_rot, box_pos, box_rot, box_size, hands_ids):

@@ -86,9 +86,11 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/dashboard_pickUp/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/*/box02.high*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/handle_2*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle_carry/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle_carry/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bad_pickUp/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bag_*/*/smpl_params.npy"))
     
+    # TODO: change file
     
     
     print(all_files)
@@ -222,14 +224,20 @@ if __name__ == '__main__':
             #     "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v3"],
             #     "root_height_offset": 0.07,
             # },
-            "phys_humanoid_v4": {
+            # "phys_humanoid_v4": {
+            #     "skeleton": phys_humanoid_v3_skeleton,
+            #     "xml_path": phys_humanoid_v3_xml_path,
+            #     "tpose": phys_humanoid_v3_tpose,
+            #     "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v4"],
+            #     "root_height_offset": 0.18, # 0.07,
+            # }, # TODO: seperte v3 and v4, also v4 here should be v5, v4 = v3 + wrist, then modified torso loc
+            "phys_humanoid_v5": {
                 "skeleton": phys_humanoid_v3_skeleton,
                 "xml_path": phys_humanoid_v3_xml_path,
                 "tpose": phys_humanoid_v3_tpose,
-                "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v4"],
-                "root_height_offset": 0.18, # 0.07,
-            }, # TODO: seperte v3 and v4, also v4 here should be v5, v4 = v3 + wrist, then modified torso loc
-            # TODO: V5
+                "joints_to_use": joints_to_use["from_smpl_original_to_phys_humanoid_v5"],
+                "root_height_offset": 0.12,
+            }, 
         }
 
         ###### retargeting ######
@@ -267,11 +275,11 @@ if __name__ == '__main__':
             new_motion_params_root_trans = new_motion.root_translation.clone()
             new_motion_params_local_rots = new_motion.local_rotation.clone()
 
-            # check foot-ground penetration
-            min_h = torch.min(new_motion.global_translation[:, :, 2], dim=-1)[0].mean()
-            # min_h = torch.min(new_motion.global_translation[:, :, 2])
-            for i in range(new_motion.global_translation.shape[0]):
-                new_motion_params_root_trans[i, 2] += -min_h
+            # # check foot-ground penetration
+            # min_h = torch.min(new_motion.global_translation[:, :, 2], dim=-1)[0].mean()
+            min_h = torch.min(new_motion.global_translation[:, :, 2], dim=-1)[0]
+            new_motion_params_root_trans[:, 2] += -min_h
+            
             
             # adjust the height of the root to avoid ground penetration
             root_height_offset = v["root_height_offset"]

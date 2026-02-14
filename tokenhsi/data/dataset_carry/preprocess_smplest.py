@@ -30,9 +30,10 @@ if __name__ == "__main__":
     # TODO:selected motions here
     candidates = {
         # "box_pickUp": cfg["motions"]["box_pickUp"],
-        "handle_pickUp": cfg["motions"]["handle_pickUp"],
-        "handle_carry": cfg["motions"]["handle_carry"],
-        # "bag_pickUp": cfg["motions"]["bag_pickUp"],
+        # "handle_pickUp": cfg["motions"]["handle_pickUp"],
+        # "handle_carry": cfg["motions"]["handle_carry"],
+        "bag_pickUp": cfg["motions"]["bag_pickUp"],
+        "bag_carry": cfg["motions"]["bag_carry"],
         # "timber_pickUp": cfg["motions"]["timber_pickUp"],
         # "timber_carry": cfg["motions"]["timber_carry"],
         # "timber_putDown": cfg["motions"]["timber_putDown"],

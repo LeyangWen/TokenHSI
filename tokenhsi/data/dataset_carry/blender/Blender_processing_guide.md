@@ -40,6 +40,15 @@ ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.66920734.20
 ROOT="tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.66920734.20250919201355+__+clip_03/phys_humanoid_v4"
 
 
+# MMH bag example
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag01.51470934.20250919201429+__+clip_01/phys_humanoid_v5"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag01.66920734.20250919201429+__+clip_02/phys_humanoid_v5"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag01.51470934.20250919201429+__+clip_03/phys_humanoid_v5"
+
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag+__+bag_lift_1/phys_humanoid_v5"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag+__+bag_lift_6/phys_humanoid_v5"
+ROOT="tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag+__+bag_lift_9/phys_humanoid_v5"
+
 
 
 # Absolute variant (recommended for Blender scripts)
@@ -47,15 +56,11 @@ ABS_ROOT="/home/leyang/Documents/TokenHSI/${ROOT}"
 echo $ABS_ROOT
 
 # Humanoid XML used for render checks
-HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
-HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_sticky_horizontal.xml"
+# HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"
+# HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_sticky_horizontal.xml"
+HUMANOID_XML="tokenhsi/data/assets/mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 ```
 
----
-
-Got it — you want the README to explicitly tell you how to **open Blender** and run each script by pointing to the **absolute path** of the `.py` files, so you don’t have to hunt for them. Here’s the updated version of those steps:
-
----
 
 ## 1) In Blender: build a simple humanoid
 
@@ -136,6 +141,8 @@ python tokenhsi/data/dataset_carry/blender/motion_render_and_check.py \
   --root "$ROOT" \
   --humanoid-xml "$HUMANOID_XML" \
   --out-html "box_motion_render.html" \
+  --box-size 0.35 0.51 0.15
+
   --box-size 0.34 0.34 0.38
 
     # --box-size 0.095 1.8 0.045 

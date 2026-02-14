@@ -148,7 +148,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-9/Humanoid_10-16-59-12/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -183,8 +183,32 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-7/Humanoid_03-02-18-37/nn/Humanoid.pth  # more imitation motion, 90s,
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-8/Humanoid_03-02-22-13/nn/Humanoid.pth  # more imitation motion, 120s, good hand pos, but still diagnal
 
+# Updated diag reward
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-9/Humanoid_10-16-59-12/nn/Humanoid.pth  # resume
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-10/Humanoid_10-17-06-21/nn/Humanoid.pth # scratch
 
-# MMH bag carry test TODO:dataset_MMH_timber file change
+
+# MMH bag carry test
+python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
+    --checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth     \
+    --test \
+    --num_envs 1 \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "Carry_test_1" \
+    --wandb_mode "disabled" \
+    --random_size False \
+    --random_density True \
+    --density 180 \
+    --ergo_coeff 0.2 \
+    --construction_experiment True \
+
+--checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth  # scratch
+
+
+
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
@@ -552,7 +576,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/bag_lift_fail" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_lift_working_2" --video_name "vid"  --fps 18 --delete_imgs
 
 
 # | Keyboard | Function |

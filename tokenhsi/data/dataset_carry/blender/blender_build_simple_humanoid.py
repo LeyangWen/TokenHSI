@@ -11,8 +11,8 @@ import numpy as np
 # Finally run this script in Blender to add object annotations
 
 # ----------------- USER PATHS -----------------
-MJCF_XML = r"/home/leyang/Documents/TokenHSI/tokenhsi/data/assets/mjcf/phys_humanoid_v4_box_foot_tall_slippery.xml"          # <--- set this to your MJCF
-MOTION_NPY = r"/home/leyang/Documents/TokenHSI/tokenhsi/data/dataset_carry/motions/MMH/timber_pickUp/timber01.51470934.20250919201355+__+clip_01/phys_humanoid_v3/ref_motion.npy"         # <--- your uploaded motion
+MJCF_XML = r"/home/leyang/Documents/TokenHSI/tokenhsi/data/assets/mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"          # <--- set this to your MJCF
+MOTION_NPY = r"/home/leyang/Documents/TokenHSI/tokenhsi/data/dataset_carry/motions/MMH/bag_pickUp/bag01.51470934.20250919201429+__+clip_01/phys_humanoid_v5/ref_motion.npy"         # <--- your uploaded motion
 SCENE_FPS_FROM_MOTION = True
 # Limit frames for quick test (set to None to use full length)
 MAX_FRAMES = None  # e.g., 200
