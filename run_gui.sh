@@ -52,7 +52,7 @@ output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/H
 output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
 # all above uses "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"
 
-output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  # from good ones, adapt to v5 mediumn heights
+output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  # from good ones, adapt to v5 mediumn heights, TODO: new v5 arm fix checkpoint downloaded
 
 
 # MMH Timber Test
@@ -137,7 +137,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-4/Humanoid_20-13-25-30/nn/Humanoid.pth  # 220 hr not workinig
 
 
-output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights
+output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights, TODO: new v5 arm fix checkpoint downloaded
 
 # Handle Carry Test 
 # 1. imitation motion w/ box annotation, done
@@ -148,7 +148,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_handle_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-9/Humanoid_10-16-59-12/nn/Humanoid.pth \
+    --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-10/Humanoid_10-17-06-21/nn/Humanoid.pth \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \

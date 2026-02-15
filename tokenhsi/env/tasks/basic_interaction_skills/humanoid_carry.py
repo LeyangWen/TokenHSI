@@ -1501,47 +1501,51 @@ def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos
 def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height, box_size, box_rot):
     # type: (Tensor, Tensor, Tensor, Tensor, bool, Tensor, Tensor) -> Tensor
     """
-    Rewards the humanoid for lifting a box by its handles on opposite sides of the same edge.
+    Rewards the humanoid for lifting a box by its handles near the TOP EDGE
+    on opposite sides.
 
     Key change vs prior version:
-        - `opposite_reward` now also checks that both hands lie along the *same*
-          local box axis (i.e. the axis whose half-extent is smallest, so they
-          grab the long/wide sides rather than corners or adjacent edges).
-        - We decompose each hand's relative position into the box's local frame
-          (via the quaternion), pick the dominant axis per hand, and reward
-          configurations where both hands share that axis but have opposite signs.
+        - Added handle_height_reward: hands should be near the top of the box,
+          not at the vertical center. Handles are located near the top edge.
+        - The target hand height is now box_top - small_offset, not box_center + offset.
     """
-    hand_length = 0.08
-    box_to_hand_dist_threshold = 0.75
+    # Handle is at 15% of box dimension inward from the top edge.
+    handle_offset_prectage = 0.15
+    # Wrist-to-palm offset: rigid body pos is at the wrist joint,
+    # but the actual grip (palm center) is ~10cm further down the hand.
+    wrist_to_palm_offset = 0.10
 
     # ------------------------------------------------------------------ #
-    # 1. Target hand position: above box centre, at handle height          #
+    # 1. Box geometry                                                      #
     # ------------------------------------------------------------------ #
     box_size_max = torch.max(box_size, dim=1).values
+
+    # XY target is the box center (hands go to opposite sides, handled by orientation reward)
     box_pos_adjusted = box_pos.clone()
-    box_pos_adjusted[:, 2] += hand_length + (box_size_max / 2) * 0.65
+    box_pos_adjusted[:, 2] += wrist_to_palm_offset + (box_size_max* (0.5-handle_offset_prectage))
 
     # ------------------------------------------------------------------ #
-    # 2. Proximity reward (unchanged)                                      #
-    # ------------------------------------------------------------------ #
-    hands2box_pos_err = torch.sum(
-        (humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos_adjusted) ** 2, dim=-1
-    )
-    hands2box_pos_err_z = torch.sum(
-        torch.abs(
-            humanoid_rigid_body_pos[:, hands_ids, 2].mean(dim=1)
-            - box_pos_adjusted[:, 2].unsqueeze(-1)
-        ),
-        dim=-1,
-    )
-    hands2box_xyz = torch.exp(-5.0 * hands2box_pos_err)
-    hands2box_z   = torch.exp(-5.0 * hands2box_pos_err_z)
-    hands2box     = 0.5 * hands2box_xyz + 0.5 * hands2box_z
-
-    # ------------------------------------------------------------------ #
-    # 3. Opposite-side-of-the-SAME-edge reward                            #
+    # 2. Proximity reward                                                  #
     # ------------------------------------------------------------------ #
     hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]          # (N, 2, 3)
+    hand_center = hand_pos.mean(dim=1)                            # (N, 3)
+
+    # XY proximity: hand center should be near box center in XY
+    hands2box_xy_err = torch.sum(
+        (hand_center[:, 0:2] - box_pos_adjusted[:, 0:2]) ** 2, dim=-1
+    )
+    hands2box_xy = torch.exp(-5.0 * hands2box_xy_err)
+
+    # Z proximity: each hand should be near the handle height individually
+    hand_z_err = torch.abs(hand_pos[:, :, 2] - box_pos_adjusted[:, 2].unsqueeze(1))  # (N, 2)
+    hand_z_mean_err = hand_z_err.mean(dim=1)  # (N,)
+    hands2box_z = torch.exp(-10.0 * hand_z_mean_err)
+
+    hands2box = 0.4 * hands2box_xy + 0.6 * hands2box_z
+
+    # ------------------------------------------------------------------ #
+    # 4. Opposite-side-of-the-SAME-edge reward                            #
+    # ------------------------------------------------------------------ #
     # XY only – we care about which face they're gripping, not height
     rel_xy = hand_pos[..., 0:2] - box_pos_adjusted[:, None, 0:2]  # (N, 2, 2)
     left_xy  = rel_xy[:, 0]   # (N, 2)
@@ -1599,19 +1603,24 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
     # --- 3c. Combine the two orientation terms ---
     # Both must be satisfied: hands 180° apart AND along the same box axis.
     orientation_reward = opposite_reward * same_axis_reward
-    hands2box = hands2box * orientation_reward
 
     # ------------------------------------------------------------------ #
-    # 4. Disable reward when box is far from the humanoid (unchanged)     #
+    # 5. Final combination                                                 #
+    # ------------------------------------------------------------------ #
+    # Proximity (with height emphasis) × orientation × handle height
+    combined = hands2box * orientation_reward
+
+    # ------------------------------------------------------------------ #
+    # 6. Disable reward when box is far from humanoid                      #
     # ------------------------------------------------------------------ #
     root_pos  = humanoid_rigid_body_pos[:, 0, :]
     box2human = torch.sum(
-        (box_pos_adjusted[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1
+        (box_pos[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1
     )
-    hands2box[box2human > 0.7 ** 2] = 0
+    combined[box2human > 0.7 ** 2] = 0
 
     # ------------------------------------------------------------------ #
-    # 5. Verbose debug (optional)                                          #
+    # 7. Verbose debug                                                     #
     # ------------------------------------------------------------------ #
     verbose = False
     if verbose:
@@ -1627,11 +1636,10 @@ def compute_handheld_handle_reward(humanoid_rigid_body_pos, box_pos, hands_ids, 
         print("Opposite reward:", opposite_reward[0].item())
         print("Same-axis reward:", same_axis_reward[0].item())
         print("Orientation reward:", orientation_reward[0].item())
-        print("Hands2Box xyz:", hands2box_xyz[0].item())
-        print("Hands2Box z:",   hands2box_z[0].item())
-        print("Total reward:", hands2box[0].item())
+        print("Combined reward:", combined[0].item())
+        print("0.2 * combined:", 0.2 * combined[0].item())
 
-    return 0.2 * hands2box
+    return 0.2 * combined
 
 @torch.jit.script
 def compute_handheld_bag_reward(humanoid_rigid_body_pos, humanoid_rigid_body_rot, box_pos, box_rot, box_size, hands_ids):
