@@ -148,9 +148,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment False \
     --random_density True \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-10/ \
-    --wandb_name Try3-Carry-handle-train-10 \
-    --notes "opposite edge orient reward, scratch" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-11/ \
+    --wandb_name Try3-Carry-handle-train-11 \
+    --notes "Tunned edge reward, scratch" \
     --ergo_coeff 0.2 \
     # --resume 1 \
     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \

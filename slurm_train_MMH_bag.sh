@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=TokenHSI-MMH-train
-#SBATCH --output=output_slurm/train_MMH_log.txt
-#SBATCH --error=output_slurm/train_MMH_error.txt
+#SBATCH --output=output_slurm/train_MMH_log_bag.txt
+#SBATCH --error=output_slurm/train_MMH_error_bag.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -54,9 +54,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --construction_experiment False \
     --random_density True \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-2/ \
-    --wandb_name "Try4-Carry-bag-train-2" \
-    --notes "resume from Try4-1, imitation motion and reward" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/ \
+    --wandb_name "Try4-Carry-bag-train-3" \
+    --notes "Scratch, imitation motion and reward" \
     --ergo_coeff 0.2 \
-    --resume \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth
+    # --resume 1\
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth
