@@ -150,10 +150,10 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml \
     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-11/ \
     --wandb_name Try3-Carry-handle-train-11 \
-    --notes "Tunned edge reward, scratch" \
+    --notes "Tunned handle height reward, scratch" \
     --ergo_coeff 0.2 \
-    # --resume 1 \
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-6/Humanoid_02-02-52-00/nn/Humanoid.pth \
+    --resume 1 \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-11/Humanoid_10-17-06-21/nn/Humanoid.pth \
 
 
 
