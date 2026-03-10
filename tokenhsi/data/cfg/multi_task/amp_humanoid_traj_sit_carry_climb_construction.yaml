@@ -173,7 +173,8 @@ env:
 
   asset:
     assetRoot: "tokenhsi/data/assets"
-    assetFileName: "mjcf/phys_humanoid_v3.xml"
+    # assetFileName: "mjcf/phys_humanoid_v3.xml"
+    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 
   plane:
     staticFriction: 1.0

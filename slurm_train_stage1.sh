@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=80:00:00
+#SBATCH --time=100:00:00
 #SBATCH --account=shdpm0
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -50,8 +50,8 @@ python ./tokenhsi/run.py --task HumanoidTrajSitCarryClimb \
     --headless \
     --wandb_project "TokenHSI-Train" \
     --wandb_mode "online" \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/ \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/Stage1/Stage1-GoodMotion-scratch-train-1/ \
     --wandb_name "Try8-Stage1-GoodMotion-scratch-train-1" \
-    --notes "motion only" \
-    --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_12-15-07-56/nn/Humanoid.pth \
+    --notes "motion only, v5 humnaoid" \
+    # --resume 1 \
+    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_12-15-07-56/nn/Humanoid.pth \
