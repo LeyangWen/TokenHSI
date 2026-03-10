@@ -518,6 +518,29 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # --checkpoint output/custom_trained/try8/Terrain-GoodMotion-Reward-resume-pretrained-6/Humanoid_13-14-42-32/nn/Humanoid.pth \ # motion + reward, Trips, can MMH, bad lower
 # --checkpoint output/custom_trained/try8/Terrain-GoodMotion-resume-pretrained-7/Humanoid_09-06-20-48/nn/Humanoid.pth \ # motion only, unstable walk, can not MMH
 
+
+# Terrain train 
+python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt_small.yaml \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --hrl_checkpoint output/tokenhsi/ckpt_stage1.pth \
+    --num_envs 1 \
+    --box_w 0.4 \
+    --random_size True \
+    --random_density False \
+    --random_mode_equal_proportion True \
+    --wandb_project "TokenHSI-Test" \
+    --wandb_name "CarryTerrain_test" \
+    --wandb_mode "disabled" \
+    --ergo_coeff 0.0 \
+    --load_terrain False \
+    --headless
+    
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_timber.yaml \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --box_w 0.4 \
+
 # Terrain train 
 python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \

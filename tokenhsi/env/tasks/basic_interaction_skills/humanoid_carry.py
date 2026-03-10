@@ -415,6 +415,25 @@ class HumanoidCarry(Humanoid):
         print(f"[Info]: box mass = {mass} kg")
         return
     
+    def _build_platforms(self, env_id, env_ptr):
+        col_group = env_id
+        col_filter = 0
+        segmentation_id = 0
+        default_pose = gymapi.Transform()
+    
+        default_pose.p.z = -5 # place under the ground
+        platform_handle = self.gym.create_actor(env_ptr, self._platform_asset, default_pose, "platform", col_group, col_filter, segmentation_id)
+        self.gym.set_rigid_body_color(env_ptr, platform_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.5, 0.235, 0.6))
+    
+        default_pose.p.z = -5 - self._platform_height
+        tar_platform_handle = self.gym.create_actor(env_ptr, self._platform_asset, default_pose, "tar_platform", col_group, col_filter, segmentation_id)
+        self.gym.set_rigid_body_color(env_ptr, tar_platform_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.0, 0.0, 0.8))
+    
+        self._platform_handles.append(platform_handle)
+        self._tar_platform_handles.append(tar_platform_handle)
+    
+        return
+    
     def _build_marker(self, env_id, env_ptr):
         col_group = self.num_envs + 1
         col_filter = 0
@@ -427,25 +446,29 @@ class HumanoidCarry(Humanoid):
         self._marker_handles.append(marker_handle)
 
         return
+
+    def _build_marker_state_tensors(self):
+        num_actors = self._root_states.shape[0] // self.num_envs
+        self._marker_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., num_actors - 1, :]
+        self._marker_pos = self._marker_states[..., :3]
+        
+        self._marker_actor_ids = self._humanoid_actor_ids + (num_actors - 1)
     
-    def _build_platforms(self, env_id, env_ptr):
-        col_group = env_id
-        col_filter = 0
-        segmentation_id = 0
-        default_pose = gymapi.Transform()
-
-        default_pose.p.z = -5 # place under the ground
-        platform_handle = self.gym.create_actor(env_ptr, self._platform_asset, default_pose, "platform", col_group, col_filter, segmentation_id)
-        self.gym.set_rigid_body_color(env_ptr, platform_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.5, 0.235, 0.6))
-
-        default_pose.p.z = -5 - self._platform_height
-        tar_platform_handle = self.gym.create_actor(env_ptr, self._platform_asset, default_pose, "tar_platform", col_group, col_filter, segmentation_id)
-        self.gym.set_rigid_body_color(env_ptr, tar_platform_handle, 0, gymapi.MESH_VISUAL, gymapi.Vec3(0.0, 0.0, 0.8))
-
-        self._platform_handles.append(platform_handle)
-        self._tar_platform_handles.append(tar_platform_handle)
-
         return
+    
+def _build_platforms_state_tensors(self):
+    num_actors = self._root_states.shape[0] // self.num_envs
+    self._platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 2, :]
+    self._platform_pos = self._platform_states[..., :3]
+    self._platform_default_pos = self._platform_pos.clone()
+    self._platform_actor_ids = self._humanoid_actor_ids + 2
+
+    self._tar_platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 3, :]
+    self._tar_platform_pos = self._tar_platform_states[..., :3]
+    self._tar_platform_default_pos = self._tar_platform_pos.clone()
+    self._tar_platform_actor_ids = self._humanoid_actor_ids + 3
+
+    return
 
     def _build_box_tensors(self):
         num_actors = self.get_num_actors_per_env()
@@ -470,29 +493,6 @@ class HumanoidCarry(Humanoid):
         bps_6 = torch.vstack([-1 * self._box_size[:, 0] / 2, -1 * self._box_size[:, 1] / 2,      self._box_size[:, 2] / 2]).t().unsqueeze(-2)
         bps_7 = torch.vstack([     self._box_size[:, 0] / 2, -1 * self._box_size[:, 1] / 2,      self._box_size[:, 2] / 2]).t().unsqueeze(-2)
         self._box_bps = torch.cat([bps_0, bps_1, bps_2, bps_3, bps_4, bps_5, bps_6, bps_7], dim=1).to(self.device) # (num_envs, 8, 3)
-
-        return
-
-    def _build_platforms_state_tensors(self):
-        num_actors = self._root_states.shape[0] // self.num_envs
-        self._platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 2, :]
-        self._platform_pos = self._platform_states[..., :3]
-        self._platform_default_pos = self._platform_pos.clone()
-        self._platform_actor_ids = self._humanoid_actor_ids + 2
-
-        self._tar_platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 3, :]
-        self._tar_platform_pos = self._tar_platform_states[..., :3]
-        self._tar_platform_default_pos = self._tar_platform_pos.clone()
-        self._tar_platform_actor_ids = self._humanoid_actor_ids + 3
-
-        return
-    
-    def _build_marker_state_tensors(self):
-        num_actors = self._root_states.shape[0] // self.num_envs
-        self._marker_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., num_actors - 1, :]
-        self._marker_pos = self._marker_states[..., :3]
-        
-        self._marker_actor_ids = self._humanoid_actor_ids + (num_actors - 1)
 
         return
 

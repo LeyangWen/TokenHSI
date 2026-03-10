@@ -1,4 +1,5 @@
 # if given, will override the device setting in gym. 
+taskName: MMH_timber
 env: 
   numEnvs: 4096
   envSpacing: 0
@@ -25,12 +26,9 @@ env:
   enableSelfCollisionDetection: True
   enableTrackInitState: False
   
-  # skill: ["omomo", "loco", "loco_terrain", "pickUp", "carryWith", "putDown"]
-  # skillInitProb: [0.0, 0.3, 0.3, 0.0, 0.4, 0.0]
-  # skillDiscProb: [0.3, 0.2, 0.2, 0.1, 0.1, 0.1]
   skill: ["omomo", "loco", "loco_terrain", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.0, 0.4, 0.4, 0.0, 0.1, 0.0]
-  skillDiscProb: [0.0, 0.2, 0.2, 0.5, 0.1, 0.1]
+  skillInitProb: [0.3, 0.3, 0.3, 0.0, 0.0, 0.0]
+  skillDiscProb: [0.4, 0.2, 0.2, 0.4, 0.1, 0.1]
 
   enableTaskObs: True
   onlyVelReward: False
@@ -159,7 +157,6 @@ env:
     density: 100.0 # kg/m^3
   asset:
     assetRoot: "tokenhsi/data/assets"
-    # assetFileName: "mjcf/phys_humanoid_v3_box_foot.xml"
     assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 
   plane:

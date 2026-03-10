@@ -1,4 +1,5 @@
 # if given, will override the device setting in gym. 
+taskName: MMH_bag
 env: 
   numEnvs: 4096
   envSpacing: 0
@@ -25,12 +26,9 @@ env:
   enableSelfCollisionDetection: True
   enableTrackInitState: False
   
-  # skill: ["omomo", "loco", "loco_terrain", "pickUp", "carryWith", "putDown"]
-  # skillInitProb: [0.0, 0.3, 0.3, 0.0, 0.4, 0.0]
-  # skillDiscProb: [0.3, 0.2, 0.2, 0.1, 0.1, 0.1]
   skill: ["omomo", "loco", "loco_terrain", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.0, 0.4, 0.4, 0.0, 0.1, 0.0]
-  skillDiscProb: [0.0, 0.2, 0.2, 0.5, 0.1, 0.1]
+  skillInitProb: [0.2, 0.3, 0.3, 0.0, 0.0, 0.0]
+  skillDiscProb: [0.6, 0.2, 0.2, 0.1, 0.1, 0.1]
 
   enableTaskObs: True
   onlyVelReward: False
@@ -45,15 +43,16 @@ env:
 
   box:
     build:
-      baseSize: [0.4, 0.4, 0.4] # unit: m
-      randomSize: True
+      userUrdf: "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"
+      baseSize: [0.25, 0.45, 0.10] # unit: m  [width(X), length(Y), thickness(Z)]
+      randomSize: False
       randomModeEqualProportion: False
-      scaleRangeX: [0.5, 1.5] # default range if randomModeEqualProportion: True
-      scaleRangeY: [0.5, 1.5]
-      scaleRangeZ: [0.5, 1.5]
+      scaleRangeX: [1.0, 1.0] # default range if randomModeEqualProportion: True
+      scaleRangeY: [1.0, 1.0]
+      scaleRangeZ: [1.0, 1.0]
       scaleSampleInterval: 0.125 # 0.05m
       randomDensity: False # if True, mass will be added into policy obs
-      massRange: [2.0, 43.0]  # kg, standard brick --> concrete bag
+      massRange: [8.0, 43.0]  # kg, standard brick --> concrete bag
       testSizes:
        - [0.22, 0.22, 0.22]
        - [0.27, 0.27, 0.27]
@@ -159,7 +158,6 @@ env:
     density: 100.0 # kg/m^3
   asset:
     assetRoot: "tokenhsi/data/assets"
-    # assetFileName: "mjcf/phys_humanoid_v3_box_foot.xml"
     assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
 
   plane:

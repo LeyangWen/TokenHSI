@@ -44,7 +44,7 @@ from utils.motion_lib import MotionLib
 from isaacgym.torch_utils import *
 from isaacgym.terrain_utils import *
 from env.tasks.basic_interaction_skills.humanoid_carry import compute_back_ergo_reward, compute_box_ergo_reward, compute_elbow_ergo_reward
-
+from env.tasks.basic_interaction_skills.humanoid_carry import compute_handheld_timber_reward, compute_handheld_bag_reward, compute_handheld_handle_reward
 from utils import torch_utils
 from utils import traj_generator
 
@@ -90,6 +90,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._ergo_coeff = cfg["env"].get("ergoCoeff", False)
         self._ergo_sub_weight = cfg["env"].get("ergoSubWeight", False)
         self._verbose = False
+        self._task_name = cfg.get("taskName", "MMH_box")
         
         if cfg["args"].eval:
             self._mode = "test"
@@ -114,6 +115,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         self._reset_minBottomSurfaceHeight = box_cfg["reset"]["minBottomSurfaceHeight"]
 
         self._enable_bbox_obs = box_cfg["obs"]["enableBboxObs"]
+        self.user_urdf = box_cfg["build"].get("userUrdf", None)
 
         ##### debug
         self._flag_small_terrain = cfg["env"]["flagSmallTerrain"]
@@ -500,9 +502,19 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         asset_options.density = 1.0
         asset_options.fix_base_link = True
         asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
-
+        
+        if self._task_name =="MMH_box":
+            platform_size = 0.4
+        elif self._task_name =="MMH_handle":
+            platform_size = 0.36
+        elif self._task_name =="MMH_timber":
+            platform_size = 0.2  # smaller size to avoid tripping
+        elif self._task_name =="MMH_bag":
+            platform_size = 0.4
+        # if self.constructionExp and self._is_test:
+        #     platform_size = max(self._build_base_size)
         self._platform_height = 0.02
-        self._platform_asset = self.gym.create_box(self.sim, 0.4, 0.4, self._platform_height, asset_options)
+        self._platform_asset = self.gym.create_box(self.sim, platform_size, platform_size, self._platform_height, asset_options)
 
         return
 
@@ -576,8 +588,10 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                 dist = torch.distributions.uniform.Uniform(torch.tensor(self._mass_range[0], device=self.device), 
                                                            torch.tensor(self._mass_range[1], device=self.device),)
                 box_mass = dist.sample((self.num_envs,))
-                box_volume = self._box_scale.prod(dim=1)
-                
+                scale_volume = self._box_scale.prod(dim=1) 
+                base_size = torch.tensor(self._build_base_size, device=self.device)
+                base_volume = base_size.prod()
+                box_volume = base_volume * scale_volume
                 self._box_density = box_mass / box_volume
                 # print("box_mass shape = ", box_mass.shape)
                 # print("box_volume shape = ", box_volume.shape)
@@ -598,8 +612,19 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             asset_options.max_angular_velocity = 100.0
             asset_options.density = self._box_density[i]
             asset_options.default_dof_drive_mode = gymapi.DOF_MODE_NONE
-            self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
-        
+            if self.user_urdf is not None:
+                # "tokenhsi/data/assets/carry_box/indented_box.urdf"
+                asset_root, asset_file = os.path.split(self.user_urdf)
+                print(f"[Info]: Loading user urdf for box: {self.user_urdf}")
+                print(f"[Info]: asset_root = {asset_root}, asset_file = {asset_file}")
+                # asset_root = "tokenhsi/data/assets/carry_box"
+                self._box_assets.append(self.gym.load_asset(self.sim, asset_root, asset_file, asset_options))
+                # TODO: mass & size are taken from urdf file, not asset_options, also need to happen before _build_box_tensors if dynamic, also change mass
+            else: 
+                self._box_assets.append(self.gym.create_box(self.sim, self._box_size[i, 0], self._box_size[i, 1], self._box_size[i, 2], asset_options))
+
+
+
         return
 
     def _build_env(self, env_id, env_ptr, humanoid_asset):
@@ -617,9 +642,12 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             self._char_h = 0.92 # perfect number
         elif (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml"):
             self._char_h = 0.94
-        else:
-            print("Unsupported character config file: {s}".format(asset_file))
-            assert(False)
+        elif ("mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
+            self._char_h = 1.04
+            # TODO: pelvis height, see if this works
+        elif ("mjcf/phys_humanoid_v4" in asset_file or "mjcf/phys_humanoid_v5" in asset_file):
+            self._char_h = 1.04
+            # TODO: pelvis height, see if this works
 
         pos = torch.tensor(get_axis_params(self._char_h,
                                            self.up_axis_idx)).to(self.device)
@@ -675,7 +703,15 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         box_handle = self.gym.create_actor(env_ptr, self._box_assets[env_id], default_pose, "box", col_group, col_filter, segmentation_id)
         self._box_handles.append(box_handle)
+        if env_id == 0:  # count box joints
+            self._box_dof_count = self.gym.get_actor_dof_count(env_ptr, box_handle)
 
+        if self.gym.get_actor_dof_count(env_ptr, box_handle) > 0:  # for box with joints
+            dof_prop = self.gym.get_actor_dof_properties(env_ptr, box_handle)
+            dof_prop["driveMode"].fill(gymapi.DOF_MODE_NONE)
+            self.gym.set_actor_dof_properties(env_ptr, box_handle, dof_prop)
+        
+        # print(self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0])
         mass = self.gym.get_actor_rigid_body_properties(env_ptr, box_handle)[0].mass
         self._box_masses.append(mass)
         print(f"[Info]: box mass = {mass} kg")
@@ -1225,8 +1261,22 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                                        self.cfg["env"]["debug"]["vel"])
         handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
         putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
-        carry_box_reward = 2.0 * walk_r + 2.0 * carry_r + handheld_r + putdown_r
         
+        if self._task_name =="MMH_box":
+            carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
+        elif self._task_name =="MMH_handle":
+            handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size, box_rot)
+            carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
+            handheld_r = handheld_handle_r  # override handheld_r for handle task
+        elif self._task_name =="MMH_timber":
+            handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
+            handheld_r = handheld_timber_r  # override handheld_r for timber task
+            carry_box_reward = walk_r + carry_r + handheld_timber_r
+        elif self._task_name =="MMH_bag":
+            handheld_bag_r = compute_handheld_bag_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
+            handheld_r = handheld_bag_r  # override handheld_r for bag task
+            carry_box_reward = walk_r + carry_r + handheld_bag_r
+            
         humanoid_angles = self.humanoid_angles()
         ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
         ergo_sub_weight /= ergo_sub_weight.sum()
@@ -1306,6 +1356,14 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         return
     def pre_physics_step(self, actions):
         super().pre_physics_step(actions)
+        reset_mask = self.progress_buf == 0
+        if torch.any(reset_mask):
+            # Hold the reset pose for the first step to avoid snapping back to stale targets.
+            self._pd_target_full[reset_mask, :self.num_dof] = self._dof_pos[reset_mask]
+            pd_tar_tensor = gymtorch.unwrap_tensor(self._pd_target_full)
+            self.gym.set_dof_position_target_tensor(self.sim, pd_tar_tensor)
+
+        self._update_task()
         self._prev_root_pos[:] = self._humanoid_root_states[..., 0:3]
         self._prev_box_pos[:] = self._box_states[..., 0:3]
         return
@@ -1380,6 +1438,9 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                     # reset platform, we needn't platforms right now.
                     if self._reset_random_height:
                         self._platform_pos[curr_env_ids] = self._platform_default_pos[curr_env_ids]
+                        if self._task_name == "MMH_timber":
+                            self._platform_pos[curr_env_ids, 0:2] = root_pos[:, 0:2] # xy
+                            self._platform_pos[curr_env_ids, -1] = 0.05
 
         # for skill is loco and reset default, we random generate an inital location of the box
         random_env_ids = []
@@ -1397,7 +1458,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             root_pos_xy *= torch.rand(len(ids), 1, device=self.device) * 9.0 + 1.0 # randomize # 边界是50m，不会走出去整张地图的
             root_pos_xy += self._humanoid_root_states[ids, :2] # get absolute pos, humanoid_root_state will be updated after set_env_state
 
-            root_pos_z = self._box_size[ids, 2] / 2 # place the box on the ground
+            root_pos_z = self._box_size[ids, 2] / 2 + 0.08 # place the box on the ground # wen: added 0.08 to avoid sit on the ground
             if self._reset_random_height:
 
                 num_envs = ids.shape[0]
@@ -1445,11 +1506,24 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         env_ids_int32 = self._box_actor_ids[env_ids].view(-1)
         if self._reset_random_height:
             # env has two platforms
-            env_ids_int32 = torch.cat([env_ids_int32, self._platform_actor_ids, self._tar_platform_actor_ids], dim=0)
+            env_ids_int32 = torch.cat([env_ids_int32, self._platform_actor_ids, self._tar_platform_actor_ids], dim=0)  # tensor([1, 2, 3], device='cuda:0', dtype=torch.int32)
+        
+        
+        if getattr(self, "_box_dof_count", 0) > 0:  # need to reset humanoid and box at the same time, or else the reset in super() will overwritten
+            humanoid_env_ids_int32 = self._humanoid_actor_ids[env_ids]
+            box_env_ids_int32 = self._box_actor_ids[env_ids]
+            dof_env_ids_int32 = torch.cat([humanoid_env_ids_int32, box_env_ids_int32], dim=0)  # 0, 1
+           
+            dof_state = self._dof_state.view(self.num_envs, self._dofs_per_env, 2)
+            dof_state[env_ids, self.num_dof:self.num_dof + self._box_dof_count, :] = 0.0
+            self.gym.set_dof_state_tensor_indexed(self.sim,  # (42, 2) for bag, (38, 2) for boxes
+                                                              gymtorch.unwrap_tensor(self._dof_state),
+                                                              gymtorch.unwrap_tensor(dof_env_ids_int32), len(dof_env_ids_int32))
+            env_ids_int32 = torch.cat([humanoid_env_ids_int32, env_ids_int32], dim=0)  # 0, 1, 2, 3
+        
         self.gym.set_actor_root_state_tensor_indexed(self.sim,
-                                                        gymtorch.unwrap_tensor(self._root_states),
-                                                        gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
-
+                                                     gymtorch.unwrap_tensor(self._root_states),
+                                                     gymtorch.unwrap_tensor(env_ids_int32), len(env_ids_int32))
         return
     
 
@@ -1541,10 +1615,12 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
 
         if (asset_file == "mjcf/amp_humanoid.xml"):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
-        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml") or (asset_file == "mjcf/phys_humanoid_v3_box_foot.xml"):
+        elif (asset_file == "mjcf/phys_humanoid.xml") or (asset_file == "mjcf/phys_humanoid_v2.xml") or (asset_file == "mjcf/phys_humanoid_v3.xml" or "mjcf/phys_humanoid_v3_box_foot_tall" in asset_file):
             self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
+        elif ("mjcf/phys_humanoid_v4" in asset_file or "mjcf/phys_humanoid_v5" in asset_file):
+            self._num_amp_obs_per_step = 13 + self._dof_obs_size + 28 + 2 * 2 + 3 * 2 + 3 * num_key_bodies # [root_h, root_rot, root_vel, root_ang_vel, dof_pos, dof_vel, key_body_pos]
         else:
-            print("Unsupported character config file: {s}".format(asset_file))
+            print("Unsupported character config file: {s}".format(asset_file=asset_file))
             assert(False)
 
         return
@@ -1716,7 +1792,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
                                     root_vel=root_vel, 
                                     root_ang_vel=root_ang_vel, 
                                     dof_vel=dof_vel)
-
+                self._humanoid_root_states[env_ids, 2] += 0.1  # wen2: example MMH motion have collision with ground
                 self._reset_ref_env_ids[sk_name] = curr_env_ids
                 self._reset_ref_motion_ids[sk_name] = motion_ids
                 self._reset_ref_motion_times[sk_name] = motion_times
@@ -2635,7 +2711,7 @@ class Terrain:
         x2 = int(x + surrounding_square_dim)
         y1 = int(y - surrounding_square_dim)
         y2 = int(y + surrounding_square_dim)
-        print(x1, x2, y1, y2)
+        # print(x1, x2, y1, y2)
         return np.max(self.height_field_raw[x1:x2, y1:y2]) * self.vertical_scale
 
     def get_ground_xyz(self, x, y):
