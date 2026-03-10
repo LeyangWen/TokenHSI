@@ -3,7 +3,7 @@ taskName: MMH_bag
 env: 
   numEnvs: 4096
   envSpacing: 3
-  episodeLength: 900 # 20s
+  episodeLength: 300 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -50,7 +50,7 @@ env:
 
   box:
     build:
-      userUrdf: "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"
+      userUrdf: "tokenhsi/data/assets/non_rigid_bag/stone_bag_l.urdf"
       baseSize: [0.35, 0.51, 0.15] # unit: m  [width(X), length(Y), thickness(Z)]
       randomSize: False
       randomModeEqualProportion: False
@@ -94,16 +94,15 @@ env:
     numExperiments: 4
     constructionExperiment: True
     start_positions:
-      - [2.0, 0.0, 0.2]
-      - [2.0, 0.0, 0.4]
-      # - [2.0, 0.0, 0.4]
-      - [2.0, 0.0, 0.6]
-      - [2.0, 0.0, 0.8]
+      - [2.0, 0.0, 0.1]
+      - [2.0, 0.0, 0.1]
+      - [2.0, 0.0, 0.1]
+      - [2.0, 0.0, 0.1]
     end_positions:
-      - [-2.0, 0.0, 0.2]
-      - [-2.0, 0.0, 0.4]
-      - [-2.0, 0.0, 0.6]
-      - [-2.0, 0.0, 0.8]
+      - [2.0, 0.0, 0.1]
+      - [2.0, 0.0, 0.1]
+      - [2.0, 0.0, 0.1]
+      - [2.0, 0.0, 0.1]
     density: 100.0  # kg/m^3
 
   asset:

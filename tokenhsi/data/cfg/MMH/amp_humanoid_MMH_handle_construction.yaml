@@ -3,7 +3,7 @@ taskName: MMH_handle
 env: 
   numEnvs: 4096
   envSpacing: 3
-  episodeLength: 900 # 20s
+  episodeLength: 300 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -95,14 +95,13 @@ env:
     start_positions:
       - [2.0, 0.0, 0.2]
       - [2.0, 0.0, 0.4]
-      # - [2.0, 0.0, 0.4]
       - [2.0, 0.0, 0.6]
       - [2.0, 0.0, 0.8]
     end_positions:
-      - [-2.0, 0.0, 0.2]
-      - [-2.0, 0.0, 0.4]
-      - [-2.0, 0.0, 0.6]
-      - [-2.0, 0.0, 0.8]
+      - [2.0, 0.0, 0.2]
+      - [2.0, 0.0, 0.4]
+      - [2.0, 0.0, 0.6]
+      - [2.0, 0.0, 0.8]
     density: 100.0  # kg/m^3
 
   asset:

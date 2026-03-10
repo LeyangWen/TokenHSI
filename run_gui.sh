@@ -5,7 +5,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
-    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  \
+    --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-6-v5_armfix/Humanoid_13-01-05-28/nn/Humanoid.pth  \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -52,8 +52,8 @@ output/custom_trained/MMH-Try1/Carry-box-train-3-wrist/Humanoid_26-01-20-34/nn/H
 output/custom_trained/MMH-Try1/Carry-box-train-5-wrist/Humanoid_28-03-16-52/nn/Humanoid.pth  \
 # all above uses "mjcf/phys_humanoid_v4_box_foot_tall_slippery_og+wrist.xml"
 
-output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  # from good ones, adapt to v5 mediumn heights, TODO: new v5 arm fix checkpoint downloaded
-
+output/custom_trained/MMH-Try1/Carry-box-train-6-wrist/Humanoid_13-22-39-59/nn/Humanoid.pth  # from good ones, adapt to v5 mediumn heights
+ --checkpoint output/custom_trained/MMH-Try1/Carry-box-train-6-v5_armfix/Humanoid_13-01-05-28/nn/Humanoid.pth  #  new v5 arm fix checkpoint downloaded, better w/new model
 
 # MMH Timber Test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
@@ -137,7 +137,8 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 --checkpoint output/custom_trained/MMH-Try2/Carry-timber-train-4/Humanoid_20-13-25-30/nn/Humanoid.pth  # 220 hr not workinig
 
 
-output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights, TODO: new v5 arm fix checkpoint downloaded
+output/custom_trained/MMH-Try2/Carry-timber-train-1/Humanoid_13-22-39-34/nn/Humanoid.pth # from good ones, adapt to v5 mediumn heights
+MMH-Try2/Carry-timber-train-1-v5_armfix/Humanoid_13-00-48-01/nn/Humanoid.pth # new v5 arm fix checkpoint downloaded, better w/ new model
 
 # Handle Carry Test 
 # 1. imitation motion w/ box annotation, done
@@ -185,15 +186,17 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
 
 # Updated diag reward
 --checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-9/Humanoid_10-16-59-12/nn/Humanoid.pth  # resume
---checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-10/Humanoid_10-17-06-21/nn/Humanoid.pth # scratch
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-10/Humanoid_10-17-06-21/nn/Humanoid.pth # scratch, opposite liftin now
 
+# update reward weight, resume from 3-10
+--checkpoint output/custom_trained/MMH-Try3/Carry-handle-train-11/Humanoid_15-18-36-52/nn/Humanoid.pth
 
 # MMH bag carry test
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
-    --checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth     \
+    --checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth     \
     --test \
     --num_envs 1 \
     --wandb_project "TokenHSI-Test" \
@@ -205,29 +208,9 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --ergo_coeff 0.2 \
     --construction_experiment True \
 
---checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth  # scratch
-
-
-
-python -u ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
-    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth     \
-    --test \
-    --num_envs 1 \
-    --wandb_project "TokenHSI-Test" \
-    --wandb_name "Carry_test_1" \
-    --wandb_mode "disabled" \
-    --random_size False \
-    --random_density True \
-    --density 180 \
-    --ergo_coeff 0.2 \
-    --construction_experiment True \
-
---checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth  # scratch
-
-
+--checkpoint output/custom_trained/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth  # scratch, lift, but now proper posture
+output/custom_trained/MMH-Try4/Carry-bag-train-2/Humanoid_14-02-26-01/nn/Humanoid.pth  # Resume from Try4-1, imitation motion and reward
+output/custom_trained/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth  # Scratch, imitation motion and reward
 
 
 
@@ -576,7 +559,7 @@ python -m pdb ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # sh tokenhsi/scripts/single_task/traj_test.sh
 
 
-# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_lift_working_2" --video_name "vid"  --fps 18 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_lift_works_0" --video_name "vid"  --fps 8 --delete_imgs
 
 
 # | Keyboard | Function |

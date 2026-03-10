@@ -173,7 +173,7 @@ class BaseTask():
     def save_imgs(self):
         # render frame if we're saving video
         if self.save_video and self.viewer is not None:
-            if np.mod(self.frame_count, self.downsample) == 0:  # default 3
+            if np.mod(self.frame_count, self.downsample) == 0:  # default 3, frame_count increase by 2 each cycle for some bug, use odd downsample value for now
                 num = str(self.save_img_count)
                 num = '0' * (6 - len(num)) + num
                 if not self.skip_img:  # skip and only get csv, faster this way

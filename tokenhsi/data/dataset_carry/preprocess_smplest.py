@@ -32,11 +32,22 @@ if __name__ == "__main__":
         # "box_pickUp": cfg["motions"]["box_pickUp"],
         # "handle_pickUp": cfg["motions"]["handle_pickUp"],
         # "handle_carry": cfg["motions"]["handle_carry"],
-        "bag_pickUp": cfg["motions"]["bag_pickUp"],
-        "bag_carry": cfg["motions"]["bag_carry"],
+        # "bag_pickUp": cfg["motions"]["bag_pickUp"],
+        # "bag_carry": cfg["motions"]["bag_carry"],
         # "timber_pickUp": cfg["motions"]["timber_pickUp"],
         # "timber_carry": cfg["motions"]["timber_carry"],
         # "timber_putDown": cfg["motions"]["timber_putDown"],
+        "S01": cfg["motions"]["S01"],
+        "S02": cfg["motions"]["S02"],
+        "S03": cfg["motions"]["S03"],
+        # "S04": cfg["motions"]["S04"],
+        # "S05": cfg["motions"]["S05"],
+        # "S06": cfg["motions"]["S06"],
+        # "S07": cfg["motions"]["S07"],
+        # "S08": cfg["motions"]["S08"],
+        # "S09": cfg["motions"]["S09"],
+        # "S10": cfg["motions"]["S10"],
+        
     }
     target_fps = 20
     # candidates = {

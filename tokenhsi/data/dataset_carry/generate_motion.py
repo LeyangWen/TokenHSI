@@ -88,7 +88,7 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/handle_2*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle_carry/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bad_pickUp/*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bag_*/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/S*/*/smpl_params.npy"))
     
     # TODO: change file
     
