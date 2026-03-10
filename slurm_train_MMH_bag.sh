@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=TokenHSI-MMH-train
-#SBATCH --output=output_slurm/train_MMH_log_bag.txt
-#SBATCH --error=output_slurm/train_MMH_error_bag.txt
+#SBATCH --output=output_slurm/train_MMH_log_bag-3.txt
+#SBATCH --error=output_slurm/train_MMH_error_bag-3.txt
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -75,9 +75,8 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-4-small/ \
     --wandb_name "Try4-Carry-bag-train-4-small" \
-    --notes "Scratch, imitation motion and reward" \
+    --notes "bag motion - small" \
     --ergo_coeff 0.2 \
-    --density 1008 \
     --box_w 0.25 \
     --box_l 0.45 \
     --box_h 0.10 \
@@ -86,20 +85,20 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth
 
 
-    python -u ./tokenhsi/run.py --task HumanoidCarry \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
-    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
-    --num_envs 10240 \
-    --headless \
-    --wandb_project "TokenHSI-MMH-Train" \
-    --wandb_mode "online" \
-    --random_mode_equal_proportion False \
-    --construction_experiment False \
-    --random_density True \
-    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-4-big/ \
-    --wandb_name "Try4-Carry-bag-train-4-big" \
-    --notes "bag motion" \
-    --ergo_coeff 0.2 \
-    --resume 1\
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
+#     --num_envs 10240 \
+#     --headless \
+#     --wandb_project "TokenHSI-MMH-Train" \
+#     --wandb_mode "online" \
+#     --random_mode_equal_proportion False \
+#     --construction_experiment False \
+#     --random_density True \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-4-big/ \
+#     --wandb_name "Try4-Carry-bag-train-4-big" \
+#     --notes "bag motion" \
+#     --ergo_coeff 0.2 \
+#     --resume 1\
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth
