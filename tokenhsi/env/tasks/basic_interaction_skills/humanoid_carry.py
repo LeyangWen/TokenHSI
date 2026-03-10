@@ -342,9 +342,9 @@ class HumanoidCarry(Humanoid):
                 base_volume = base_size.prod()
                 box_volume = base_volume * scale_volume
                 self._box_density = box_mass / box_volume
-                # print("box_mass shape = ", box_mass.shape)
-                # print("box_volume shape = ", box_volume.shape)
-                # print("box_density shape = ", self._box_density.shape)
+                # print("box_mass shape = ", box_mass)
+                # print("box_volume shape = ", box_volume)
+                # print("box_density shape = ", self._box_density)
             else:
                 self._box_density[:] = 100.0
 

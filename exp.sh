@@ -287,7 +287,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --box_h 0.10 \
     --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
     --skip_img \
-#--density 1000
+#--density 1008
 # TODO: small one need more training, especially with the proper densty
 
 

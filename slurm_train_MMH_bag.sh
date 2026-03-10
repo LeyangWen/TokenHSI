@@ -43,6 +43,25 @@ nvcc --version
 # export MAX_JOBS=1
 
 # box w. bag
+# python -u ./tokenhsi/run.py --task HumanoidCarry \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+#     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
+#     --num_envs 10240 \
+#     --headless \
+#     --wandb_project "TokenHSI-MMH-Train" \
+#     --wandb_mode "online" \
+#     --random_mode_equal_proportion False \
+#     --construction_experiment False \
+#     --random_density True \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/ \
+#     --wandb_name "Try4-Carry-bag-train-3" \
+#     --notes "Scratch, imitation motion and reward" \
+#     --ergo_coeff 0.2 \
+#     # --resume 1\
+#     # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth
+
+
 python -u ./tokenhsi/run.py --task HumanoidCarry \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
     --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
@@ -53,10 +72,34 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --random_density True \
-    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/ \
-    --wandb_name "Try4-Carry-bag-train-3" \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-4-small/ \
+    --wandb_name "Try4-Carry-bag-train-4-small" \
     --notes "Scratch, imitation motion and reward" \
     --ergo_coeff 0.2 \
-    # --resume 1\
-    # --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-1/Humanoid_03-22-51-45/nn/Humanoid.pth
+    --density 1008 \
+    --box_w 0.25 \
+    --box_l 0.45 \
+    --box_h 0.10 \
+    --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
+    --resume 1\
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth
+
+
+    python -u ./tokenhsi/run.py --task HumanoidCarry \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task.yaml \
+    --cfg_env tokenhsi/data/cfg/MMH/amp_humanoid_MMH_bag_construction.yaml \
+    --num_envs 10240 \
+    --headless \
+    --wandb_project "TokenHSI-MMH-Train" \
+    --wandb_mode "online" \
+    --random_mode_equal_proportion False \
+    --construction_experiment False \
+    --random_density True \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-4-big/ \
+    --wandb_name "Try4-Carry-bag-train-4-big" \
+    --notes "bag motion" \
+    --ergo_coeff 0.2 \
+    --resume 1\
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try4/Carry-bag-train-3/Humanoid_14-02-31-22/nn/Humanoid.pth
