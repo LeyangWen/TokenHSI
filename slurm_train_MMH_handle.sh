@@ -153,7 +153,7 @@ python -u ./tokenhsi/run.py --task HumanoidCarry \
     --notes "Tunned handle height reward, scratch" \
     --ergo_coeff 0.2 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-11/Humanoid_10-17-06-21/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Try3/Carry-handle-train-10/Humanoid_10-17-06-21/nn/Humanoid.pth \
 
 
 
