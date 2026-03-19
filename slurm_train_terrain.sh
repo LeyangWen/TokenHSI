@@ -8,8 +8,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=80:00:00
-#SBATCH --account=shdpm0
+#SBATCH --time=100:00:00
+#SBATCH --account=shdpm98
 #SBATCH --partition=spgpu
 ##### END preamble
 ##### Run in MotionBert dir
@@ -43,10 +43,12 @@ export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindin
 
 # export MAX_JOBS=1
 
+
+# box try
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
-    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_slope.yaml \
-    --hrl_checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
+    --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction.yaml \
+    --hrl_checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_14-22-34-39/nn/Humanoid.pth \
     --num_envs 2048 \
     --headless \
     --wandb_project "TokenHSI-Train" \
@@ -56,14 +58,38 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_density False \
     --random_mode_equal_proportion True \
     --construction_experiment False \
-    --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try9/Terrain-GoodMotion-Reward-scratch-4/ \
-    --wandb_name "Try9-Terrain-GoodMotion-Reward-scratch-4" \
-    --notes "reward bug fix based on Try9-2" \
+    --motion_file tokenhsi/data/dataset_carry/dataset_MMH_box.yaml \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-box/Terrain-box-scratch-1/ \
+    --wandb_name "Terrain-box-scratch-1" \
+    --notes "new humanoid" \
     --ergo_coeff 0.2 \
     --unwalkable_obstacles 0 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-box/Terrain-box-scratch-1/Humanoid_14-23-10-07/nn/Humanoid.pth \
+
+
+
+# python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
+#     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
+#     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_slope.yaml \
+#     --hrl_checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try8/Try8-Stage1-GoodMotion-scratch-train-1/Humanoid_19-12-40-28/nn/Humanoid.pth \
+#     --num_envs 2048 \
+#     --headless \
+#     --wandb_project "TokenHSI-Train" \
+#     --wandb_mode "online" \
+#     --box_w 0.4 \
+#     --random_size True \
+#     --random_density False \
+#     --random_mode_equal_proportion True \
+#     --construction_experiment False \
+#     --motion_file tokenhsi/data/dataset_carry/dataset_carry_VEHS.yaml \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try9/Terrain-GoodMotion-Reward-scratch-4/ \
+#     --wandb_name "Try9-Terrain-GoodMotion-Reward-scratch-4" \
+#     --notes "reward bug fix based on Try9-2" \
+#     --ergo_coeff 0.2 \
+#     --unwalkable_obstacles 0 \
+#     --resume 1 \
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/try9/Terrain-GoodMotion-Reward-scratch-2/Humanoid_23-03-56-14/nn/Humanoid.pth \
 
 
 ### 3 exp resume from scratch

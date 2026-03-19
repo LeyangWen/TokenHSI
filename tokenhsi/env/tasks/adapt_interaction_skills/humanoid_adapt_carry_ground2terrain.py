@@ -1249,6 +1249,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         root_pos = self._humanoid_root_states[..., 0:3]
         root_rot = self._humanoid_root_states[..., 3:7]
         rigid_body_pos = self._rigid_body_pos
+        rigid_body_rot = self._rigid_body_rot
         box_pos = self._box_states[..., 0:3]
         box_rot = self._box_states[..., 3:7]
         hands_ids = self._key_body_ids[[0, 1]]
@@ -1363,7 +1364,7 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
             pd_tar_tensor = gymtorch.unwrap_tensor(self._pd_target_full)
             self.gym.set_dof_position_target_tensor(self.sim, pd_tar_tensor)
 
-        self._update_task()
+        # self._update_task()
         self._prev_root_pos[:] = self._humanoid_root_states[..., 0:3]
         self._prev_box_pos[:] = self._box_states[..., 0:3]
         return
