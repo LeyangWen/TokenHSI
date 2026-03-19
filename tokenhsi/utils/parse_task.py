@@ -39,6 +39,7 @@ from env.tasks.basic_interaction_skills.humanoid_climb import HumanoidClimb
 ######### multi task
 from tokenhsi.env.tasks.multi_task.humanoid_traj_sit_carry_climb import HumanoidTrajSitCarryClimb
 from tokenhsi.env.tasks.multi_task.humanoid_carry_MMH import HumanoidCarryMMH
+from tokenhsi.env.tasks.multi_task.humanoid_MMH_merge import HumanoidMMHMerge
 #########
 
 ######### policy adaptation
