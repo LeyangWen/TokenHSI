@@ -1,0 +1,148 @@
+# if given, will override the device setting in gym.
+env:
+  numEnvs: 4096
+  envSpacing: 3
+  episodeLength: 900
+  isFlagrun: False
+  enableDebugVis: False
+
+  pdControl: True
+  powerScale: 1.0
+  controlFrequencyInv: 2
+  stateInit: "Random"
+  hybridInitProb: 0.5
+  numAMPObsSteps: 10
+
+  localRootObs: True
+  localRootObsPolicy: False
+  rootHeightObs: False
+  rootHeightObsPolicy: False
+  keyBodies: ["right_hand", "left_hand", "right_foot", "left_foot"]
+  contactBodies: ["right_foot", "left_foot"]
+  terminationHeight: 0.15
+  enableEarlyTermination: True
+
+  enableSelfCollisionDetection: True
+  enableTrackInitState: False
+
+  # power reward
+  power_reward: True
+  power_coefficient: 0.0005
+
+  # merged MMH task setup
+  enableTaskObs: True
+  enableTaskMaskObs: True
+  enableTaskSpecificDisc: True
+  onlyVelReward: True
+  onlyHeightHandHeldReward: False
+  taskInitProb: [0.25, 0.25, 0.25, 0.25]
+  taskDiscProb: [0.25, 0.25, 0.25, 0.25]
+
+  box_vel_penalty: True
+  box_vel_pen_coeff: 1.0
+  box_vel_pen_threshold: 1.8
+  mode: "train"
+
+  mmhTasks:
+    MMH_box:
+      motion_file: "tokenhsi/data/dataset_carry/dataset_MMH_box.yaml"
+      skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
+      skillInitProb: [0.0, 0.4, 0.4, 0.1, 0.1]
+      skillDiscProb: [0.0, 0.2, 0.5, 0.2, 0.1]
+      boxSize: [0.4, 0.4, 0.4]
+    MMH_handle:
+      motion_file: "tokenhsi/data/dataset_carry/dataset_MMH_handle.yaml"
+      skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
+      skillInitProb: [0.1, 0.3, 0.6, 0.0, 0.0]
+      skillDiscProb: [0.4, 0.2, 0.4, 0.1, 0.1]
+      boxSize: [0.34, 0.34, 0.36]
+    MMH_timber:
+      motion_file: "tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml"
+      skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
+      skillInitProb: [0.1, 0.3, 0.6, 0.0, 0.0]
+      skillDiscProb: [0.4, 0.2, 0.4, 0.1, 0.1]
+      boxSize: [0.4, 0.4, 0.4]
+    MMH_bag:
+      motion_file: "tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml"
+      skill: ["omomo", "loco", "pickUp", "carryWith", "putDown"]
+      skillInitProb: [0.1, 0.3, 0.1, 0.0, 0.0]
+      skillDiscProb: [0.6, 0.2, 0.2, 0.1, 0.1]
+      boxSize: [0.35, 0.51, 0.15]
+
+  box:
+    build:
+      baseSize: [0.4, 0.4, 0.4]
+      randomSize: False
+      randomModeEqualProportion: False
+      scaleRangeX: [1.0, 1.0]
+      scaleRangeY: [1.0, 1.0]
+      scaleRangeZ: [1.0, 1.0]
+      scaleSampleInterval: 0.125
+      randomDensity: False
+      massRange: [2.0, 43.0]
+      testSizes:
+      - [0.22, 0.22, 0.22]
+      - [0.27, 0.27, 0.27]
+      - [0.32, 0.32, 0.32]
+      - [0.37, 0.37, 0.37]
+      - [0.42, 0.42, 0.42]
+      - [0.47, 0.47, 0.47]
+      - [0.52, 0.52, 0.52]
+      - [0.57, 0.57, 0.57]
+      - [0.30, 0.30, 0.40]
+
+    reset:
+      randomRot: True
+      randomHeight: True
+      randomHeightProb: 0.5
+      maxTopSurfaceHeight: 1.2
+
+    obs:
+      enableBboxObs: True
+
+  debug:
+    vel: False
+  ergoCoeff: 0.2
+  ergoSubWeight: [50.0, 25.0, 25.0]
+
+  eval:
+    successThreshold: 0.2
+    numExperiments: 4
+    constructionExperiment: False
+    start_positions:
+    - [2.0, 0.0, 0.2]
+    - [2.0, 0.0, 0.4]
+    - [2.0, 0.0, 0.6]
+    - [2.0, 0.0, 0.8]
+    end_positions:
+    - [2.0, 0.0, 0.2]
+    - [2.0, 0.0, 0.4]
+    - [2.0, 0.0, 0.6]
+    - [2.0, 0.0, 0.8]
+    density: 100.0
+
+  asset:
+    assetRoot: "tokenhsi/data/assets"
+    assetFileName: "mjcf/phys_humanoid_v5_box_foot_medianH_slippery_horizontal_arm_fix.xml"
+
+  plane:
+    staticFriction: 1.0
+    dynamicFriction: 1.0
+    restitution: 0.0
+
+sim:
+  substeps: 2
+  physx:
+    num_threads: 4
+    solver_type: 1
+    num_position_iterations: 4
+    num_velocity_iterations: 0
+    contact_offset: 0.02
+    rest_offset: 0.0
+    bounce_threshold_velocity: 0.2
+    max_depenetration_velocity: 10.0
+    default_buffer_size_multiplier: 10.0
+
+  flex:
+    num_inner_iterations: 10
+    warm_start: 0.25
