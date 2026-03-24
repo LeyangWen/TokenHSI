@@ -3,7 +3,7 @@ conda activate tokenhsi # need python 3.8, so you cant load python3.10-anaconda 
 hrl_checkpoint="output/custom_trained/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_14-22-34-39/nn/Humanoid.pth"
 # hrl_checkpoint="output/custom_trained/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_10-04-34-17/nn/Humanoid.pth"
 ### MMH Box
-box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-scratch-1/Humanoid_17-00-37-26/nn/Humanoid.pth"
+box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
 
 # box_s_10lbs
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
@@ -21,10 +21,10 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --box_w 0.34 \
     --box_l 0.34 \
     --box_h 0.36 \
-    --random_size True \
+    --random_size False \
     --random_density False \
     --density 109 \
-    --random_mode_equal_proportion True \
+    --random_mode_equal_proportion False \
     --construction_experiment True \
     --ergo_coeff 0.2 \
     --load_terrain True \
@@ -32,7 +32,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 
 ### MMH Handle
-handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-scratch-1/Humanoid_17-00-37-28/nn/Humanoid.pth"
+handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
 # handle_s_10lbs
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
@@ -62,7 +62,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 ### MMH Timber
 # timber_s
-timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-scratch-1/Humanoid_17-00-37-27/nn/Humanoid.pth"
+timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_timber.yaml \
@@ -90,7 +90,7 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 
 # bag_s
-bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_17-00-37-26/nn/Humanoid.pth"
+bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_bag.yaml \
@@ -111,13 +111,13 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --box_l 0.45 \
     --box_h 0.10 \
     --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
-    --load_terrain True \
+    --load_terrain False \
     --skip_img \
 #--density 1008
 
 
 ### Render
-# python lpanlib/others/video.py --imgs_dir "output/imgs/handle_lift_works_0" --video_name "vid"  --fps 8 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/timber" --video_name "vid"  --fps 10 --delete_imgs
 
 
 # | Keyboard | Function |

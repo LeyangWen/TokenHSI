@@ -79,8 +79,8 @@ params:
     tau: 0.95
     learning_rate: 2e-5
     lr_schedule: constant
-    score_to_win: 20000
-    max_epochs: 1000000
+    score_to_win: 200
+    max_epochs: 1000
     save_best_after: 50
     save_frequency: 100
     save_intermediate: False
@@ -97,8 +97,8 @@ params:
     clip_value: False
     seq_len: 4
     bounds_loss_coef: 10
-    amp_obs_demo_buffer_size: 200000
-    amp_replay_buffer_size: 200000
+    amp_obs_demo_buffer_size: 200
+    amp_replay_buffer_size: 200
     amp_replay_keep_prob: 0.01
     amp_batch_size: 128
     amp_minibatch_size: 128
