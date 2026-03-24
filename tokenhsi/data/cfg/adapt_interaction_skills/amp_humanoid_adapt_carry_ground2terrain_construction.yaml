@@ -2,7 +2,7 @@
 env: 
   numEnvs: 4096
   envSpacing: 0
-  episodeLength: 900 #600 # 20s
+  episodeLength: 300 #600 # 20s
   isFlagrun: False
   enableDebugVis: False
   
@@ -145,13 +145,13 @@ env:
 
     # vicon-lab
     start_positions:
-      - [8.5, 4, 0.25]
+      - [8.5, 4, 0.15]
       # - [2.0, 4.5, 0.2]
       # - [7.0, 2.0, 0.4]
       # - [2.0, 2.5, 0.6]
       # - [3.5, 1.5, 0.8]
     end_positions:
-      - [2.5, 2.5, 0.25]
+      - [8.5, 4, 0.15]
       # - [7.0, 2.0, 0.4]
       # - [2.0, 2.5, 0.6]
       # - [3.5, 1.5, 0.8]
