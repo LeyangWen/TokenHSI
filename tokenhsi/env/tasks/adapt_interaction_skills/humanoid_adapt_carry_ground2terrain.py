@@ -1263,20 +1263,21 @@ class HumanoidAdaptCarryGround2Terrain(Humanoid):
         handheld_r = compute_handheld_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward)
         putdown_r = compute_putdown_reward(box_pos, self._tar_pos)
         
+        approach_r = compute_approach_reward(rigid_body_pos, box_pos, hands_ids)
         if self._task_name =="MMH_box":
             carry_box_reward = walk_r + carry_r + handheld_r + putdown_r
         elif self._task_name =="MMH_handle":
             handheld_handle_r = compute_handheld_handle_reward(rigid_body_pos, box_pos, hands_ids, self._tar_pos, self._only_height_handheld_reward, self._box_size, box_rot)
-            carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r
+            carry_box_reward = walk_r + carry_r + handheld_handle_r + putdown_r + approach_r
             handheld_r = handheld_handle_r  # override handheld_r for handle task
         elif self._task_name =="MMH_timber":
             handheld_timber_r = compute_handheld_timber_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
             handheld_r = handheld_timber_r  # override handheld_r for timber task
-            carry_box_reward = walk_r + carry_r + handheld_timber_r
+            carry_box_reward = walk_r + carry_r + handheld_timber_r+ approach_r
         elif self._task_name =="MMH_bag":
             handheld_bag_r = compute_handheld_bag_reward(rigid_body_pos, rigid_body_rot, box_pos, box_rot, self._box_size, hands_ids)
             handheld_r = handheld_bag_r  # override handheld_r for bag task
-            carry_box_reward = walk_r + carry_r + handheld_bag_r
+            carry_box_reward = walk_r + carry_r + handheld_bag_r+ approach_r
             
         humanoid_angles = self.humanoid_angles()
         ergo_sub_weight = torch.tensor(self._ergo_sub_weight, dtype=torch.float32)
@@ -1985,6 +1986,23 @@ def compute_location_observations(root_states, box_states, box_bps, tar_pos, ena
 
     return obs
 
+# @torch.jit.script
+# def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height):
+    # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
+    # if only_height:
+    #     hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
+    # else:
+    #     hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos) ** 2, dim=-1) # xyz
+    # hands2box = torch.exp(-5.0 * hands2box_pos_err)
+
+    # # box2tar = torch.sum((box_pos[..., 0:2] - tar_pos[..., 0:2]) ** 2, dim=-1) # 2d
+    # # hands2box[box2tar < 0.7 ** 2] = 1.0 # assume this reward is max when the box is close enough to its target location
+
+    # root_pos = humanoid_rigid_body_pos[:, 0, :]
+    # box2human = torch.sum((box_pos[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1) # 2d
+    # hands2box[box2human > 0.7 ** 2] = 0 # disable this reward when the box is not close to the humanoid
+
+    # return 0.2 * hands2box
 @torch.jit.script
 def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height):
     # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
@@ -1994,14 +2012,57 @@ def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos
         hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids].mean(dim=1) - box_pos) ** 2, dim=-1) # xyz
     hands2box = torch.exp(-5.0 * hands2box_pos_err)
 
-    # box2tar = torch.sum((box_pos[..., 0:2] - tar_pos[..., 0:2]) ** 2, dim=-1) # 2d
-    # hands2box[box2tar < 0.7 ** 2] = 1.0 # assume this reward is max when the box is close enough to its target location
-
     root_pos = humanoid_rigid_body_pos[:, 0, :]
     box2human = torch.sum((box_pos[..., 0:2] - root_pos[..., 0:2]) ** 2, dim=-1) # 2d
     hands2box[box2human > 0.7 ** 2] = 0 # disable this reward when the box is not close to the humanoid
 
-    return 0.2 * hands2box
+    # reward for lifting box to near torso height, higher is okay
+    hand_carry_height = 1.0  # m, approximate torso height
+    height_err = torch.clamp_min(hand_carry_height - box_pos[:, 2], 0.0)  # no penalty for being above target
+    box_height_reward = torch.exp(-2.0 * height_err)
+
+    # only give lift reward when hands are near the box (i.e. humanoid is holding it)
+    hand_center = humanoid_rigid_body_pos[:, hands_ids, :].mean(dim=1)
+    box2hand = torch.sqrt(torch.sum((box_pos[:] - hand_center[:]) ** 2, dim=-1))
+    box_height_reward[box2hand > 0.3] = 0.0
+
+    reward = 0.1 * hands2box + 0.1 * box_height_reward
+
+    return reward
+
+@torch.jit.script
+def compute_approach_reward(humanoid_rigid_body_pos, box_pos, hands_ids):
+    # type: (Tensor, Tensor, Tensor) -> Tensor
+    """
+    Encourages the humanoid to move toward the object and bring hands close to it.
+    This reward is NEVER gated by proximity, so it provides gradient at any distance.
+    Designed to complement the handheld rewards for timber/bag/handle tasks.
+    """
+    root_pos = humanoid_rigid_body_pos[:, 0, :]
+    hand_pos = humanoid_rigid_body_pos[:, hands_ids, :]   # (B, 2, 3)
+    hand_center = hand_pos.mean(dim=1)                     # (B, 3)
+
+    # 1. Body approach: encourage root to move toward box in xy
+    #    exp(-1.0 * d) gives meaningful gradient even at 3-5m
+    root2box_xy = torch.sqrt(torch.sum((root_pos[:, :2] - box_pos[:, :2]) ** 2, dim=-1))
+    body_approach = torch.exp(-1.0 * root2box_xy)
+
+    # 2. Hand approach: encourage hands to reach toward box in xyz
+    #    Slightly sharper than body approach since hands need to be more precise
+    hand2box = torch.sqrt(torch.sum((hand_center - box_pos) ** 2, dim=-1))
+    hand_approach = torch.exp(-2.0 * hand2box)
+
+    # 3. Crouch/bend incentive: when close in xy, reward reducing hand height toward box
+    #    This helps the humanoid learn to bend down to ground-level objects
+    hand_height_err = torch.abs(hand_center[:, 2] - box_pos[:, 2])
+    hand_height_match = torch.exp(-3.0 * hand_height_err)
+    # Only relevant when humanoid is already somewhat close in xy
+    close_xy_scale = torch.exp(-2.0 * root2box_xy)  # smooth activation, not a hard gate
+    hand_height_match = hand_height_match * close_xy_scale
+
+    reward = 0.1 * body_approach + 0.1 * hand_approach + 0.05 * hand_height_match
+
+    return reward
 
 @torch.jit.script
 def compute_walk_reward(root_pos, prev_root_pos, box_pos, dt, tar_vel, only_vel_reward, debug_vel):
