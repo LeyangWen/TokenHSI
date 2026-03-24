@@ -27,8 +27,8 @@ env:
   enableTrackInitState: False
   
   skill: ["omomo", "loco", "loco_terrain", "pickUp", "carryWith", "putDown"]
-  skillInitProb: [0.2, 0.3, 0.3, 0.0, 0.0, 0.0]
-  skillDiscProb: [0.6, 0.2, 0.2, 0.1, 0.1, 0.1]
+  skillInitProb: [0.1, 0.3, 0.3, 0.0, 0.0, 0.0]
+  skillDiscProb: [0.3, 0.3, 0.3, 0.1, 0.1, 0.1]
 
   enableTaskObs: True
   onlyVelReward: False

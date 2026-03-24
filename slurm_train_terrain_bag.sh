@@ -63,5 +63,5 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --ergo_coeff 0.2 \
     --unwalkable_obstacles 0 \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_15-00-13-36/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_17-00-37-26/nn/Humanoid.pth \
 
