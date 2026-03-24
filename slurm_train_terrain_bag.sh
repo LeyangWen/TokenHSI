@@ -57,9 +57,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_bag.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-bag/Terrain-bag-boxContinue-2/ \
-    --wandb_name "Terrain-bag-boxContinue-2" \
-    --notes "new humanoid" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-bag/Terrain-bag-boxContinue-3/ \
+    --wandb_name "Terrain-bag-boxContinue-3" \
+    --notes "new reward" \
     --ergo_coeff 0.2 \
     --unwalkable_obstacles 0 \
     --resume 1 \
