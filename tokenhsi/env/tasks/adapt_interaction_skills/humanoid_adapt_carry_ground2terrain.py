@@ -1988,7 +1988,7 @@ def compute_location_observations(root_states, box_states, box_bps, tar_pos, ena
 
 # @torch.jit.script
 # def compute_handheld_reward(humanoid_rigid_body_pos, box_pos, hands_ids, tar_pos, only_height):
-    # type: (Tensor, Tensor, Tensor, Tensor, bool) -> Tensor
+    
     # if only_height:
     #     hands2box_pos_err = torch.sum((humanoid_rigid_body_pos[:, hands_ids, 2] - box_pos[:, 2].unsqueeze(-1)) ** 2, dim=-1) # height
     # else:
