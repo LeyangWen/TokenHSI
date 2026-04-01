@@ -3,8 +3,9 @@ conda activate tokenhsi # need python 3.8, so you cant load python3.10-anaconda 
 hrl_checkpoint="output/custom_trained/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_14-22-34-39/nn/Humanoid.pth"
 # hrl_checkpoint="output/custom_trained/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_10-04-34-17/nn/Humanoid.pth"
 ### MMH Box
-box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
-
+# box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont lift
+# box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-VEHSMotion-2/Humanoid_24-01-05-54/nn/Humanoid.pth"  # dont lift
+box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-VEHSMotion-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lift - VEHS dataset motion + modified reward
 # box_s_10lbs
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
@@ -23,7 +24,6 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --box_h 0.36 \
     --random_size False \
     --random_density False \
-    --density 109 \
     --random_mode_equal_proportion False \
     --construction_experiment True \
     --ergo_coeff 0.2 \
@@ -32,8 +32,10 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 
 ### MMH Handle
-handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
-# handle_s_10lbs
+# handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"   # dont even reach
+# handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-boxContinue-1/Humanoid_24-01-08-36/nn/Humanoid.pth"  # reach but dont lift
+handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts!, check weight calculations - modifed reward
+
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_handle.yaml \
@@ -51,7 +53,6 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --ergo_coeff 0.2 \
     --construction_experiment True \
     --load_terrain True \
-    --density 109 \
     --box_w 0.34 \
     --box_l 0.34 \
     --box_h 0.36 \
@@ -62,7 +63,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 ### MMH Timber
 # timber_s
-timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
+# timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont even walk to target
+# timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-2/Humanoid_24-01-10-18/nn/Humanoid.pth"  # bent down, but not as good
+timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth" # bend down properly, dont lift
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_timber.yaml \
@@ -80,7 +83,6 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_size False \
     --random_mode_equal_proportion False \
     --random_density False \
-    --density 180 \
     --ergo_coeff 0.2 \
     --construction_experiment True \
     --load_terrain True \
@@ -90,7 +92,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 
 
 # bag_s
-bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"
+# bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont bent down
+# bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-2/Humanoid_24-01-08-37/nn/Humanoid.pth" # dont bent down
+bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts but weight calculations might be off - check reward modifications
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_bag.yaml \
@@ -111,15 +115,15 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --box_l 0.45 \
     --box_h 0.10 \
     --user_urdf "tokenhsi/data/assets/non_rigid_bag/concrete_bag.urdf"  \
-    --load_terrain False \
+    --load_terrain True \
     --skip_img \
 #--density 1008
 
 
 ### Render
-# python lpanlib/others/video.py --imgs_dir "output/imgs/timber" --video_name "vid"  --fps 10 --delete_imgs
+# python lpanlib/others/video.py --imgs_dir "output/imgs/2_Terrain_timber_b3" --video_name "vid"  --fps 10 --delete_imgs
 
-
+# dont --skip_img
 # | Keyboard | Function |
 # | ---- | --- |
 # | F | focus on humanoid |
