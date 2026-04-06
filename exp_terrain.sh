@@ -5,7 +5,9 @@ hrl_checkpoint="output/custom_trained/Stage1/Stage1-GoodMotion-scratch-train-1/H
 ### MMH Box
 # box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont lift
 # box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-VEHSMotion-2/Humanoid_24-01-05-54/nn/Humanoid.pth"  # dont lift
-box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-VEHSMotion-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lift - VEHS dataset motion + modified reward
+box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-VEHSMotion-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lift - VEHS dataset motion + modified reward --> best
+
+# box_pth="output/custom_trained/MMH-Terrain-box/Terrain-box-VEHSMotion-3/Humanoid_01-02-45-45/nn/Humanoid.pth"   # dont lift
 # box_s_10lbs
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
@@ -34,7 +36,8 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 ### MMH Handle
 # handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"   # dont even reach
 # handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-boxContinue-1/Humanoid_24-01-08-36/nn/Humanoid.pth"  # reach but dont lift
-handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts!, check weight calculations - modifed reward
+handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts!, check weight calculations - modifed reward --> best
+# handle_pth="output/custom_trained/MMH-Terrain-handle/Terrain-handle-boxContinue-3/Humanoid_01-02-46-11/nn/Humanoid.pth"
 
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
@@ -66,6 +69,8 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont even walk to target
 # timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-2/Humanoid_24-01-10-18/nn/Humanoid.pth"  # bent down, but not as good
 timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth" # bend down properly, dont lift
+# timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_01-02-45-49/nn/Humanoid.pth" # lift, bug include werid head behaviro
+
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_timber.yaml \
@@ -94,7 +99,8 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # bag_s
 # bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont bent down
 # bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-2/Humanoid_24-01-08-37/nn/Humanoid.pth" # dont bent down
-bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts but weight calculations might be off - check reward modifications
+bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts but weight calculations might be off - check reward modifications --> best
+bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_01-02-46-11/nn/Humanoid.pth"  # --> dont life
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_bag.yaml \
