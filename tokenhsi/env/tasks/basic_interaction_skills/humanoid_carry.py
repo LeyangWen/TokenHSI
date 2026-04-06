@@ -1924,7 +1924,7 @@ def compute_handheld_timber_reward(humanoid_rigid_body_pos, humanoid_rigid_body_
     aligned = torch.sum(long_axis_vec_world * z_axis, dim=-1)
     tilt_angle = torch.asin(torch.clamp(torch.abs(aligned), -1.0, 1.0))  # 0 when horizontal, pi/2 when vertical
     timber_notilt_reward = torch.exp(-5.0 * tilt_angle)
-    pickup_reward = 0.8 * box_height_reward + 0.2 * timber_notilt_reward
+    pickup_reward = 0.7 * box_height_reward + 0.3 * timber_notilt_reward
     pickup_reward[box2hand > 0.2] = 0.0
     
     reward = 0.25*hand_pos_reward + 0.75*pickup_reward

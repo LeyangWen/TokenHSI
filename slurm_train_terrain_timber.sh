@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=20g
 #SBATCH --gres=gpu:1
-#SBATCH --time=100:00:00
+#SBATCH --time=24:00:00
 #SBATCH --account=shdpm98
 #SBATCH --partition=spgpu
 ##### END preamble
@@ -59,9 +59,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --random_mode_equal_proportion False \
     --construction_experiment False \
     --motion_file tokenhsi/data/dataset_carry/dataset_MMH_timber.yaml \
-    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-timber/Terrain-timber-boxContinue-3/ \
-    --wandb_name "Terrain-timber-boxContinue-3" \
-    --notes "new reward" \
+    --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/MMH-Terrain-timber/Terrain-timber-4/ \
+    --wandb_name "Terrain-timber-4" \
+    --notes "continue on 3 - 24013624, more timber balance reward" \
     --ergo_coeff 0.2 \
     --unwalkable_obstacles 0 \
     --resume 1 \
