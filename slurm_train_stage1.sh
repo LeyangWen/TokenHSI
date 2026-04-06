@@ -42,9 +42,23 @@ export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:$LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH="/home/wenleyan/projects/isaacgym/python/isaacgym/_bindings/linux-x86_64:$LD_LIBRARY_PATH"
 
 # export MAX_JOBS=1
-python ./tokenhsi/run.py --task HumanoidMMHMerge \
-    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_MMH.yaml \
-    --cfg_env tokenhsi/data/cfg/multi_task/amp_humanoid_MMH_merge_construction.yaml \
+# python ./tokenhsi/run.py --task HumanoidMMHMerge \
+ #    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_MMH.yaml \
+  #   --cfg_env tokenhsi/data/cfg/multi_task/amp_humanoid_MMH_merge_construction.yaml \
+#     --num_envs 4096 \
+#     --headless \
+#     --wandb_project "TokenHSI-Train" \
+#     --wandb_mode "online" \
+#     --output_path /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/Stage1/Stage1-GoodMotion-scratch-train-1/ \
+#     --wandb_name "Try8-Stage1-GoodMotion-scratch-train-1" \
+#     --notes "motion only, v5 humnaoid" \
+#     --resume 1 \
+#     --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_14-22-34-39/nn/Humanoid.pth \
+    
+python ./tokenhsi/run.py --task HumanoidTrajSitCarryClimb \
+    --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task.yaml \
+    --cfg_env tokenhsi/data/cfg/multi_task/amp_humanoid_traj_sit_carry_climb_construction.yaml \
+    --motion_file tokenhsi/data/dataset_loco_sit_carry_climb_VEHS.yaml \
     --num_envs 4096 \
     --headless \
     --wandb_project "TokenHSI-Train" \
@@ -53,4 +67,4 @@ python ./tokenhsi/run.py --task HumanoidMMHMerge \
     --wandb_name "Try8-Stage1-GoodMotion-scratch-train-1" \
     --notes "motion only, v5 humnaoid" \
     --resume 1 \
-    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_10-04-34-17/nn/Humanoid.pth \
+    --checkpoint /scratch/shdpm_root/shdpm0/wenleyan/tokenhsi/Stage1/Stage1-GoodMotion-scratch-train-1/Humanoid_14-22-34-39/nn/Humanoid.pth \
