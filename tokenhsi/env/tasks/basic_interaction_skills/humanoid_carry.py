@@ -1768,7 +1768,7 @@ def compute_handheld_bag_reward(humanoid_rigid_body_pos, humanoid_rigid_body_rot
 
     # Reward for lifting the bag to a comfortable carry height
     carry_height = 0.95  # m — slightly lower than timber, bag is heavier
-    lift_height_reward = torch.exp(-3.0 * torch.clamp_min(carry_height - box_pos[:, 2], 0.0))
+    lift_height_reward = torch.exp(-5.0 * torch.clamp_min(carry_height - box_pos[:, 2], 0.0))
 
     # Keep bag upright during lift (don't let it flop over)
     lift_upright_reward = torch.exp(-5.0 * (1.0 - upright_alignment))
