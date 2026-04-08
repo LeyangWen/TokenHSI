@@ -68,9 +68,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # timber_s
 # timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont even walk to target
 # timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-2/Humanoid_24-01-10-18/nn/Humanoid.pth"  # bent down, but not as good
-timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth" # bend down properly, dont lift
-# timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_01-02-45-49/nn/Humanoid.pth" # lift, bug include werid head behaviro
-
+timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth" # bend down properly, dont lift  --> best
+# timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-boxContinue-3/Humanoid_01-02-45-49/nn/Humanoid.pth" # lift, bug include werid head behavior
+# timber_pth="output/custom_trained/MMH-Terrain-timber/Terrain-timber-4/Humanoid_06-17-01-23/nn/Humanoid.pth"  # bend down properly, dont lift
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_timber.yaml \
@@ -99,8 +99,9 @@ python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
 # bag_s
 # bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-scratch-1/Humanoid_21-16-40-13/nn/Humanoid.pth"  # dont bent down
 # bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-2/Humanoid_24-01-08-37/nn/Humanoid.pth" # dont bent down
-bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts but weight calculations might be off - check reward modifications --> best
-bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_01-02-46-11/nn/Humanoid.pth"  # --> dont life
+# bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_24-01-36-24/nn/Humanoid.pth"  # lifts but weight calculations might be off - check reward modifications --> best
+# bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-3/Humanoid_01-02-46-11/nn/Humanoid.pth"  # --> dont lift
+bag_pth="output/custom_trained/MMH-Terrain-bag/Terrain-bag-boxContinue-4/Humanoid_06-19-24-21/nn/Humanoid.pth"  # good hug, but fast
 python ./tokenhsi/run.py --task HumanoidAdaptCarryGround2Terrain \
     --cfg_train tokenhsi/data/cfg/train/rlg/amp_imitation_task_transformer_multi_task_adapt.yaml \
     --cfg_env tokenhsi/data/cfg/adapt_interaction_skills/amp_humanoid_adapt_carry_ground2terrain_construction_bag.yaml \
