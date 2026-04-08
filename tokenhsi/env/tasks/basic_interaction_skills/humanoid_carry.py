@@ -456,19 +456,19 @@ class HumanoidCarry(Humanoid):
     
         return
     
-def _build_platforms_state_tensors(self):
-    num_actors = self._root_states.shape[0] // self.num_envs
-    self._platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 2, :]
-    self._platform_pos = self._platform_states[..., :3]
-    self._platform_default_pos = self._platform_pos.clone()
-    self._platform_actor_ids = self._humanoid_actor_ids + 2
+    def _build_platforms_state_tensors(self):
+        num_actors = self._root_states.shape[0] // self.num_envs
+        self._platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 2, :]
+        self._platform_pos = self._platform_states[..., :3]
+        self._platform_default_pos = self._platform_pos.clone()
+        self._platform_actor_ids = self._humanoid_actor_ids + 2
 
-    self._tar_platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 3, :]
-    self._tar_platform_pos = self._tar_platform_states[..., :3]
-    self._tar_platform_default_pos = self._tar_platform_pos.clone()
-    self._tar_platform_actor_ids = self._humanoid_actor_ids + 3
+        self._tar_platform_states = self._root_states.view(self.num_envs, num_actors, self._root_states.shape[-1])[..., 3, :]
+        self._tar_platform_pos = self._tar_platform_states[..., :3]
+        self._tar_platform_default_pos = self._tar_platform_pos.clone()
+        self._tar_platform_actor_ids = self._humanoid_actor_ids + 3
 
-    return
+        return
 
     def _build_box_tensors(self):
         num_actors = self.get_num_actors_per_env()
