@@ -16,6 +16,13 @@ class sp_animation():
         self.scene.framerate = framerate
         self.static_meshes = []
 
+        # configure lighting for depth shading (scenepic has no shadow casting)
+        self.main.shading = sp.Shading(
+            ambient_light_color=np.array([0.45, 0.45, 0.45]),
+            directional_light_color=np.array([0.65, 0.65, 0.65]),
+            directional_light_dir=np.array([1.5, 1.0, 2.5]),
+        )
+
     def trimeshes_to_sp(self, trimeshes_list, layer_names):
 
         sp_meshes = []
@@ -42,12 +49,16 @@ class sp_animation():
     def add_frame(self, meshes_list_tm, layer_names):
 
         meshes_list = self.trimeshes_to_sp(meshes_list_tm, layer_names)
-        if not hasattr(self, 'focus_point'):
+        if not hasattr(self, 'camera'):
             look_at = self.static_meshes[0].center_of_mass[np.newaxis, ]
             center = look_at + [8, -8, 5]
             self.camera = sp.Camera(center=center, look_at=look_at, up_dir=[0, 0, 1], fov_y_degrees=30.0, far_crop_distance=40.0)
+            # lock turntable rotation to z-axis so the ground stays horizontal
+            look_at_pos = self.static_meshes[0].center_of_mass.astype(np.float32).reshape(1, 3)
+            self.focus_point = sp.FocusPoint(look_at_pos, np.array([[0., 0., 1.]], dtype=np.float32))
 
         main_frame = self.main.create_frame(meshes=self.static_meshes, camera=self.camera)
+        main_frame.focus_point = self.focus_point
         for i, m in enumerate(meshes_list):
             # self.main.set_layer_settings({layer_names[i]:{}})
             main_frame.add_mesh(m)

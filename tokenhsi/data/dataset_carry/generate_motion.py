@@ -88,7 +88,8 @@ if __name__ == '__main__':
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle*/handle_2*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/handle_carry/*/smpl_params.npy"))
     # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/bad_pickUp/*/smpl_params.npy"))
-    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/S*/*/smpl_params.npy"))
+    # all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/S*/*/smpl_params.npy"))
+    all_files = glob.glob(osp.join(osp.dirname(__file__), "motions/MMH/S01/*_step/smpl_params.npy"))
     
     # TODO: change file
     
@@ -310,6 +311,6 @@ if __name__ == '__main__':
                 rigidbody_global_rot=new_motion.global_rotation,
                 fps=fps,
                 up_axis="z",
-                color=name_to_rgb['AliceBlue'] * 255,
+                color=name_to_rgb['forest green'] * 255,
                 output_path=osp.join(save_dir, "ref_motion_render.html"),
             )

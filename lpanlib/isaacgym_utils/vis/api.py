@@ -1,10 +1,21 @@
 import os
 import os.path as osp
 import trimesh
+import numpy as np
 
 from .utils.sp_animation import sp_animation
 from .utils.xml_parser import parse_geom_elements_from_xml
 from .utils.body_builder import build_complete_body, state2mat
+
+
+def _create_concrete_floor(plane_path, seed=42):
+    """Load the existing plane mesh and paint worn-concrete noise onto its vertex colors."""
+    mesh = trimesh.load(plane_path, process=False)
+    rng = np.random.default_rng(seed)
+    n = len(mesh.vertices)
+    v = rng.integers(108, 122, size=n, dtype=np.uint8)
+    mesh.visual.vertex_colors = np.stack([v, v, v, np.full(n, 255, dtype=np.uint8)], axis=1)
+    return mesh
 
 def vis_motion_use_scenepic_animation(
         asset_filename,
@@ -19,9 +30,9 @@ def vis_motion_use_scenepic_animation(
     # create scenepic animator
     animator = sp_animation(framerate=fps)
 
-    # add ground plane
-    plane = trimesh.load(osp.join(osp.dirname(osp.abspath(__file__)), f"data/plane_{up_axis.lower()}_up.obj"), process=False)
-    animator.add_static_mesh(plane, 'plane')
+    # add concrete-textured ground plane
+    plane_path = osp.join(osp.dirname(osp.abspath(__file__)), f"data/plane_{up_axis.lower()}_up.obj")
+    animator.add_static_mesh(_create_concrete_floor(plane_path), 'plane')
 
     # add human meshes for the motion sequence
     rigidbody_names, rigidbody_meshes = parse_geom_elements_from_xml(asset_filename)

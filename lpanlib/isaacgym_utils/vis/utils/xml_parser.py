@@ -2,6 +2,7 @@ import os
 import trimesh
 import numpy as np
 import xml.dom.minidom
+from scipy.spatial.transform import Rotation as ScipyR
 
 def create_sphere(pos, size, MESH_SIMPLIFY=True):
     if pos == '':
@@ -34,15 +35,17 @@ def create_capsule(from_to, size, MESH_SIMPLIFY=True):
     vec2 = (start_point - end_point)
     height = np.linalg.norm(vec2)
     vec2 = vec2 / np.linalg.norm(vec2)
-    if vec2[2] != 1.0: # (如果方向相同时, 公式不适用, 所以需要判断一下)
+    if vec2[2] == 1.0: # same direction, no rotation needed
+        R_mat = np.identity(3)
+    elif vec2[2] == -1.0: # anti-parallel: 180° rotation around X axis
+        R_mat = np.diag([1.0, -1.0, -1.0])
+    else:
         i = np.identity(3)
         v = np.cross(vec1, vec2)
         v_mat = [[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]]
         s = np.linalg.norm(v)
         c = np.dot(vec1, vec2)
         R_mat = i + v_mat + np.matmul(v_mat, v_mat) * (1 - c) / (s * s)
-    else:
-        R_mat = np.identity(3)
 
     # 做transform
     T = np.identity(4)
@@ -58,18 +61,21 @@ def create_capsule(from_to, size, MESH_SIMPLIFY=True):
 
     return mesh.simplify_quadric_decimation(face_count)
 
-def create_box(pos, size, MESH_SIMPLIFY=True):
+def create_box(pos, size, quat_wxyz=None, MESH_SIMPLIFY=True):
     if pos == '':
         pos = [0, 0, 0]
     else:
         pos = [float(x) for x in pos.split(' ')]
-    
+
     size = [float(x) * 2 for x in size.split(' ')]
-    
-    R = np.identity(4)
-    R[:3, 3] = np.array(pos).T
+
+    T = np.identity(4)
+    if quat_wxyz is not None:
+        w, x, y, z = quat_wxyz
+        T[:3, :3] = ScipyR.from_quat([x, y, z, w]).as_matrix()
+    T[:3, 3] = np.array(pos).T
     mesh = trimesh.creation.box(size)
-    mesh.apply_transform(R)
+    mesh.apply_transform(T)
 
     if MESH_SIMPLIFY:
         face_count = 50
@@ -107,7 +113,9 @@ def parse_geom_elements_from_xml(xml_path, MESH_SIMPLIFY=True): # only support b
                     elif c.getAttribute('type') == 'box':
                         pos = c.getAttribute('pos')
                         size = c.getAttribute('size')
-                        mesh.append(create_box(pos, size, MESH_SIMPLIFY))
+                        quat_str = c.getAttribute('quat')
+                        quat_wxyz = [float(x) for x in quat_str.split()] if quat_str else None
+                        mesh.append(create_box(pos, size, quat_wxyz, MESH_SIMPLIFY))
                     elif c.getAttribute('type') == 'mesh':
                         key = c.getAttribute('mesh')
                         mesh.append(geoms[key])
